@@ -196,6 +196,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
+                assert jsonobject != null;
                 a.nomFr = jsonobject.getString("nomFr");
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -223,7 +224,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchRoute(Response response) throws IOException {
-        ArrayList<GeoPoint> chemin = new ArrayList<>();
         myResponse = response.body().string();
         JSONArray jsonarray = null;
         try {
@@ -339,27 +339,27 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLocationChanged(Location localisation) {
-            String coordonnees = String.format("Latitude : %f - Longitude : %f\n", localisation.getLatitude(), localisation.getLongitude());
+//            String coordonnees = String.format("Latitude : %f - Longitude : %f\n", localisation.getLatitude(), localisation.getLongitude());
             myMap.getController().setCenter(new GeoPoint(localisation.getLatitude(), localisation.getLongitude()));
             myMap.invalidate();
 
-            List<Address> adresses = null;
-            try {
-//                adresses = geocoder.getFromLocation(localisation.getLatitude(), localisation.getLongitude(), 1);
-            } catch (IllegalArgumentException illegalArgumentException) {
-                Log.e("GPS", "erreur " + coordonnees, illegalArgumentException);
-            }
-
-            if (adresses == null || adresses.size() == 0) {
-                Log.e("GPS", "erreur aucune adresse !");
-            } else {
-                Address adresse = adresses.get(0);
-                ArrayList<String> addressFragments = new ArrayList<>();
-
-                for (int i = 0; i <= adresse.getMaxAddressLineIndex(); i++) {
-                    addressFragments.add(adresse.getAddressLine(i));
-                }
-            }
+//            List<Address> adresses = null;
+//            try {
+////                adresses = geocoder.getFromLocation(localisation.getLatitude(), localisation.getLongitude(), 1);
+//            } catch (IllegalArgumentException illegalArgumentException) {
+//                Log.e("GPS", "erreur " + coordonnees, illegalArgumentException);
+//            }
+//
+//            if (adresses == null || adresses.size() == 0) {
+//                Log.e("GPS", "erreur aucune adresse !");
+//            } else {
+//                Address adresse = adresses.get(0);
+//                ArrayList<String> addressFragments = new ArrayList<>();
+//
+//                for (int i = 0; i <= adresse.getMaxAddressLineIndex(); i++) {
+//                    addressFragments.add(adresse.getAddressLine(i));
+//                }
+//            }
         }
 
         @Override
