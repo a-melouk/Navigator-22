@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -41,10 +42,14 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
+import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
+import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.concurrent.Executors;
 
@@ -434,7 +439,33 @@ public class MainActivity extends AppCompatActivity {
 
             roads.add(route);
             mapView.getOverlays().add(roads.get(roads.size() - 1));
-            marker1.setSnippet("Temps restant pour arriver الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes");
+//            String distanceTo = "Distance pour arriver المسافة اللازمة للوصول كم" + road.mLength + " km";
+//            String timeTo = "Temps nécessaire الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes";;
+            DecimalFormat df = new DecimalFormat("#.##");
+            String dx=df.format(road.mDuration/60);
+            String duration=dx;
+            dx=df.format(road.mLength);
+            String dist = dx;
+            String distanceTo = "km "+dist+" كم";
+            String timeTo = "minutes "+duration+" دقيقة";
+            marker1.setSnippet(distanceTo+"\n"+timeTo);
+//            marker1.showInfoWindow();
+
+            marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+                @Override
+                public void onOpen(Object item) {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                    TextView station = (TextView)mView.findViewById(R.id.station);
+                    station.setText(marker1.getTitle());
+                    TextView details = (TextView)mView.findViewById(R.id.details);
+                    details.setText(marker1.getSnippet());
+                }
+
+                @Override
+                public void onClose() {
+
+                }
+            });
             marker1.showInfoWindow();
             mapView.getController().setCenter(marker1.getPosition());
             mapView.getController().setZoom(16.0);
@@ -446,7 +477,7 @@ public class MainActivity extends AppCompatActivity {
 //            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
 //            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
 //            Road road = roadManager.getRoad(route);
-//            RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
+//            RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //            roadManager1.addRequestOption("vehicle=foot");
 //            Road road = roadManager1.getRoad(route);
     }
