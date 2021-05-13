@@ -3,11 +3,14 @@ package com.esi.navigator_22;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -19,11 +22,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -60,22 +69,19 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-    //    private static MapView myMap;
     String urlStations = "http://192.168.1.7:3000/stations";
     String urlChemin = "http://192.168.1.7:3000/polyline";
     private String myResponse;
     int numberOfOverlays = 1;
 
-    LocationManager locationManager;
-    private MapView myMap;
+    MapView myMap;
     ScaleBarOverlay echelle;
     MyLocationNewOverlay mLocationOverlay;
-//    Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
     ImageView currentPosition;
 
     Station a = new Station();
-    GeoPoint defaultPosition = new GeoPoint(35.2023025901554, -0.6302970012564838);
+    GeoPoint defaultPosition = new GeoPoint(35.19115853846664, -0.6298066051152207);
     GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
@@ -87,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<GeoPoint> history = new ArrayList<>();
     int minZ = 2;
     int maxZ = 17;
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle toggle;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -94,10 +102,22 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        OkHttpClient client = new OkHttpClient();
         myMap = findViewById(R.id.map);
         currentPosition = findViewById(R.id.currentPosition);
+        drawerLayout = findViewById(R.id.nav_view);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
+
+
+        OkHttpClient client = new OkHttpClient();
+Log.d("LogGpsMap", String.valueOf(myMap));
         myMap.getController().setCenter(new GeoPoint(35.2023025901554, -0.6302970012564838));
+        myMap.getController().setZoom(15.0);
 
         Runnable downloadMapToCache = () -> runOnUiThread(() -> {
             myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
@@ -107,8 +127,6 @@ public class MainActivity extends AppCompatActivity {
         });
         Executors.newSingleThreadExecutor().execute(downloadMapToCache);
 
-
-        myMap.getController().setZoom(15.0);
 
         if ((ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
@@ -150,37 +168,8 @@ public class MainActivity extends AppCompatActivity {
         myMap.getOverlays().add(mRotationGestureOverlay);
         numberOfOverlays++;
 
-
-//        currentPosition.setOnClickListener(v -> {
-////            currentLocation = history.get(history.size()-1);
-//            locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-//            Criteria criteres = new Criteria();
-//            criteres.setAccuracy(Criteria.ACCURACY_FINE);
-//            criteres.setAltitudeRequired(true);
-//            criteres.setBearingRequired(true);
-//            criteres.setSpeedRequired(true);
-//            criteres.setCostAllowed(true);
-//            criteres.setPowerRequirement(Criteria.POWER_MEDIUM);
-//            fournisseur = locationManager.getBestProvider(criteres, true);
-////            Location l = new Location(GPS_PROVIDER);
-////            ecouteurGPS.onLocationChanged(locationManager.getLastKnownLocation(fournisseur));
-////            ecouteurGPS.onLocationChanged(locationManager.getLastKnownLocation(GPS_PROVIDER));
-////            currentLocation = history.get(history.size());
-//            currentLocation = mLocationOverlay.getMyLocation();
-//            if (currentLocation != null) {
-//                Log.d("LogGps1", "Button clicked and current location = " + currentLocation.toString());
-//            } else {
-//                currentLocation.setLatitude(locationManager.getLastKnownLocation(fournisseur).getLatitude());
-//                currentLocation.setLongitude(locationManager.getLastKnownLocation(fournisseur).getLongitude());
-//                Log.d("LogGps","Using the provider : "+fournisseur);
-//                Log.d("LogGps2", "Button clicked and current location = " + currentLocation.toString());
-//            }
-//            myMap.getController().setCenter(currentLocation);
-//            myMap.getController().setZoom(16.0);
-//        });
-
         currentPosition.setOnClickListener(v -> {
-
+            getLocation();
         });
 
 
@@ -239,91 +228,78 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void getLocation() {
+        if (mLocationOverlay.getMyLocation() != null)
+            currentLocation = mLocationOverlay.getMyLocation();
+        else {
+            currentLocation = defaultPosition;
+            Toast.makeText(getApplicationContext(), "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
+        }
+        myMap.getController().setCenter(currentLocation);
+        myMap.getController().setZoom(16.0);
 
     }
 
-    LocationListener ecouteurGPS = new LocationListener() {
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        toggle.syncState();
+    }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        toggle.onConfigurationChanged(newConfig);
+    }
 
-//        @Override
-//        public void onLocationChanged(Location localisation) {
-//            GeoPoint current = new GeoPoint(0.0, 0.0);
-////            current = mLocationOverlay.getMyLocation();
-//            current.setLatitude(localisation.getLatitude());
-//            current.setLongitude(localisation.getLongitude());
-//            Log.d("LogGps", "Marche et currentlocation2 = " + String.valueOf(current));
-//            myMap.getController().setCenter(current);
-//            myMap.getController().setZoom(16.0);
-//            Log.d("LogGps", "onLocationChanged-252");
-//            myMap.invalidate();
-//
-////            List<Address> adresses = null;
-////            try {
-//////                adresses = geocoder.getFromLocation(localisation.getLatitude(), localisation.getLongitude(), 1);
-////            } catch (IllegalArgumentException illegalArgumentException) {
-////                Log.e("GpsLog", "erreur " + coordonnees, illegalArgumentException);
-////            }
-////
-////            if (adresses == null || adresses.size() == 0) {
-////                Log.e("GpsLog", "erreur aucune adresse !");
-////            } else {
-////                Address adresse = adresses.get(0);
-////                ArrayList<String> addressFragments = new ArrayList<>();
-////
-////                for (int i = 0; i <= adresse.getMaxAddressLineIndex(); i++) {
-////                    addressFragments.add(adresse.getAddressLine(i));
-////                }
-////            }
-//        }
-
-
-        @Override
-        public void onLocationChanged(@NonNull Location location) {
-            currentLocation = new GeoPoint(location);
-            getLocation();
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-//            getLocation();
-            Log.d("LogGps", "Gps status changed");
-        }
-
-        @Override
-        public void onProviderDisabled(@NonNull String provider) {
-            Log.d("LogGps", "Gps disabled");
-        }
-
-        @Override
-        public void onProviderEnabled(@NonNull String provider) {
-            Log.d("LogGps", "Gps enabled");
-//            getLocation();
-        }
-    };
-
-
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        Log.d("LogGps", "onDestroy");
         arreterLocalisation();
     }
 
+    @Override
     public void onResume() {
         super.onResume();
+        Log.d("LogGps", "onResume");
         mLocationOverlay.enableMyLocation();
 //        getLocation();
     }
 
+    @Override
     public void onPause() {
         super.onPause();
-        mLocationOverlay.disableMyLocation();
+        Log.d("LogGps", "onPause");
+//        mLocationOverlay.disableMyLocation();
 //        getLocation();
     }
 
-    private void arreterLocalisation() {
-        if (locationManager != null) {
-            locationManager.removeUpdates(ecouteurGPS);
-            ecouteurGPS = null;
+    @Override
+    public void onBackPressed() {
+        Log.d("LogGps", "Back button pressed");
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.openDrawer(GravityCompat.START);
+            Log.d("LogGpsDrawer", "Fiha");
+        } else {
+//            drawerLayout.closeDrawer(GravityCompat.START);
+            Log.d("LogGpsDrawer", "Fihech");
+            drawerLayout.openDrawer(GravityCompat.START);
+            toggle.setDrawerIndicatorEnabled(true);
+            Log.d("LogGpsDrawer", "Fihech2");
+//            super.onBackPressed();
         }
+//        new AlertDialog.Builder(this)
+//                .setIcon(android.R.drawable.ic_dialog_alert)
+//                .setTitle("Closing Activity")
+//                .setMessage("Are you sure you want to close this activity?")
+//                .setPositiveButton("Yes", (dialog, which) -> super.onBackPressed())
+//                .setNegativeButton("No", null)
+//                .show();
+    }
+
+    private void arreterLocalisation() {
+        mLocationOverlay.disableMyLocation();
+        mLocationOverlay.disableFollowLocation();
     }
 
     private void fetchAllStations(Response response) throws IOException {
@@ -425,7 +401,9 @@ public class MainActivity extends AppCompatActivity {
             }
             ArrayList<GeoPoint> roadPoints = new ArrayList<>();
             roadPoints.add(marker1.getPosition());
-            roadPoints.add(mLocationOverlay.getMyLocation());
+//            roadPoints.add(mLocationOverlay.getMyLocation());
+            getLocation();
+            roadPoints.add((currentLocation));
             OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
             roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
             Road road = roadManager.getRoad(roadPoints);
@@ -442,22 +420,22 @@ public class MainActivity extends AppCompatActivity {
 //            String distanceTo = "Distance pour arriver المسافة اللازمة للوصول كم" + road.mLength + " km";
 //            String timeTo = "Temps nécessaire الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes";;
             DecimalFormat df = new DecimalFormat("#.##");
-            String dx=df.format(road.mDuration/60);
-            String duration=dx;
-            dx=df.format(road.mLength);
+            String dx = df.format(road.mDuration / 60);
+            String duration = dx;
+            dx = df.format(road.mLength);
             String dist = dx;
-            String distanceTo = "km "+dist+" كم";
-            String timeTo = "minutes "+duration+" دقيقة";
-            marker1.setSnippet(distanceTo+"\n"+timeTo);
+            String distanceTo = "km " + dist + " كم";
+            String timeTo = "minutes " + duration + " دقيقة";
+            marker1.setSnippet(distanceTo + "\n" + timeTo);
 //            marker1.showInfoWindow();
 
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
                     InfoWindow.closeAllInfoWindowsOn(myMap);
-                    TextView station = (TextView)mView.findViewById(R.id.station);
+                    TextView station = (TextView) mView.findViewById(R.id.station);
                     station.setText(marker1.getTitle());
-                    TextView details = (TextView)mView.findViewById(R.id.details);
+                    TextView details = (TextView) mView.findViewById(R.id.details);
                     details.setText(marker1.getSnippet());
                 }
 

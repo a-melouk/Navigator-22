@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.esi.navigator_22">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -10,13 +11,16 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Navigator22"
         android:usesCleartextTraffic="true">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity"
+
+            android:theme="@style/Theme.AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

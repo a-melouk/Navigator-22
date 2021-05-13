@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Navigator-22</string>
+    <string name="navigation_draw_open">open nav drawer</string>
+    <string name="navigation_draw_close">close nav drawer</string>
 </resources>
