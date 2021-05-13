@@ -3,17 +3,13 @@ package com.esi.navigator_22;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -22,23 +18,19 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.Toolbar;
-
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -51,9 +43,7 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
-import org.osmdroid.views.overlay.infowindow.BasicInfoWindow;
 import org.osmdroid.views.overlay.infowindow.InfoWindow;
-import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
@@ -68,6 +58,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+//import androidx.appcompat.app.AlertDialog;
+//import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
+
 public class MainActivity extends AppCompatActivity {
     String urlStations = "http://192.168.1.7:3000/stations";
     String urlChemin = "http://192.168.1.7:3000/polyline";
@@ -81,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView currentPosition;
 
     Station a = new Station();
-    GeoPoint defaultPosition = new GeoPoint(35.19115853846664, -0.6298066051152207);
+    GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
@@ -96,7 +89,6 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
 
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,18 +96,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         myMap = findViewById(R.id.map);
         currentPosition = findViewById(R.id.currentPosition);
-        drawerLayout = findViewById(R.id.nav_view);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        OkHttpClient client = new OkHttpClient();
 
+
+        drawerLayout = findViewById(R.id.nav_view);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.setDrawerIndicatorEnabled(true);
         toggle.syncState();
 
 
-        OkHttpClient client = new OkHttpClient();
-Log.d("LogGpsMap", String.valueOf(myMap));
         myMap.getController().setCenter(new GeoPoint(35.2023025901554, -0.6302970012564838));
         myMap.getController().setZoom(15.0);
 
@@ -156,7 +148,6 @@ Log.d("LogGpsMap", String.valueOf(myMap));
         myMap.getOverlays().add(mLocationOverlay);
         numberOfOverlays++;
 //        history.add(mLocationOverlay.getMyLocation());
-
 
         echelle = new ScaleBarOverlay(this.myMap);
         myMap.getOverlays().add(echelle);
@@ -202,7 +193,6 @@ Log.d("LogGpsMap", String.valueOf(myMap));
             @Override
             public void onResponse(Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-
                     fetchAllStations(response);
                 }
             }
@@ -212,26 +202,39 @@ Log.d("LogGpsMap", String.valueOf(myMap));
         StrictMode.setThreadPolicy(policy);
 
         chemin = database.getAllPointsChemin();
-        Log.d("LogDatabase", String.valueOf(chemin.size()));
+        Log.d("LogDatabaseChemin", String.valueOf(chemin.size()));
         tracerChemin(chemin, myMap);
 
         stations = database.getAllStations();
-        Log.d("LogDatabase", String.valueOf(stations.size()));
+        Log.d("LogDatabaseStation", String.valueOf(stations.size()));
         for (int i = 0; i < stations.size(); i++) {
             addMarker(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
             numberOfOverlays++;
         }
-
-
-        Log.d("LogDatabase", database.getAllPointsChemin().toString());
-
     }
 
     void getLocation() {
+/*        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, location -> {
+                    if (location != null) {
+                        Log.d("LogGpsListener", "Fiha");
+                        currentLocation.setLatitude(location.getLatitude());
+                        currentLocation.setLongitude(location.getLongitude());
+                        Log.d("LogGpsListener", currentLocation.toString());
+
+                    } else {
+                        Log.d("LogGpsListener", "Mefihech");
+                        currentLocation = defaultLocation;
+                    }
+                });*/
         if (mLocationOverlay.getMyLocation() != null)
             currentLocation = mLocationOverlay.getMyLocation();
         else {
-            currentLocation = defaultPosition;
+            currentLocation = defaultLocation;
             Toast.makeText(getApplicationContext(), "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
         }
         myMap.getController().setCenter(currentLocation);
@@ -277,24 +280,13 @@ Log.d("LogGpsMap", String.valueOf(myMap));
     @Override
     public void onBackPressed() {
         Log.d("LogGps", "Back button pressed");
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.openDrawer(GravityCompat.START);
-            Log.d("LogGpsDrawer", "Fiha");
-        } else {
-//            drawerLayout.closeDrawer(GravityCompat.START);
-            Log.d("LogGpsDrawer", "Fihech");
-            drawerLayout.openDrawer(GravityCompat.START);
-            toggle.setDrawerIndicatorEnabled(true);
-            Log.d("LogGpsDrawer", "Fihech2");
-//            super.onBackPressed();
-        }
-//        new AlertDialog.Builder(this)
-//                .setIcon(android.R.drawable.ic_dialog_alert)
-//                .setTitle("Closing Activity")
-//                .setMessage("Are you sure you want to close this activity?")
-//                .setPositiveButton("Yes", (dialog, which) -> super.onBackPressed())
-//                .setNegativeButton("No", null)
-//                .show();
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Fermer l'application")
+                .setMessage("Voulez-vous vraiment fermer l'application?")
+                .setPositiveButton("Oui", (dialog, which) -> super.onBackPressed())
+                .setNegativeButton("Non", null)
+                .show();
     }
 
     private void arreterLocalisation() {
