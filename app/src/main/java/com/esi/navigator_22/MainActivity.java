@@ -3,6 +3,7 @@ package com.esi.navigator_22;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -14,10 +15,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -26,6 +29,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -61,7 +66,7 @@ import okhttp3.Response;
 //import androidx.appcompat.app.AlertDialog;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     String urlStations = "http://192.168.1.7:3000/stations";
     String urlChemin = "http://192.168.1.7:3000/polyline";
     private String myResponse;
@@ -79,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = new DbHelper(this);
-
-    ArrayList<Station> stations = new ArrayList<>();
+    static ArrayList<Station> stations = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     ArrayList<Polyline> roads = new ArrayList<>();
     public ArrayList<GeoPoint> history = new ArrayList<>();
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
         currentPosition = findViewById(R.id.currentPosition);
         OkHttpClient client = new OkHttpClient();
 
-
+        setNavigationViewListener();
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -387,6 +391,8 @@ public class MainActivity extends AppCompatActivity {
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
 
+
+
         marker.setOnMarkerClickListener((marker1, mapView) -> {
             if (mapView.getOverlays().size() > numberOfOverlays) {
                 mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
@@ -406,9 +412,6 @@ public class MainActivity extends AppCompatActivity {
 //            RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
 //            roadManager1.addRequestOption("vehicle=foot");
 //            Road road = roadManager1.getRoad(route);
-
-            roads.add(route);
-            mapView.getOverlays().add(roads.get(roads.size() - 1));
 //            String distanceTo = "Distance pour arriver المسافة اللازمة للوصول كم" + road.mLength + " km";
 //            String timeTo = "Temps nécessaire الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes";;
             DecimalFormat df = new DecimalFormat("#.##");
@@ -450,6 +453,23 @@ public class MainActivity extends AppCompatActivity {
 //            RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //            roadManager1.addRequestOption("vehicle=foot");
 //            Road road = roadManager1.getRoad(route);
+    }
+
+
+    @Override
+    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.allSubwayStations:
+                Intent intent = new Intent(MainActivity.this, SubwayStationsActivity.class);
+                MainActivity.this.startActivity(intent);
+        }
+
+        return true;
+    }
+
+    private void setNavigationViewListener() {
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
 
