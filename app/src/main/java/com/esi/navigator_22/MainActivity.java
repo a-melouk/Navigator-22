@@ -72,18 +72,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String myResponse;
     int numberOfOverlays = 1;
 
-    MapView myMap;
+    static MapView myMap;
     ScaleBarOverlay echelle;
     MyLocationNewOverlay mLocationOverlay;
 
     ImageView currentPosition;
 
     Station a = new Station();
-    GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
-    GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
+    public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
+    static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
-    DbHelper database = new DbHelper(this);
+    DbHelper database = DbHelper.getInstance(this);
     static ArrayList<Station> stations = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     ArrayList<Polyline> roads = new ArrayList<>();
@@ -160,11 +160,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(this.myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.setMultiTouchControls(true);
+
         myMap.getOverlays().add(mRotationGestureOverlay);
         numberOfOverlays++;
 
+
         currentPosition.setOnClickListener(v -> {
             getLocation();
+            myMap.getController().setCenter(currentLocation);
+            myMap.getController().setZoom(16.0);
         });
 
 
@@ -202,6 +206,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+
+/*        float[] distance = new float[1];
+        Location.distanceBetween(35.21141638069786,-0.6279895164997695, 35.21534793928003, -0.6310374089929073, distance);
+        Log.d("DetailsA", String.valueOf(distance[0]));*/
+
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -215,34 +225,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addMarker(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
             numberOfOverlays++;
         }
+        Log.d("DatabaseSingleton1", String.valueOf(database.getAllStations().size()));
     }
 
-    void getLocation() {
-/*        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        Log.d("LogGpsListener", "Fiha");
-                        currentLocation.setLatitude(location.getLatitude());
-                        currentLocation.setLongitude(location.getLongitude());
-                        Log.d("LogGpsListener", currentLocation.toString());
-
-                    } else {
-                        Log.d("LogGpsListener", "Mefihech");
-                        currentLocation = defaultLocation;
-                    }
-                });*/
+    public void getLocation() {
         if (mLocationOverlay.getMyLocation() != null)
             currentLocation = mLocationOverlay.getMyLocation();
         else {
             currentLocation = defaultLocation;
             Toast.makeText(getApplicationContext(), "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
         }
-        myMap.getController().setCenter(currentLocation);
-        myMap.getController().setZoom(16.0);
 
     }
 
@@ -268,6 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onResume() {
         super.onResume();
+        myMap.onResume();
         Log.d("LogGps", "onResume");
         mLocationOverlay.enableMyLocation();
 //        getLocation();
@@ -276,6 +269,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void onPause() {
         super.onPause();
+        myMap.onPause();
         Log.d("LogGps", "onPause");
 //        mLocationOverlay.disableMyLocation();
 //        getLocation();
@@ -371,7 +365,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setColor(Color.rgb(230, 138, 0));
         line.setDensityMultiplier(0.1f);
         line.setPoints(chemin);
-        line.setGeodesic(true);
+//        line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
 
     }
@@ -392,20 +386,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mapMarker.getOverlays().add(marker);
 
 
-
         marker.setOnMarkerClickListener((marker1, mapView) -> {
-            if (mapView.getOverlays().size() > numberOfOverlays) {
-                mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
-            }
-            ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-            roadPoints.add(marker1.getPosition());
-//            roadPoints.add(mLocationOverlay.getMyLocation());
-            getLocation();
-            roadPoints.add((currentLocation));
-            OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-            Road road = roadManager.getRoad(roadPoints);
-            Polyline route = RoadManager.buildRoadOverlay(road);
+            tracerRoute(marker1, mapView);
 //            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
 //            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
 //            Road road = roadManager.getRoad(route);
@@ -414,24 +396,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            Road road = roadManager1.getRoad(route);
 //            String distanceTo = "Distance pour arriver المسافة اللازمة للوصول كم" + road.mLength + " km";
 //            String timeTo = "Temps nécessaire الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes";;
-            DecimalFormat df = new DecimalFormat("#.##");
-            String dx = df.format(road.mDuration / 60);
-            String duration = dx;
-            dx = df.format(road.mLength);
-            String dist = dx;
-            String distanceTo = "km " + dist + " كم";
-            String timeTo = "minutes " + duration + " دقيقة";
-            marker1.setSnippet(distanceTo + "\n" + timeTo);
+
+            marker1.setSnippet(tracerRoute(marker1, mapView));
+//            marker1.getSnippet().set
 //            marker1.showInfoWindow();
 
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
                     InfoWindow.closeAllInfoWindowsOn(myMap);
-                    TextView station = (TextView) mView.findViewById(R.id.station);
-                    station.setText(marker1.getTitle());
-                    TextView details = (TextView) mView.findViewById(R.id.details);
-                    details.setText(marker1.getSnippet());
+                    TextView station = mView.findViewById(R.id.nomStation);
+                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
+//                    TextView details = (TextView) mView.findViewById(R.id.route);
+//                    details.setText(marker1.getSnippet());
                 }
 
                 @Override
@@ -455,12 +432,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            Road road = roadManager1.getRoad(route);
     }
 
+    Bundle send = new Bundle();
+    Bundle get = new Bundle();
+    Boolean boolean2;
 
     @Override
     public boolean onNavigationItemSelected(@NotNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.allSubwayStations:
                 Intent intent = new Intent(MainActivity.this, SubwayStationsActivity.class);
+                getLocation();
+                send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+                send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+                intent.putExtras(send);
                 MainActivity.this.startActivity(intent);
         }
 
@@ -468,8 +452,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void setNavigationViewListener() {
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        NavigationView navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    String tracerRoute(Marker marker, MapView mapView) {
+        if (mapView.getOverlays().size() > numberOfOverlays) {
+            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
+        }
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        roadPoints.add(marker.getPosition());
+//            roadPoints.add(mLocationOverlay.getMyLocation());
+        getLocation();
+        roadPoints.add((currentLocation));
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
+//        roadManager1.addRequestOption("vehicle=foot");
+//        Road road = roadManager1.getRoad(route);
+        Polyline route = RoadManager.buildRoadOverlay(road);
+        mapView.getOverlays().add(route);
+
+
+        String duration = format(road.mDuration / 60);
+        String dist = format(road.mLength);
+        String distanceTo = "km " + dist + " كم";
+        String timeTo = "minutes " + duration + " دقيقة";
+        return distanceTo + "\n" + timeTo;
+
+    }
+
+    static String format(double number) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(number);
     }
 
 

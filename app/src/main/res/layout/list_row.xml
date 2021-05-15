@@ -29,22 +29,62 @@
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@id/imageSubway"
         android:maxLines="1"
-        android:text="Nom de la station" />
+        android:text="Nom de la station"
+        />
 
     <TextView
-        android:id="@+id/duration"
+        android:id="@+id/unitLatin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:text="km" />
 
-        android:text="20mn" />
+    <TextView
+        android:id="@+id/unitArab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/distance"
+        android:text="كم" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/duration"
+        android:layout_toLeftOf="@id/unitLatin"
+        android:text="100" />
+
+    <TextView
+        android:id="@+id/unitTimeLatin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance"
         android:layout_alignParentRight="true"
-        android:text="355555km" />
+        android:text="minutes" />
+
+    <TextView
+        android:id="@+id/unitTimeArab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance"
+        android:layout_toLeftOf="@id/time"
+        android:text="دقيقة" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance"
+        android:layout_toLeftOf="@id/unitTimeLatin"
+        android:text="222" />
+
+    <TextView
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:textSize="25dp"
+        android:text="Loading.."
+        android:visibility="invisible" />
 
 </RelativeLayout>
