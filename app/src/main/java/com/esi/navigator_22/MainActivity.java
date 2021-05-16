@@ -1,27 +1,35 @@
 package com.esi.navigator_22;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Criteria;
-import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -39,13 +47,13 @@ import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
+import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.Executors;
 
 import okhttp3.Call;
@@ -54,38 +62,55 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+//import androidx.appcompat.app.AlertDialog;
+//import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     String urlStations = "http://192.168.1.7:3000/stations";
     String urlChemin = "http://192.168.1.7:3000/polyline";
     private String myResponse;
+    int numberOfOverlays = 1;
 
-    LocationManager locationManager;
-    private String fournisseur;
-    private MapView myMap;
+    static MapView myMap;
     ScaleBarOverlay echelle;
     MyLocationNewOverlay mLocationOverlay;
-//    Geocoder geocoder = new Geocoder(this, Locale.getDefault());
 
     ImageView currentPosition;
 
     Station a = new Station();
-    GeoPoint currentLocation = new GeoPoint(35.2023025901554, -0.6302970012564838);
+    public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
+    static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
-    DbHelper database = new DbHelper(this);
-
-    ArrayList<Station> stations = new ArrayList<>();
+    DbHelper database = DbHelper.getInstance(this);
+    static ArrayList<Station> stations = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     int minZ = 2;
     int maxZ = 17;
+    DrawerLayout drawerLayout;
+    ActionBarDrawerToggle toggle;
 
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         myMap = findViewById(R.id.map);
+        currentPosition = findViewById(R.id.currentPosition);
+        OkHttpClient client = new OkHttpClient();
+
+        setNavigationViewListener();
+        drawerLayout = findViewById(R.id.nav_view);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.setDrawerIndicatorEnabled(true);
+        toggle.syncState();
+
+
+        myMap.getController().setCenter(new GeoPoint(35.2023025901554, -0.6302970012564838));
+        myMap.getController().setZoom(15.0);
 
         Runnable downloadMapToCache = () -> runOnUiThread(() -> {
             myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
@@ -95,13 +120,22 @@ public class MainActivity extends AppCompatActivity {
         });
         Executors.newSingleThreadExecutor().execute(downloadMapToCache);
 
-        currentPosition = findViewById(R.id.currentPosition);
 
-        OkHttpClient client = new OkHttpClient();
+        if ((ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED)) {
+            Log.d("LogGps", "Permissions granted");
+        } else {
+            // You can directly ask for the permission.
+            Toast.makeText(this, "Localisation requise", Toast.LENGTH_LONG).show();
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1
+            );
+//            getLocation();
+            Log.d("LogGps", "Permission check");
+        }
 
-        myMap.getController().setZoom(15.0);
-        getLocation();
-        myMap.getController().setCenter(currentLocation);
 
         mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getApplicationContext()), this.myMap);
         Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.person, null);
@@ -109,22 +143,32 @@ public class MainActivity extends AppCompatActivity {
         if (currentDraw != null) {
             currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
         }
-        mLocationOverlay.enableMyLocation();
         mLocationOverlay.setDirectionArrow(currentIcon, currentIcon);
-        echelle = new ScaleBarOverlay(this.myMap);
+        mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
+        mLocationOverlay.getMyLocation();
+        myMap.getOverlays().add(mLocationOverlay);
+        numberOfOverlays++;
+//        history.add(mLocationOverlay.getMyLocation());
+
+        echelle = new ScaleBarOverlay(myMap);
         myMap.getOverlays().add(echelle);
+        numberOfOverlays++;
         myMap.setMultiTouchControls(true);
         RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(this.myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.setMultiTouchControls(true);
+
         myMap.getOverlays().add(mRotationGestureOverlay);
-        myMap.getOverlays().add(mLocationOverlay);
+        numberOfOverlays++;
+
 
         currentPosition.setOnClickListener(v -> {
             getLocation();
             myMap.getController().setCenter(currentLocation);
-            Log.d("Offline", "Button clicked");
+            myMap.getController().setZoom(16.0);
         });
+
 
         Request request = new Request.Builder()
                 .url(urlChemin)
@@ -153,31 +197,97 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResponse(Call call, @NotNull Response response) throws IOException {
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-
                     fetchAllStations(response);
                 }
             }
         });
 
+
+/*        float[] distance = new float[1];
+        Location.distanceBetween(35.21141638069786,-0.6279895164997695, 35.21534793928003, -0.6310374089929073, distance);
+        Log.d("DetailsA", String.valueOf(distance[0]));*/
+
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        stations = database.getAllStations();
-        Log.d("databaseTest", String.valueOf(stations.size()));
-        for (int i = 0; i < stations.size(); i++) {
-            addMarker(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
-        }
-
         chemin = database.getAllPointsChemin();
-        Log.d("databaseTest", String.valueOf(chemin.size()));
+        Log.d("LogDatabaseChemin", String.valueOf(chemin.size()));
         tracerChemin(chemin, myMap);
 
+        stations = database.getAllStations();
+        Log.d("LogDatabaseStation", String.valueOf(stations.size()));
+        for (int i = 0; i < stations.size(); i++) {
+            addMarker(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
+            numberOfOverlays++;
+        }
+        Log.d("DatabaseSingleton1", String.valueOf(database.getAllStations().size()));
+    }
 
-        Log.d("databaseTest", database.getAllPointsChemin().toString());
+    public void getLocation() {
+        if (mLocationOverlay.getMyLocation() != null)
+            currentLocation = mLocationOverlay.getMyLocation();
+        else {
+            currentLocation = defaultLocation;
+            Toast.makeText(getApplicationContext(), "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
+        }
 
+    }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        toggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        toggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("LogGps", "onDestroy");
+        arreterLocalisation();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        myMap.onResume();
+        Log.d("LogGps", "onResume");
+        mLocationOverlay.enableMyLocation();
+//        getLocation();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        myMap.onPause();
+        Log.d("LogGps", "onPause");
+//        mLocationOverlay.disableMyLocation();
+//        getLocation();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d("LogGps", "Back button pressed");
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Fermer l'application")
+                .setMessage("Voulez-vous vraiment fermer l'application?")
+                .setPositiveButton("Oui", (dialog, which) -> super.onBackPressed())
+                .setNegativeButton("Non", null)
+                .show();
+    }
+
+    private void arreterLocalisation() {
+        mLocationOverlay.disableMyLocation();
+        mLocationOverlay.disableFollowLocation();
     }
 
     private void fetchAllStations(Response response) throws IOException {
@@ -196,6 +306,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
             try {
+                assert jsonobject != null;
                 a.nomFr = jsonobject.getString("nomFr");
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -223,7 +334,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchRoute(Response response) throws IOException {
-        ArrayList<GeoPoint> chemin = new ArrayList<>();
         myResponse = response.body().string();
         JSONArray jsonarray = null;
         try {
@@ -253,149 +363,125 @@ public class MainActivity extends AppCompatActivity {
         line.setColor(Color.rgb(230, 138, 0));
         line.setDensityMultiplier(0.1f);
         line.setPoints(chemin);
-        line.setGeodesic(true);
+//        line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
+
     }
 
-    public void addMarker(Context context, MapView map, GeoPoint position, String nomStation, String nomAr) {
+    @SuppressLint("UseCompatLoadingForDrawables")
+    public void addMarker(Context context, MapView mapMarker, GeoPoint positionMarker, String nomFrMarker, String nomArMarker) {
         float[] distance = new float[1];
-        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), position.getLatitude(), position.getLongitude(), distance);
-        Marker marker = new Marker(map);
-        marker.setPosition(position);
+        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
+        Marker marker = new Marker(mapMarker);
+        marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setAlpha(1);
         marker.setIcon(context.getResources().getDrawable(R.drawable.ic_tramway));
-        marker.setSnippet(nomStation + "\n " + " " + nomAr);
+//        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
+        marker.setTitle(nomFrMarker + " " + nomArMarker);
         marker.setPanToView(true);
-        map.invalidate();
-        map.getOverlays().add(marker);
+        mapMarker.invalidate();
+        mapMarker.getOverlays().add(marker);
 
-        marker.setOnMarkerClickListener((marker1, map1) -> {
-            map1.invalidate();
-            ArrayList<GeoPoint> route = new ArrayList<>();
-            route.add(currentLocation);
-            route.add(new GeoPoint(marker1.getPosition()));
-            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
-            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-            Road road = roadManager.getRoad(route);
+
+        marker.setOnMarkerClickListener((marker1, mapView) -> {
+            tracerRoute(marker1, mapView);
+//            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
+//            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//            Road road = roadManager.getRoad(route);
 //            RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
 //            roadManager1.addRequestOption("vehicle=foot");
 //            Road road = roadManager1.getRoad(route);
-            Log.d("Routing", road.mDuration / 60 + "mn | " + road.mLength);
-            marker.setSnippet(nomStation + "\n " + " " + nomAr + "\n" + "Duration: " + road.mDuration / 60 + "minutes\nDistance: " + road.mLength + "km");
-//            Toast.makeText(this, "Duration: "+road.mDuration/60+"minutes\nDistance: "+road.mLength+"km", Toast.LENGTH_LONG).show();
-            Polyline roadOverlay = RoadManager.buildRoadOverlay(road);
-            map1.getOverlays().add(roadOverlay);
-            map1.invalidate();
+//            String distanceTo = "Distance pour arriver المسافة اللازمة للوصول كم" + road.mLength + " km";
+//            String timeTo = "Temps nécessaire الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes";;
 
-//            Toast.makeText(MainActivity.this,
-//                    marker1.getSnippet() +
-//                            "\n" + String.valueOf(distance[0]) + "m",
-//                    Toast.LENGTH_SHORT).show();
-            marker.showInfoWindow();
-            map1.getController().setCenter(marker1.getPosition());
-            map1.getController().setZoom(16);
-            map1.invalidate();
-            return false;
-        });
-    }
+            marker1.setSnippet(tracerRoute(marker1, mapView));
+//            marker1.getSnippet().set
+//            marker1.showInfoWindow();
 
-    void getLocation() {
-        if (locationManager == null) {
-            locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-
-            Criteria criteres = new Criteria();
-            criteres.setAccuracy(Criteria.ACCURACY_FINE);
-            criteres.setAltitudeRequired(true);
-            criteres.setBearingRequired(true);
-            criteres.setSpeedRequired(true);
-            criteres.setCostAllowed(true);
-            criteres.setPowerRequirement(Criteria.POWER_MEDIUM);
-            fournisseur = locationManager.getBestProvider(criteres, true);
-        }
-        if (fournisseur != null) {
-            // dernière position connue
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Log.d("Offline", "no permissions !");
-
-                return;
-            }
-            Location localisation = locationManager.getLastKnownLocation(fournisseur);
-            if (localisation != null) {
-                // on notifie la localisation
-                ecouteurGPS.onLocationChanged(localisation);
-                currentLocation.setLatitude(localisation.getLatitude());
-                currentLocation.setLongitude(localisation.getLongitude());
-            }
-
-            Log.d("Offline", "Marche");
-        } else {
-            Log.d("status", "GPS desactive");
-        }
-    }
-
-    LocationListener ecouteurGPS = new LocationListener() {
-
-        @Override
-        public void onLocationChanged(Location localisation) {
-            String coordonnees = String.format("Latitude : %f - Longitude : %f\n", localisation.getLatitude(), localisation.getLongitude());
-            myMap.getController().setCenter(new GeoPoint(localisation.getLatitude(), localisation.getLongitude()));
-            myMap.invalidate();
-
-            List<Address> adresses = null;
-            try {
-//                adresses = geocoder.getFromLocation(localisation.getLatitude(), localisation.getLongitude(), 1);
-            } catch (IllegalArgumentException illegalArgumentException) {
-                Log.e("GPS", "erreur " + coordonnees, illegalArgumentException);
-            }
-
-            if (adresses == null || adresses.size() == 0) {
-                Log.e("GPS", "erreur aucune adresse !");
-            } else {
-                Address adresse = adresses.get(0);
-                ArrayList<String> addressFragments = new ArrayList<>();
-
-                for (int i = 0; i <= adresse.getMaxAddressLineIndex(); i++) {
-                    addressFragments.add(adresse.getAddressLine(i));
+            marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+                @Override
+                public void onOpen(Object item) {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                    TextView station = mView.findViewById(R.id.nomStation);
+                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
+//                    TextView details = (TextView) mView.findViewById(R.id.route);
+//                    details.setText(marker1.getSnippet());
                 }
-            }
-        }
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+                @Override
+                public void onClose() {
 
-        }
+                }
+            });
+            marker1.showInfoWindow();
+            mapView.getController().setCenter(marker1.getPosition());
+            mapView.getController().setZoom(16.0);
+            return true;
+        });
 
-        @Override
-        public void onProviderDisabled(@NonNull String provider) {
+//        marker.setOnMarkerClickListener((marker1, map1) -> {
 
-        }
+//            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
+//            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//            Road road = roadManager.getRoad(route);
+//            RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//            roadManager1.addRequestOption("vehicle=foot");
+//            Road road = roadManager1.getRoad(route);
+    }
 
-        @Override
-        public void onProviderEnabled(@NonNull String provider) {
-
-        }
-    };
+    Bundle send = new Bundle();
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        arreterLocalisation();
-    }
-
-    public void onResume() {
-        super.onResume();
-    }
-
-    public void onPause() {
-        super.onPause();
-    }
-
-    private void arreterLocalisation() {
-        if (locationManager != null) {
-            locationManager.removeUpdates(ecouteurGPS);
-            ecouteurGPS = null;
+    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
+        if (item.getItemId() == R.id.allSubwayStations) {
+            Intent intent = new Intent(MainActivity.this, SubwayStationsActivity.class);
+            getLocation();
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
         }
+
+        return true;
     }
+
+    private void setNavigationViewListener() {
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    String tracerRoute(Marker marker, MapView mapView) {
+        if (mapView.getOverlays().size() > numberOfOverlays) {
+            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
+        }
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        roadPoints.add(marker.getPosition());
+//            roadPoints.add(mLocationOverlay.getMyLocation());
+        getLocation();
+        roadPoints.add((currentLocation));
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
+//        roadManager1.addRequestOption("vehicle=foot");
+//        Road road = roadManager1.getRoad(route);
+        Polyline route = RoadManager.buildRoadOverlay(road);
+        mapView.getOverlays().add(route);
+
+
+        String duration = format(road.mDuration / 60);
+        String dist = format(road.mLength);
+        String distanceTo = "km " + dist + " كم";
+        String timeTo = "minutes " + duration + " دقيقة";
+        return distanceTo + "\n" + timeTo;
+
+    }
+
+    static String format(double number) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(number);
+    }
+
+
 }

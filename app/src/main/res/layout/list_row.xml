@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+
+    <ImageView
+        android:id="@+id/imageSubway"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:src="@drawable/ic_tramway" />
+
+    <TextView
+        android:id="@+id/nomAr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/imageSubway"
+        android:maxLines="2"
+        android:text="اسم المحطة"
+        android:textSize="15dp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/nomFr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/nomAr"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/imageSubway"
+        android:maxLines="1"
+        android:text="Nom de la station"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/unitLatin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="  km"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/unitArab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/distance"
+        android:text="  كم"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/unitLatin"
+        android:maxLength="5"
+        android:text="100"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/unitTimeLatin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance"
+        android:layout_alignParentRight="true"
+        android:text="  minutes"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/unitTimeArab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance"
+        android:layout_toLeftOf="@id/time"
+        android:text="  دقيقة"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/distance"
+        android:layout_toLeftOf="@id/unitTimeLatin"
+        android:maxLength="5"
+        android:text="222"
+        android:textSize="15dp"/>
+
+
+</RelativeLayout>
