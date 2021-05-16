@@ -19,7 +19,9 @@
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@id/imageSubway"
         android:maxLines="2"
-        android:text="اسم المحطة" />
+        android:text="اسم المحطة"
+        android:textSize="15dp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/nomFr"
@@ -30,28 +32,32 @@
         android:layout_toRightOf="@id/imageSubway"
         android:maxLines="1"
         android:text="Nom de la station"
-        />
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/unitLatin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:text="km" />
+        android:text="  km"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/unitArab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/distance"
-        android:text="كم" />
+        android:text="  كم"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/distance"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/unitLatin"
-        android:text="100" />
+        android:maxLength="5"
+        android:text="100"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/unitTimeLatin"
@@ -59,7 +65,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/distance"
         android:layout_alignParentRight="true"
-        android:text="minutes" />
+        android:text="  minutes"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/unitTimeArab"
@@ -67,7 +74,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/distance"
         android:layout_toLeftOf="@id/time"
-        android:text="دقيقة" />
+        android:text="  دقيقة"
+        android:textSize="15dp" />
 
     <TextView
         android:id="@+id/time"
@@ -75,16 +83,9 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/distance"
         android:layout_toLeftOf="@id/unitTimeLatin"
-        android:text="222" />
+        android:maxLength="5"
+        android:text="222"
+        android:textSize="15dp"/>
 
-    <TextView
-        android:id="@+id/loading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:textSize="25dp"
-        android:text="Loading.."
-        android:visibility="invisible" />
 
 </RelativeLayout>

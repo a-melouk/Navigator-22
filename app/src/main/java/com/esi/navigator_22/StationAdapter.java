@@ -11,8 +11,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 public class StationAdapter extends ArrayAdapter<StationDetails> {
@@ -29,6 +27,7 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
         convertView = layoutInflater.inflate(mResource, parent, false);
         ImageView subway = convertView.findViewById(R.id.imageSubway);
@@ -36,6 +35,7 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
         TextView nomFr = convertView.findViewById(R.id.nomFr);
         TextView distance = convertView.findViewById(R.id.distance);
         TextView time = convertView.findViewById(R.id.time);
+
 
         subway.setImageResource(R.drawable.ic_tramway);
         nomAr.setText(getItem(position).nomAr);

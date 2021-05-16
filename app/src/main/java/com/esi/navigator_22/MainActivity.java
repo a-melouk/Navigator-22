@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -86,8 +85,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DbHelper database = DbHelper.getInstance(this);
     static ArrayList<Station> stations = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
-    ArrayList<Polyline> roads = new ArrayList<>();
-    public ArrayList<GeoPoint> history = new ArrayList<>();
     int minZ = 2;
     int maxZ = 17;
     DrawerLayout drawerLayout;
@@ -148,12 +145,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         mLocationOverlay.setDirectionArrow(currentIcon, currentIcon);
         mLocationOverlay.enableMyLocation();
+        mLocationOverlay.enableFollowLocation();
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
         numberOfOverlays++;
 //        history.add(mLocationOverlay.getMyLocation());
 
-        echelle = new ScaleBarOverlay(this.myMap);
+        echelle = new ScaleBarOverlay(myMap);
         myMap.getOverlays().add(echelle);
         numberOfOverlays++;
         myMap.setMultiTouchControls(true);
@@ -199,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             @Override
-            public void onResponse(Call call, @NotNull Response response) throws IOException {
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     fetchAllStations(response);
                 }
@@ -433,19 +431,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     Bundle send = new Bundle();
-    Bundle get = new Bundle();
-    Boolean boolean2;
 
     @Override
     public boolean onNavigationItemSelected(@NotNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.allSubwayStations:
-                Intent intent = new Intent(MainActivity.this, SubwayStationsActivity.class);
-                getLocation();
-                send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
-                send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
-                intent.putExtras(send);
-                MainActivity.this.startActivity(intent);
+        if (item.getItemId() == R.id.allSubwayStations) {
+            Intent intent = new Intent(MainActivity.this, SubwayStationsActivity.class);
+            getLocation();
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
         }
 
         return true;
