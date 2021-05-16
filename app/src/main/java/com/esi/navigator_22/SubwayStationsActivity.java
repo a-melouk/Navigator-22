@@ -100,9 +100,6 @@ public class SubwayStationsActivity extends AppCompatActivity {
 //        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //        roadManager1.addRequestOption("vehicle=foot");
 //        Road road = roadManager1.getRoad(roadPoints);
-//        RoadManager roadManager2 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-//        roadManager2.addRequestOption("vehicle=car");
-//        Road road2 = roadManager2.getRoad(roadPoints);
         distanceTo = road.mLength;
         timeTo = road.mDuration / 60;
     }
@@ -111,16 +108,16 @@ public class SubwayStationsActivity extends AppCompatActivity {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add(geoPoint);
         roadPoints.add((currentLocation));
-//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-//        roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
-//        Road road = roadManager.getRoad(roadPoints);
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
+        Road road = roadManager.getRoad(roadPoints);
 
 //        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //        roadManager1.addRequestOption("vehicle=foot");
 //        Road road = roadManager1.getRoad(roadPoints);
-        RoadManager roadManager2 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-        roadManager2.addRequestOption("vehicle=car");
-        Road road = roadManager2.getRoad(roadPoints);
+//        RoadManager roadManager2 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        roadManager2.addRequestOption("vehicle=car");
+//        Road road = roadManager2.getRoad(roadPoints);
         distanceTo = road.mLength;
         timeTo = road.mDuration / 60;
     }

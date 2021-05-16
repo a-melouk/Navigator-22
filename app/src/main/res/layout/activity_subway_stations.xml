@@ -7,15 +7,15 @@
     android:padding="5dp"
     tools:context=".SubwayStationsActivity">
 
-    <TextView
-        android:id="@+id/nom"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:paddingLeft="5dp"
-        android:text="Nom de la station"
-        android:textSize="20dp"
-        android:textStyle="bold"/>
+<!--    <TextView-->
+<!--        android:id="@+id/nom"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_alignParentLeft="true"-->
+<!--        android:paddingLeft="5dp"-->
+<!--        android:text="Nom de la station"-->
+<!--        android:textSize="20dp"-->
+<!--        android:textStyle="bold"/>-->
 
     <TextView
         android:id="@+id/whileLoading"
@@ -30,8 +30,8 @@
 
 
     <ListView
+        android:paddingTop="3dp"
         android:id="@+id/listSubway"
-        android:layout_below="@id/nom"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
