@@ -66,8 +66,8 @@ import okhttp3.Response;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String urlStations = "http://192.168.1.7:3000/stations";
-    String urlChemin = "http://192.168.1.7:3000/polyline";
+    String urlStations = "http://192.168.1.15:3000/stations";
+    String urlChemin = "http://192.168.1.15:3000/polyline";
     private String myResponse;
     int numberOfOverlays = 1;
 
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
-        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getApplicationContext()), this.myMap);
+        mLocationOverlay = new MyLocationNewOverlay(new GpsMyLocationProvider(getApplicationContext()), myMap);
         Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.person, null);
         Bitmap currentIcon = null;
         if (currentDraw != null) {
@@ -145,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         mLocationOverlay.setDirectionArrow(currentIcon, currentIcon);
         mLocationOverlay.enableMyLocation();
-        mLocationOverlay.enableFollowLocation();
+
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
         numberOfOverlays++;
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(echelle);
         numberOfOverlays++;
         myMap.setMultiTouchControls(true);
-        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(this.myMap);
+        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.setMultiTouchControls(true);
 
@@ -386,27 +386,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         marker.setOnMarkerClickListener((marker1, mapView) -> {
             tracerRoute(marker1, mapView);
-//            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
-//            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-//            Road road = roadManager.getRoad(route);
-//            RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
-//            roadManager1.addRequestOption("vehicle=foot");
-//            Road road = roadManager1.getRoad(route);
-//            String distanceTo = "Distance pour arriver المسافة اللازمة للوصول كم" + road.mLength + " km";
-//            String timeTo = "Temps nécessaire الوقت اللازم للوصول دقيقة" + road.mDuration / 60 + " minutes";;
-
             marker1.setSnippet(tracerRoute(marker1, mapView));
-//            marker1.getSnippet().set
-//            marker1.showInfoWindow();
-
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
                     InfoWindow.closeAllInfoWindowsOn(myMap);
                     TextView station = mView.findViewById(R.id.nomStation);
                     station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
-//                    TextView details = (TextView) mView.findViewById(R.id.route);
-//                    details.setText(marker1.getSnippet());
                 }
 
                 @Override
@@ -419,15 +405,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mapView.getController().setZoom(16.0);
             return true;
         });
-
-//        marker.setOnMarkerClickListener((marker1, map1) -> {
-
-//            OSRMRoadManager roadManager = new OSRMRoadManager(this, "22-Transport");
-//            roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-//            Road road = roadManager.getRoad(route);
-//            RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-//            roadManager1.addRequestOption("vehicle=foot");
-//            Road road = roadManager1.getRoad(route);
     }
 
     Bundle send = new Bundle();
@@ -435,7 +412,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NotNull MenuItem item) {
         if (item.getItemId() == R.id.allSubwayStations) {
-            Intent intent = new Intent(MainActivity.this, SubwayStationsActivity.class);
+            Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
+            getLocation();
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
+        }
+        else if (item.getItemId() == R.id.closestStations) {
+            Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
             getLocation();
             send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
@@ -456,19 +441,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
         }
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        roadPoints.add(marker.getPosition());
-//            roadPoints.add(mLocationOverlay.getMyLocation());
         getLocation();
         roadPoints.add((currentLocation));
+        roadPoints.add(marker.getPosition());
+
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
         Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager1 = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
-//        roadManager1.addRequestOption("vehicle=foot");
-//        Road road = roadManager1.getRoad(route);
+//        RoadManager roadManager = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
+//        roadManager.addRequestOption("vehicle=foot");
+//        Road road = roadManager.getRoad(route);
+        
         Polyline route = RoadManager.buildRoadOverlay(road);
         mapView.getOverlays().add(route);
-
 
         String duration = format(road.mDuration / 60);
         String dist = format(road.mLength);
