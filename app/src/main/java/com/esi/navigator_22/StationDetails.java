@@ -14,6 +14,17 @@ public class StationDetails extends Station {
         this.timeTo=timeTo;
     }
 
+
+    public StationDetails(String nomFr, String nomAr,GeoPoint coordonnees, double distanceTo,double timeTo) {
+        this.nomFr = nomFr;
+        this.nomAr = nomAr;
+        this.coordonnees=coordonnees;
+        this.distanceTo = distanceTo;
+        this.timeTo=timeTo;
+    }
+
+
+
     public StationDetails() {
     }
 

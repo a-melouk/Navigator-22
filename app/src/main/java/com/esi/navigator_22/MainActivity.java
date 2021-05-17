@@ -90,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
 
+    double distanceTo, timeTo;
+
+    GeoPoint aa,bb,cc,dd;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
         numberOfOverlays++;
+        getLocation();
 //        history.add(mLocationOverlay.getMyLocation());
 
         echelle = new ScaleBarOverlay(myMap);
@@ -161,12 +166,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         myMap.getOverlays().add(mRotationGestureOverlay);
         numberOfOverlays++;
+        addMarker(this, myMap, new GeoPoint(35.193098292023045, -0.6314308284717288));
+        numberOfOverlays++;
 
 
         currentPosition.setOnClickListener(v -> {
             getLocation();
             myMap.getController().setCenter(currentLocation);
             myMap.getController().setZoom(16.0);
+            travelPlanner();
         });
 
 
@@ -220,18 +228,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         stations = database.getAllStations();
         Log.d("LogDatabaseStation", String.valueOf(stations.size()));
         for (int i = 0; i < stations.size(); i++) {
-            addMarker(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
+            addStation(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
             numberOfOverlays++;
         }
         Log.d("DatabaseSingleton1", String.valueOf(database.getAllStations().size()));
+
     }
 
     public void getLocation() {
-        if (mLocationOverlay.getMyLocation() != null)
+        if (mLocationOverlay.getMyLocation() != null) {
+            Log.d("DatabaseSingleton1","fiha");
             currentLocation = mLocationOverlay.getMyLocation();
-        else {
+        } else {
+            Log.d("DatabaseSingleton1","mafihech");
             currentLocation = defaultLocation;
-            Toast.makeText(getApplicationContext(), "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),
+                    "Using default location, consider enabling the GPS and restarting the app",
+                    Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -368,8 +381,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    public void addMarker(Context context, MapView mapMarker, GeoPoint positionMarker) {
+        float[] distance = new float[1];
+        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
+        Marker marker = new Marker(mapMarker);
+        marker.setPosition(positionMarker);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAlpha(1);
+//        marker.setIcon(context.getResources().getDrawable(R.drawable.ic_tramway));
+        marker.setSnippet("Custom station");
+//        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
+        marker.setPanToView(true);
+        mapMarker.invalidate();
+        mapMarker.getOverlays().add(marker);
+
+
+        marker.setOnMarkerClickListener((marker1, mapView) -> {
+            tracerRoute(marker1, mapView);
+            marker1.setSnippet(tracerRoute(marker1, mapView));
+            marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+                @Override
+                public void onOpen(Object item) {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                    TextView station = mView.findViewById(R.id.nomStation);
+                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
+                }
+
+                @Override
+                public void onClose() {
+
+                }
+            });
+            marker1.showInfoWindow();
+            mapView.getController().setCenter(marker1.getPosition());
+            mapView.getController().setZoom(16.0);
+            return true;
+        });
+    }
+
     @SuppressLint("UseCompatLoadingForDrawables")
-    public void addMarker(Context context, MapView mapMarker, GeoPoint positionMarker, String nomFrMarker, String nomArMarker) {
+    public void addStation(Context context, MapView mapMarker, GeoPoint positionMarker, String nomFrMarker, String nomArMarker) {
         float[] distance = new float[1];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
@@ -418,8 +469,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
             intent.putExtras(send);
             MainActivity.this.startActivity(intent);
-        }
-        else if (item.getItemId() == R.id.closestStations) {
+        } else if (item.getItemId() == R.id.closestStations) {
             Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
             getLocation();
             send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
@@ -451,7 +501,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        RoadManager roadManager = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
 //        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(route);
-        
+
+        Polyline route = RoadManager.buildRoadOverlay(road);
+        mapView.getOverlays().add(route);
+
+        String duration = format(road.mDuration / 60);
+        String dist = format(road.mLength);
+        String distanceTo = "km " + dist + " كم";
+        String timeTo = "minutes " + duration + " دقيقة";
+        return distanceTo + "\n" + timeTo;
+
+    }
+
+    String tracerShortestRoute(Marker marker, MapView mapView) {
+        if (mapView.getOverlays().size() > numberOfOverlays) {
+            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
+        }
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((currentLocation));
+
+        roadPoints.add(marker.getPosition());
+
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
+//        roadManager.addRequestOption("vehicle=foot");
+//        Road road = roadManager.getRoad(route);
+
         Polyline route = RoadManager.buildRoadOverlay(road);
         mapView.getOverlays().add(route);
 
@@ -467,6 +545,216 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DecimalFormat df = new DecimalFormat("#.##");
         return df.format(number);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //new GeoPoint(35.193098292023045, -0.6314308284717288)
+
+    private void travelPlanner() {
+        GeoPoint destinationStation = new GeoPoint(35.193098292023045, -0.6314308284717288);
+        StationDetails closestSubwayStationGetOn;
+        StationDetails closestSubwayStationGetOff;
+        GeoPoint temp = new GeoPoint(0.0,0.0 );
+        ArrayList<StationDetails> stationss = new ArrayList<>();
+
+        ArrayList<GeoPoint> points = new ArrayList<>();
+        points.add(currentLocation);
+        database.deleteAllNearestSubwayStation();
+        for (int i = 0; i < MainActivity.stations.size(); i++) {
+            StationDetails availableStation = new StationDetails();
+            availableStation.nomAr = MainActivity.stations.get(i).nomAr;
+            availableStation.nomFr = MainActivity.stations.get(i).nomFr;
+            availableStation.coordonnees = stations.get(i).coordonnees;
+            getRouteOnlineOnFootDetails(currentLocation,MainActivity.stations.get(i).coordonnees);
+            availableStation.distanceTo = distanceTo;
+            availableStation.timeTo = timeTo;
+            stationss.add(availableStation);
+            sort(stationss);
+            database.addNearStation(availableStation);
+        }
+        closestSubwayStationGetOn = stationss.get(0);
+        Log.d("TravelPlanner11",closestSubwayStationGetOn.toString());
+//        temp.setLatitude(closestSubwayStationGetOn.coordonnees.getLatitude());
+//        temp.setLongitude(closestSubwayStationGetOn.coordonnees.getLongitude());
+//        points.add(temp);
+        stationss.clear();
+        for (int i = 0; i < MainActivity.stations.size(); i++) {
+            database.deleteAllNearestSubwayStation();
+
+            StationDetails availableStation = new StationDetails();
+            availableStation.nomAr = MainActivity.stations.get(i).nomAr;
+            availableStation.nomFr = MainActivity.stations.get(i).nomFr;
+            getRouteOnlineOnFootDetails(destinationStation,MainActivity.stations.get(i).coordonnees);
+            availableStation.coordonnees=stations.get(i).coordonnees;
+            availableStation.distanceTo = distanceTo;
+            availableStation.timeTo = timeTo;
+            stationss.add(availableStation);
+            sort(stationss);
+        }
+        closestSubwayStationGetOff = stationss.get(0);
+
+        Log.d("TravelPlanner12",closestSubwayStationGetOff.toString());
+        drawRouteOnlineOnFoot(currentLocation,closestSubwayStationGetOn.coordonnees);
+        drawRouteOnlineOnFoot(closestSubwayStationGetOff.coordonnees,destinationStation);
+
+//        temp.setLatitude(closestSubwayStationGetOff.coordonnees.getLatitude());
+//        temp.setLongitude(closestSubwayStationGetOff.coordonnees.getLongitude());
+//        points.add(temp);
+        points.add(destinationStation);
+
+        Log.d("TravelPlanner",points.toString());
+        Log.d("TestClosest", String.valueOf(closestSubwayStationGetOn));
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
+        float[] distance = new float[2];
+        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
+                targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
+        return distance[0] / 1000;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void getRouteOnlineOnFootDetails(GeoPoint start, GeoPoint end) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        roadManager1.addRequestOption("vehicle=foot");
+//        Road road = roadManager1.getRoad(roadPoints);
+        if (road.mLength == 0) {
+            distanceTo = getDistanceOffline(currentLocation, end);
+            Log.d("allStation", "Unavailable " + getDistanceOffline(currentLocation, end));
+            timeTo = 99999.0;
+        } else {
+            Log.d("allStation", "Available " + getDistanceOffline(currentLocation, end));
+            distanceTo = road.mLength;
+            timeTo = road.mDuration / 60;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    private void drawRouteOnlineOnFoot(GeoPoint start, GeoPoint end) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        roadPoints.add((start));
+        roadPoints.add(end);
+
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+        Road road = roadManager.getRoad(roadPoints);
+
+        Polyline route = RoadManager.buildRoadOverlay(road);
+        myMap.getOverlays().add(route);
+
+//        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        roadManager1.addRequestOption("vehicle=foot");
+//        Road road = roadManager1.getRoad(roadPoints);
+
+    }
+
+    void sort(ArrayList<StationDetails> stationDetails) {
+        StationDetails temp;
+        for (int i = 0; i < stationDetails.size() - 1; i++)
+            for (int j = i; j < stationDetails.size(); j++) {
+                if (stationDetails.get(i).distanceTo > stationDetails.get(j).distanceTo) {
+                    temp = stationDetails.get(i);
+                    stationDetails.set(i, stationDetails.get(j));
+                    stationDetails.set(j, temp);
+                }
+            }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
