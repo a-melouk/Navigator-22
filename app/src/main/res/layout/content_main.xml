@@ -9,8 +9,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:layout_constraintHeight_percent="0.9"
-        app:layout_constraintTop_toTopOf="@+id/horGuideline10"
-    />
+        app:layout_constraintTop_toTopOf="@+id/horGuideline10" />
     <!--    app:layout_constraintTop_toTopOf="@+id/horGuideline10"-->
 
     <androidx.constraintlayout.widget.Guideline
@@ -44,6 +43,14 @@
         android:src="@drawable/map"
         app:layout_constraintBottom_toTopOf="@+id/horGuideline2"
         app:layout_constraintStart_toStartOf="@+id/verGuideline2" />
+
+    <ImageView
+        android:id="@+id/current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/map"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline2"
+        app:layout_constraintStart_toStartOf="@+id/verGuideline10" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline2"

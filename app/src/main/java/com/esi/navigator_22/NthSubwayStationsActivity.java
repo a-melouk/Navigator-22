@@ -52,10 +52,10 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_subway_stations);
 
         t1 = new Thread(() -> {
-//            Log.d("databaseDelete1", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
+            Log.d("databaseDelete11", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
 
-            Log.d("databaseDelete5", String.valueOf(getDistanceOffline(new GeoPoint(35.2065503, -0.6191647), new GeoPoint(0.0, 0.0))));
+            Log.d("databaseDelete12", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
 
 //            MainActivity.stations.size()
             for (int i = 0; i < MainActivity.stations.size(); i++) {
@@ -63,7 +63,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
                 StationDetails availableStation = new StationDetails();
                 availableStation.nomAr = MainActivity.stations.get(i).nomAr;
                 availableStation.nomFr = MainActivity.stations.get(i).nomFr;
-                getDistanceOnlineOnFoot(MainActivity.stations.get(i).coordonnees);
+                getRouteOnlineOnFoot(MainActivity.stations.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
 
@@ -87,7 +87,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
             list.add(temp.get(i));
     }
 
-    private void getDistanceOnlineOnFoot(GeoPoint geoPoint) {
+    private void getRouteOnlineOnFoot(GeoPoint geoPoint) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add((currentLocation));
 
@@ -111,7 +111,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
         }
     }
 
-    private void getDistanceOnlineOnVehicle(GeoPoint geoPoint) {
+    private void getRouteOnlineOnVehicle(GeoPoint geoPoint) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add(geoPoint);
         roadPoints.add((currentLocation));

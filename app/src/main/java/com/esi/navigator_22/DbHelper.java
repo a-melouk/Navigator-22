@@ -218,7 +218,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<StationDetails> getNthNearestSubStationsSortedByDistance(int number) {
         ArrayList<StationDetails> stationDetails = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_TIME+" LIMIT "+number;
+        String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_DISTANCE+" LIMIT "+number;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
@@ -229,6 +229,23 @@ public class DbHelper extends SQLiteOpenHelper {
                 s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
                 s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
                 stationDetails.add(s);
+            } while (c.moveToNext());
+        }
+        return stationDetails;
+    }
+    public StationDetails getNearestSubStationsSortedByDistance() {
+        StationDetails stationDetails = new StationDetails();
+        String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_DISTANCE+" LIMIT "+1;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                StationDetails s = new StationDetails();
+                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
+                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
+                s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
+                s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
+                stationDetails = s;
             } while (c.moveToNext());
         }
         return stationDetails;

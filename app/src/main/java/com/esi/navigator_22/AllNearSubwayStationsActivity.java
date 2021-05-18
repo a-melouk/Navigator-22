@@ -1,6 +1,5 @@
 package com.esi.navigator_22;
 
-import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,10 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
-import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -55,8 +52,9 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_subway_stations);
 
         t1 = new Thread(() -> {
-//            Log.d("databaseDelete1", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
+            Log.d("databaseDelete13", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
+            Log.d("databaseDelete14", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
 
             Log.d("databaseDelete5", String.valueOf(getDistanceOffline(new GeoPoint(35.2065503, -0.6191647), new GeoPoint(0.0, 0.0))));
 
@@ -66,17 +64,21 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
                 StationDetails availableStation = new StationDetails();
                 availableStation.nomAr = MainActivity.stations.get(i).nomAr;
                 availableStation.nomFr = MainActivity.stations.get(i).nomFr;
-                getDistanceOnlineOnFoot(MainActivity.stations.get(i).coordonnees);
+                getRouteOnlineOnFoot(MainActivity.stations.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
-
+                Log.d("Distance offline", MainActivity.stations.get(i).nomFr + " | " + getDistanceOffline(currentLocation, MainActivity.stations.get(i).coordonnees));
                 database.addNearStation(availableStation);
+
 
             }
 
             runOnUiThread(() -> {
-                for (int i = 0; i < MainActivity.stations.size(); i++)
+                for (int i = 0; i < MainActivity.stations.size(); i++) {
                     myList.add(database.getAllNearestSubStationsSortedByDistance().get(i));
+                    Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo);
+
+                }
                 loading.setVisibility(View.INVISIBLE);
                 listView.setAdapter(stationAdapter);
             });
@@ -85,16 +87,16 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         t1.start();
     }
 
-    private void getDistanceOnlineOnFoot(GeoPoint geoPoint) {
+
+
+    private void getRouteOnlineOnFoot(GeoPoint geoPoint) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add((currentLocation));
-
         roadPoints.add(geoPoint);
 
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
         Road road = roadManager.getRoad(roadPoints);
-
 //        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //        roadManager1.addRequestOption("vehicle=foot");
 //        Road road = roadManager1.getRoad(roadPoints);
@@ -108,16 +110,18 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             distanceTo = road.mLength;
             timeTo = road.mDuration / 60;
         }
+
     }
 
-    private void getDistanceOnlineOnVehicle(GeoPoint geoPoint) {
+
+    private void getRouteOnlineOnVehicle(GeoPoint geoPoint) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add(geoPoint);
         roadPoints.add((currentLocation));
+
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
         roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
         Road road = roadManager.getRoad(roadPoints);
-
 //        RoadManager roadManager2 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //        roadManager2.addRequestOption("vehicle=car");
 //        Road road = roadManager2.getRoad(roadPoints);
@@ -126,14 +130,12 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         timeTo = road.mDuration / 60;
     }
 
+
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
         float[] distance = new float[2];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
         return distance[0] / 1000;
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-    }
+
 }
