@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.MenuItem;
@@ -29,6 +30,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.esi.navigator_22.utils.FileUtils;
+import com.esi.navigator_22.utils.MapListener;
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +41,12 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-import org.osmdroid.tileprovider.cachemanager.CacheManager;
+import org.osmdroid.tileprovider.modules.ArchiveFileFactory;
+import org.osmdroid.tileprovider.modules.IArchiveFile;
+import org.osmdroid.tileprovider.modules.OfflineTileProvider;
+import org.osmdroid.tileprovider.tilesource.FileBasedTileSource;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.util.BoundingBox;
+import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -51,10 +57,11 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.concurrent.Executors;
+import java.util.Set;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -65,11 +72,12 @@ import okhttp3.Response;
 //import androidx.appcompat.app.AlertDialog;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FileUtils.FileTransferListener {
     String urlStations = "http://192.168.1.15:3000/stations";
     String urlChemin = "http://192.168.1.15:3000/polyline";
     private String myResponse;
     int numberOfOverlays = 1;
+
 
     static MapView myMap;
     ScaleBarOverlay echelle;
@@ -82,17 +90,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
+
     DbHelper database = DbHelper.getInstance(this);
     static ArrayList<Station> stations = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
-    int minZ = 2;
-    int maxZ = 17;
+    double minZ = 14.0;
+    double maxZ = 19.0;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
 
     double distanceTo, timeTo;
-
-    GeoPoint aa,bb,cc,dd;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -114,15 +121,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         myMap.getController().setCenter(new GeoPoint(35.2023025901554, -0.6302970012564838));
+        myMap.setMinZoomLevel(minZ);
+        myMap.setMaxZoomLevel(maxZ);
         myMap.getController().setZoom(15.0);
-
-        Runnable downloadMapToCache = () -> runOnUiThread(() -> {
-            myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
-            CacheManager cacheManager = new CacheManager(myMap);
-            BoundingBox bbox = new BoundingBox(35.2287, -0.6058, 35.1775, -0.6630);
-            cacheManager.downloadAreaAsync(getApplicationContext(), bbox, minZ, maxZ);
-        });
-        Executors.newSingleThreadExecutor().execute(downloadMapToCache);
+        setMapOfflineSource();
+//        Runnable downloadMapToCache = () -> runOnUiThread(() -> {
+//            myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
+//            CacheManager cacheManager = new CacheManager(myMap);
+//            BoundingBox bbox = new BoundingBox(35.2287, -0.6058, 35.1775, -0.6630);
+//            cacheManager.downloadAreaAsync(getApplicationContext(), bbox, minZ, maxZ);
+//        });
+//        Executors.newSingleThreadExecutor().execute(downloadMapToCache);
 
 
         if ((ContextCompat.checkSelfPermission(
@@ -166,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         myMap.getOverlays().add(mRotationGestureOverlay);
         numberOfOverlays++;
-        addMarker(this, myMap, new GeoPoint(35.193098292023045, -0.6314308284717288));
+        addMarker(this, myMap, new GeoPoint(35.19181984486152, -0.6367524076104305));
         numberOfOverlays++;
 
 
@@ -233,14 +242,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         Log.d("DatabaseSingleton1", String.valueOf(database.getAllStations().size()));
 
+
     }
 
     public void getLocation() {
         if (mLocationOverlay.getMyLocation() != null) {
-            Log.d("DatabaseSingleton1","fiha");
+            Log.d("DatabaseSingleton1", "fiha");
             currentLocation = mLocationOverlay.getMyLocation();
         } else {
-            Log.d("DatabaseSingleton1","mafihech");
+            Log.d("DatabaseSingleton1", "mafihech");
             currentLocation = defaultLocation;
             Toast.makeText(getApplicationContext(),
                     "Using default location, consider enabling the GPS and restarting the app",
@@ -547,38 +557,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     //new GeoPoint(35.193098292023045, -0.6314308284717288)
 
     private void travelPlanner() {
-        GeoPoint destinationStation = new GeoPoint(35.193098292023045, -0.6314308284717288);
+        GeoPoint destinationStation = new GeoPoint(35.19181984486152, -0.6367524076104305);
         StationDetails closestSubwayStationGetOn;
         StationDetails closestSubwayStationGetOff;
-        GeoPoint temp = new GeoPoint(0.0,0.0 );
+        GeoPoint temp = new GeoPoint(0.0, 0.0);
         ArrayList<StationDetails> stationss = new ArrayList<>();
 
         ArrayList<GeoPoint> points = new ArrayList<>();
@@ -589,7 +574,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             availableStation.nomAr = MainActivity.stations.get(i).nomAr;
             availableStation.nomFr = MainActivity.stations.get(i).nomFr;
             availableStation.coordonnees = stations.get(i).coordonnees;
-            getRouteOnlineOnFootDetails(currentLocation,MainActivity.stations.get(i).coordonnees);
+            getRouteOnlineOnFootDetails(currentLocation, MainActivity.stations.get(i).coordonnees);
             availableStation.distanceTo = distanceTo;
             availableStation.timeTo = timeTo;
             stationss.add(availableStation);
@@ -597,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             database.addNearStation(availableStation);
         }
         closestSubwayStationGetOn = stationss.get(0);
-        Log.d("TravelPlanner11",closestSubwayStationGetOn.toString());
+        Log.d("TravelPlanner11", closestSubwayStationGetOn.toString());
 //        temp.setLatitude(closestSubwayStationGetOn.coordonnees.getLatitude());
 //        temp.setLongitude(closestSubwayStationGetOn.coordonnees.getLongitude());
 //        points.add(temp);
@@ -608,8 +593,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             StationDetails availableStation = new StationDetails();
             availableStation.nomAr = MainActivity.stations.get(i).nomAr;
             availableStation.nomFr = MainActivity.stations.get(i).nomFr;
-            getRouteOnlineOnFootDetails(destinationStation,MainActivity.stations.get(i).coordonnees);
-            availableStation.coordonnees=stations.get(i).coordonnees;
+            getRouteOnlineOnFootDetails(destinationStation, MainActivity.stations.get(i).coordonnees);
+            availableStation.coordonnees = stations.get(i).coordonnees;
             availableStation.distanceTo = distanceTo;
             availableStation.timeTo = timeTo;
             stationss.add(availableStation);
@@ -617,33 +602,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         closestSubwayStationGetOff = stationss.get(0);
 
-        Log.d("TravelPlanner12",closestSubwayStationGetOff.toString());
-        drawRouteOnlineOnFoot(currentLocation,closestSubwayStationGetOn.coordonnees);
-        drawRouteOnlineOnFoot(closestSubwayStationGetOff.coordonnees,destinationStation);
+        Log.d("TravelPlanner12", closestSubwayStationGetOff.toString());
+        drawRouteOnlineOnFoot(currentLocation, closestSubwayStationGetOn.coordonnees);
+        numberOfOverlays++;
+        drawRouteOnlineOnFoot(closestSubwayStationGetOff.coordonnees, destinationStation);
+        numberOfOverlays++;
 
 //        temp.setLatitude(closestSubwayStationGetOff.coordonnees.getLatitude());
 //        temp.setLongitude(closestSubwayStationGetOff.coordonnees.getLongitude());
 //        points.add(temp);
         points.add(destinationStation);
 
-        Log.d("TravelPlanner",points.toString());
+        Log.d("TravelPlanner", points.toString());
         Log.d("TestClosest", String.valueOf(closestSubwayStationGetOn));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
@@ -652,27 +624,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
         return distance[0] / 1000;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private void getRouteOnlineOnFootDetails(GeoPoint start, GeoPoint end) {
@@ -697,19 +648,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timeTo = road.mDuration / 60;
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private void drawRouteOnlineOnFoot(GeoPoint start, GeoPoint end) {
@@ -742,19 +680,74 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
     }
 
+    private void setMapOfflineSource() {
+        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/osmdroid/");
+        if (f.exists()) {
+            File[] list = f.listFiles();
+            if (list != null) {
+                for (File aList : list) {
+                    if (aList.isDirectory()) {
+                        continue;
+                    }
+                    String name = aList.getName().toLowerCase();
+                    if (!name.contains(".")) {
+                        continue;
+                    }
+                    name = name.substring(name.lastIndexOf(".") + 1);
+                    if (name.length() == 0) {
+                        continue;
+                    }
+                    if (ArchiveFileFactory.isFileExtensionRegistered(name)) {
+                        try {
+                            OfflineTileProvider tileProvider = new OfflineTileProvider(new SimpleRegisterReceiver(this),
+                                    new File[]{aList});
+                            myMap.setTileProvider(tileProvider);
+                            String source = "";
+                            IArchiveFile[] archives = tileProvider.getArchives();
+                            if (archives.length > 0) {
+                                Set<String> tileSources = archives[0].getTileSources();
+                                if (!tileSources.isEmpty()) {
+                                    source = tileSources.iterator().next();
+                                    myMap.setTileSource(FileBasedTileSource.getSource(source));
+                                } else {
+                                    myMap.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+                                }
+                            } else {
+                                myMap.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+                            }
+                            myMap.invalidate();
+                            return;
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        } else {
+            if (!FileUtils.isMapFileExists()) {
+                FileUtils.copyMapFilesToSdCard(this, new FileUtils.FileTransferListener() {
+                    @Override
+                    public void onLoadFailed() {
+                        //WARNING Fabric.getInstance() custom event
 
+                    }
 
+                    @Override
+                    public void onLoadSuccess() {
+                        setMapOfflineSource();
+                    }
+                });
+            }
+        }
+    }
 
+    @Override
+    public void onLoadFailed() {
 
+    }
 
+    @Override
+    public void onLoadSuccess() {
 
-
-
-
-
-
-
-
-
-
+    }
 }
