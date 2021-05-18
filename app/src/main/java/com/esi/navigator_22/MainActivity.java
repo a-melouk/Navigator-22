@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorLong;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -84,12 +85,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     MyLocationNewOverlay mLocationOverlay;
 
     ImageView currentPosition;
+    ImageView closestStation;
 
     Station a = new Station();
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
-
 
     DbHelper database = DbHelper.getInstance(this);
     static ArrayList<Station> stations = new ArrayList<>();
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         myMap = findViewById(R.id.map);
         currentPosition = findViewById(R.id.currentPosition);
+        closestStation = findViewById(R.id.current);
         OkHttpClient client = new OkHttpClient();
 
         setNavigationViewListener();
@@ -138,12 +140,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
+                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED)) {
             Log.d("LogGps", "Permissions granted");
         } else {
             // You can directly ask for the permission.
             Toast.makeText(this, "Localisation requise", Toast.LENGTH_LONG).show();
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1
             );
 //            getLocation();
             Log.d("LogGps", "Permission check");
@@ -162,7 +168,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
         numberOfOverlays++;
-        getLocation();
 //        history.add(mLocationOverlay.getMyLocation());
 
         echelle = new ScaleBarOverlay(myMap);
@@ -180,6 +185,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         currentPosition.setOnClickListener(v -> {
+            getLocation();
+            myMap.getController().setCenter(currentLocation);
+            myMap.getController().setZoom(16.0);
+        });
+
+        closestStation.setOnClickListener(v -> {
             getLocation();
             myMap.getController().setCenter(currentLocation);
             myMap.getController().setZoom(16.0);
@@ -239,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (int i = 0; i < stations.size(); i++) {
             addStation(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
             numberOfOverlays++;
+
         }
         Log.d("DatabaseSingleton1", String.valueOf(database.getAllStations().size()));
 
@@ -472,16 +484,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NotNull MenuItem item) {
+        getLocation();
         if (item.getItemId() == R.id.allSubwayStations) {
             Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
-            getLocation();
             send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
             intent.putExtras(send);
             MainActivity.this.startActivity(intent);
         } else if (item.getItemId() == R.id.closestStations) {
             Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
-            getLocation();
             send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
             intent.putExtras(send);

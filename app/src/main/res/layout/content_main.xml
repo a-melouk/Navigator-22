@@ -44,6 +44,14 @@
         app:layout_constraintBottom_toTopOf="@+id/horGuideline2"
         app:layout_constraintStart_toStartOf="@+id/verGuideline2" />
 
+    <ImageView
+        android:id="@+id/current"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/map"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline2"
+        app:layout_constraintStart_toStartOf="@+id/verGuideline10" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline2"
         android:layout_width="wrap_content"
