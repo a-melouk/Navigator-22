@@ -3,69 +3,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/scrollView1"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/map"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintHeight_percent="0.9"
-        app:layout_constraintTop_toTopOf="@+id/horGuideline10" />
-    <!--    app:layout_constraintTop_toTopOf="@+id/horGuideline10"-->
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horGuideline10"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.01" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horGuideline95"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/verGuideline10"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1"
-
-        />
+        <LinearLayout
+            android:id="@+id/stations_menu"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
 
 
-    <ImageView
-        android:id="@+id/currentPosition"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/map"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline2"
-        app:layout_constraintStart_toStartOf="@+id/verGuideline2" />
+            <TextView
+                android:id="@+id/button1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="station1" />
 
-    <ImageView
-        android:id="@+id/current"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/map"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline2"
-        app:layout_constraintStart_toStartOf="@+id/verGuideline10" />
+            <TextView
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="station2" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horGuideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.80" />
+            <TextView
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="station3" />
 
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/verGuideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.75" />
+        </LinearLayout>
+
+
+    </ScrollView>
+
+    <include layout="@layout/map"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

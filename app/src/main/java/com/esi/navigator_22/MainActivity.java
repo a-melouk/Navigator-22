@@ -13,15 +13,20 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.StrictMode;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.ColorLong;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
@@ -31,8 +36,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.esi.navigator_22.utils.FileUtils;
-import com.esi.navigator_22.utils.MapListener;
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
@@ -42,12 +45,9 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-import org.osmdroid.tileprovider.modules.ArchiveFileFactory;
-import org.osmdroid.tileprovider.modules.IArchiveFile;
-import org.osmdroid.tileprovider.modules.OfflineTileProvider;
-import org.osmdroid.tileprovider.tilesource.FileBasedTileSource;
+import org.osmdroid.tileprovider.cachemanager.CacheManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
-import org.osmdroid.tileprovider.util.SimpleRegisterReceiver;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -58,11 +58,10 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.concurrent.Executors;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -73,7 +72,7 @@ import okhttp3.Response;
 //import androidx.appcompat.app.AlertDialog;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, FileUtils.FileTransferListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     String urlStations = "http://192.168.1.15:3000/stations";
     String urlChemin = "http://192.168.1.15:3000/polyline";
     private String myResponse;
@@ -98,18 +97,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     double minZ = 14.0;
     double maxZ = 19.0;
     DrawerLayout drawerLayout;
+    LinearLayout scroll_menu;
     ActionBarDrawerToggle toggle;
+    int boucle = 1000500;
+    int[] ids = new int[22];
 
     double distanceTo, timeTo;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ids = new int[]{R.id.station1, R.id.station2, R.id.station3, R.id.station4, R.id.station5, R.id.station6, R.id.station7, R.id.station8, R.id.station9,
+                R.id.station10, R.id.station11, R.id.station12, R.id.station13, R.id.station14, R.id.station15, R.id.station16, R.id.station17, R.id.station18, R.id.station19, R.id.station20, R.id.station21, R.id.station22};
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         myMap = findViewById(R.id.map);
         currentPosition = findViewById(R.id.currentPosition);
         closestStation = findViewById(R.id.current);
+        scroll_menu = findViewById(R.id.stations_menu);
         OkHttpClient client = new OkHttpClient();
 
         setNavigationViewListener();
@@ -126,24 +131,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.setMinZoomLevel(minZ);
         myMap.setMaxZoomLevel(maxZ);
         myMap.getController().setZoom(15.0);
-        setMapOfflineSource();
-//        Runnable downloadMapToCache = () -> runOnUiThread(() -> {
-//            myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
-//            CacheManager cacheManager = new CacheManager(myMap);
-//            BoundingBox bbox = new BoundingBox(35.2287, -0.6058, 35.1775, -0.6630);
-//            cacheManager.downloadAreaAsync(getApplicationContext(), bbox, minZ, maxZ);
-//        });
-//        Executors.newSingleThreadExecutor().execute(downloadMapToCache);
+        myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
+//        setMapOfflineSource();
+        Runnable downloadMapToCache = () -> runOnUiThread(() -> {
+            CacheManager cacheManager = new CacheManager(myMap);
+            BoundingBox bbox = new BoundingBox(35.2287, -0.6058, 35.1775, -0.6630);
+            cacheManager.downloadAreaAsync(this, bbox, 12, 17);
+        });
+        Executors.newSingleThreadExecutor().execute(downloadMapToCache);
 
 
         if ((ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
                 this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(
-                this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED)) {
             Log.d("LogGps", "Permissions granted");
         } else {
@@ -164,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         mLocationOverlay.setDirectionArrow(currentIcon, currentIcon);
         mLocationOverlay.enableMyLocation();
+
 
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
@@ -245,16 +247,101 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("LogDatabaseChemin", String.valueOf(chemin.size()));
         tracerChemin(chemin, myMap);
 
-        stations = database.getAllStations();
+        stations = database.getAllSubwayStations();
         Log.d("LogDatabaseStation", String.valueOf(stations.size()));
         for (int i = 0; i < stations.size(); i++) {
             addStation(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
             numberOfOverlays++;
 
         }
-        Log.d("DatabaseSingleton1", String.valueOf(database.getAllStations().size()));
+        Log.d("DatabaseSingleton1", String.valueOf(database.getAllSubwayStations().size()));
 
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        ArrayList<Station> stations = database.getAllSubwayStations();
+        SubMenu tramwaySubMenu = menu.addSubMenu("Stations de Tramway");
+        SubMenu busSubMenu = menu.addSubMenu("Stations de bus");
+
+        for (int i = 0; i < 7; i++) {
+            busSubMenu.addSubMenu("Ligne " + i);
+        }
+        for (int i = 0; i < stations.size(); i++) {
+            tramwaySubMenu.add(R.id.subway_stations, ids[i], 1, stations.get(i).nomFr + " " + stations.get(i).nomAr);
+        }
+//        int i = 0;
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station1, 1, stations.get(0).nomFr + " " + stations.get(0).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station2, 1, stations.get(1).nomFr + " " + stations.get(1).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station3, 1, stations.get(2).nomFr + " " + stations.get(2).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station4, 1, stations.get(3).nomFr + " " + stations.get(3).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station5, 1, stations.get(4).nomFr + " " + stations.get(4).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station6, 1, stations.get(5).nomFr + " " + stations.get(5).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station7, 1, stations.get(6).nomFr + " " + stations.get(6).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station8, 1, stations.get(7).nomFr + " " + stations.get(7).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station9, 1, stations.get(8).nomFr + " " + stations.get(8).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station10, 1, stations.get(9).nomFr + " " + stations.get(9).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station11, 1, stations.get(10).nomFr + " " + stations.get(10).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station12, 1, stations.get(11).nomFr + " " + stations.get(11).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station13, 1, stations.get(12).nomFr + " " + stations.get(12).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station14, 1, stations.get(13).nomFr + " " + stations.get(13).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station15, 1, stations.get(14).nomFr + " " + stations.get(14).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station16, 1, stations.get(15).nomFr + " " + stations.get(15).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station17, 1, stations.get(16).nomFr + " " + stations.get(16).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station18, 1, stations.get(17).nomFr + " " + stations.get(17).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station19, 1, stations.get(18).nomFr + " " + stations.get(18).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station20, 1, stations.get(19).nomFr + " " + stations.get(19).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station21, 1, stations.get(20).nomFr + " " + stations.get(20).nomAr);
+//        tramwaySubMenu.add(R.id.subway_stations, R.id.station22, 1, stations.get(21).nomFr + " " + stations.get(21).nomAr);
+
+
+        MenuInflater menuInflater = getMenuInflater();
+
+        menuInflater.inflate(R.menu.stations_sba, menu);
+
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.d("ItemSeelected", stations.get(0).nomFr);
+        getLocation();
+        switch (item.getItemId()) {
+            case R.id.station1:
+                Log.d("ItemSelected1", String.valueOf(item.getTitle().toString().equals(stations.get(0).nomFr + " " + stations.get(0).nomAr)));
+                cleanMap(myMap);
+                drawRouteOnlineOnFoot(currentLocation, stations.get(0).coordonnees);
+                numberOfOverlays++;
+                break;
+            case R.id.station2:
+                cleanMap(myMap);
+                Log.d("ItemSelected2", String.valueOf(item.getTitle().toString().equals(stations.get(1).nomFr + " " + stations.get(1).nomAr)));
+                drawRouteOnlineOnFoot(currentLocation, stations.get(1).coordonnees);
+                numberOfOverlays++;
+                break;
+            case R.id.station3:
+                cleanMap(myMap);
+                Log.d("ItemSelected3", String.valueOf(item.getTitle().toString().equals(stations.get(2).nomFr + " " + stations.get(2).nomAr)));
+                drawRouteOnlineOnFoot(currentLocation, stations.get(2).coordonnees);
+                numberOfOverlays++;
+                break;
+            case R.id.station4:
+                cleanMap(myMap);
+                Log.d("ItemSelected4", String.valueOf(item.getTitle().toString().equals(stations.get(3).nomFr + " " + stations.get(3).nomAr)));
+                drawRouteOnlineOnFoot(currentLocation, stations.get(3).coordonnees);
+                numberOfOverlays++;
+                break;
+            case R.id.station5:
+                Log.d("ItemSelected5", String.valueOf(item.getTitle().toString().equals(stations.get(4).nomFr + " " + stations.get(4).nomAr)));
+                cleanMap(myMap);
+                drawRouteOnlineOnFoot(currentLocation, stations.get(4).coordonnees);
+                numberOfOverlays++;
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public void getLocation() {
@@ -508,9 +595,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     String tracerRoute(Marker marker, MapView mapView) {
-        if (mapView.getOverlays().size() > numberOfOverlays) {
-            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
-        }
+        cleanMap(mapView);
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         getLocation();
         roadPoints.add((currentLocation));
@@ -691,74 +776,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
     }
 
-    private void setMapOfflineSource() {
-        File f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/osmdroid/");
-        if (f.exists()) {
-            File[] list = f.listFiles();
-            if (list != null) {
-                for (File aList : list) {
-                    if (aList.isDirectory()) {
-                        continue;
-                    }
-                    String name = aList.getName().toLowerCase();
-                    if (!name.contains(".")) {
-                        continue;
-                    }
-                    name = name.substring(name.lastIndexOf(".") + 1);
-                    if (name.length() == 0) {
-                        continue;
-                    }
-                    if (ArchiveFileFactory.isFileExtensionRegistered(name)) {
-                        try {
-                            OfflineTileProvider tileProvider = new OfflineTileProvider(new SimpleRegisterReceiver(this),
-                                    new File[]{aList});
-                            myMap.setTileProvider(tileProvider);
-                            String source = "";
-                            IArchiveFile[] archives = tileProvider.getArchives();
-                            if (archives.length > 0) {
-                                Set<String> tileSources = archives[0].getTileSources();
-                                if (!tileSources.isEmpty()) {
-                                    source = tileSources.iterator().next();
-                                    myMap.setTileSource(FileBasedTileSource.getSource(source));
-                                } else {
-                                    myMap.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-                                }
-                            } else {
-                                myMap.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-                            }
-                            myMap.invalidate();
-                            return;
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            }
-        } else {
-            if (!FileUtils.isMapFileExists()) {
-                FileUtils.copyMapFilesToSdCard(this, new FileUtils.FileTransferListener() {
-                    @Override
-                    public void onLoadFailed() {
-                        //WARNING Fabric.getInstance() custom event
-
-                    }
-
-                    @Override
-                    public void onLoadSuccess() {
-                        setMapOfflineSource();
-                    }
-                });
-            }
+    void cleanMap(MapView mapView) {
+        if (mapView.getOverlays().size() > numberOfOverlays) {
+            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
         }
-    }
-
-    @Override
-    public void onLoadFailed() {
-
-    }
-
-    @Override
-    public void onLoadSuccess() {
-
     }
 }

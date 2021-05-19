@@ -11,4 +11,29 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="les_cascades">Les Cascades</string>
+    <string name="gare_routiere_est">Gare Routière Est Ghalmi</string>
+    <string name="freres_adnane">Frères Adnane</string>
+    <string name="benhamouda">Benhamouda</string>
+    <string name="aadl_benhamouda">AADL Benhamouda</string>
+    <string name="gare_routiere_nord">Gare Routière Nord</string>
+    <string name="gare_ferroviaire">Gare Ferroviaire</string>
+    <string name="campus">Campus</string>
+    <string name="niaama">Centre El Niaâma</string>
+    <string name="fac_droit">Faculté de Droit</string>
+    <string name="environnement">L\'Environnement</string>
+    <string name="sidi_djilali">Sidi Djilali</string>
+    <string name="wiam">Wiam</string>
+    <string name="daira">La Daira</string>
+    <string name="houari_boumediene">Houari Boumediene</string>
+    <string name="radio">La Radio</string>
+    <string name="maternite">Maternité</string>
+    <string name="adda_boudjelal">Salle Adda Boudjelal</string>
+    <string name="amir_aek">Amir Abdelakder</string>
+    <string name="quatre_horloges">4 Horloges</string>
+    <string name="jardin_public">Jardin Public</string>
+    <string name="gare_routiere_sud">Gare Routière Sud</string>
+    <string name="stations_de_tramway">Stations de Tramway</string>
+
 </resources>

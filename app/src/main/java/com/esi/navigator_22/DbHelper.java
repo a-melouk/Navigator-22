@@ -16,7 +16,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
     private static DbHelper mInstance = null;
-    private Context mCxt;
+    private final Context mCxt;
 
 
     private static final String TABLE_STATIONS_SUB = "stations_sub";
@@ -142,7 +142,7 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-    public ArrayList<Station> getAllStations() {
+    public ArrayList<Station> getAllSubwayStations() {
         ArrayList<Station> stations = new ArrayList<Station>();
         String selectQuery = "SELECT * FROM " + TABLE_STATIONS_SUB;
         SQLiteDatabase db = this.getReadableDatabase();

@@ -21,11 +21,11 @@ import java.util.Set;
 
 public class MapUtils implements FileUtils.FileTransferListener {
 
-    private MapView map;
-    private MapListener mapListener;
+    private final MapView map;
+    private final MapListener mapListener;
     private View animatedView;
-    private Activity activity;
-    private MapUtils mapUtils;
+    private final Activity activity;
+    private final MapUtils mapUtils;
 
     public MapView getMap() {
         return map;
