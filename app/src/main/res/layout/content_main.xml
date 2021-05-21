@@ -3,41 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/scrollView1"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+<!--    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--        android:id="@+id/scrollView1"-->
+<!--        android:layout_width="fill_parent"-->
+<!--        android:layout_height="fill_parent">-->
 
-        <LinearLayout
-            android:id="@+id/stations_menu"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical">
-
-
-            <TextView
-                android:id="@+id/button1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="station1" />
-
-            <TextView
-                android:id="@+id/button2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="station2" />
-
-            <TextView
-                android:id="@+id/button3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="station3" />
+<!--        <LinearLayout-->
+<!--            android:id="@+id/stations_menu"-->
+<!--            android:layout_width="fill_parent"-->
+<!--            android:layout_height="fill_parent"-->
+<!--            android:orientation="vertical">-->
 
 
-        </LinearLayout>
+<!--            <TextView-->
+<!--                android:id="@+id/button1"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="station1" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/button2"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="station2" />-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/button3"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="station3" />-->
 
 
-    </ScrollView>
+<!--        </LinearLayout>-->
+
+
+<!--    </ScrollView>-->
 
     <include layout="@layout/map"/>
 
