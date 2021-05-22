@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/design_default_color_primary</item>
         <item name="colorPrimaryDark">@color/design_default_color_primary_dark</item>
         <item name="colorAccent">@color/tramway</item>
+        <item name="android:actionOverflowButtonStyle">@style/MyActionButtonOverflow</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -16,5 +17,9 @@
         <item name="android:textSize">10dp</item>
         <item name="android:textColor">@color/purple_500</item>
         <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="MyActionButtonOverflow" parent="android:style/Widget.Holo.Light.ActionButton.Overflow">
+        <item name="android:src">@drawable/arrow_up</item>
     </style>
 </resources>

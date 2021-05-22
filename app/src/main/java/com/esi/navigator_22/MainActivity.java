@@ -2,6 +2,8 @@ package com.esi.navigator_22;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -19,6 +21,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +35,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -59,6 +65,8 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 import okhttp3.Call;
@@ -81,9 +89,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static MapView myMap;
     ScaleBarOverlay echelle;
     MyLocationNewOverlay mLocationOverlay;
+    RotationGestureOverlay mRotationGestureOverlay;
 
-    ImageView currentPosition;
-    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27;
+    ImageView currentPosition, reset;
+    LinearLayout menu_linear;
+    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up;
 
     Station a = new Station();
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
@@ -99,21 +109,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout scroll_menu;
     ActionBarDrawerToggle toggle;
     int[] ids = new int[22];
+    int[] couleurs;
 
     double distanceTo, timeTo;
     boolean drawn = false;
+
+    private NotificationManager mNotifyManager;
+    private NotificationCompat.Builder mBuilder;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         ids = new int[]{R.id.station1, R.id.station2, R.id.station3, R.id.station4, R.id.station5, R.id.station6, R.id.station7, R.id.station8, R.id.station9,
                 R.id.station10, R.id.station11, R.id.station12, R.id.station13, R.id.station14, R.id.station15, R.id.station16, R.id.station17, R.id.station18, R.id.station19, R.id.station20, R.id.station21, R.id.station22};
+        couleurs = new int[]{getApplicationContext().getResources().getColor(R.color.black),
+                getApplicationContext().getResources().getColor(R.color.red),
+                getApplicationContext().getResources().getColor(R.color.green),
+                getApplicationContext().getResources().getColor(R.color.blue),
+                getApplicationContext().getResources().getColor(R.color.orange),
+                getApplicationContext().getResources().getColor(R.color.yellow),
+                getApplicationContext().getResources().getColor(R.color.dark_blue)};
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        stations = database.getAllSubwayStations();
+
+
         myMap = findViewById(R.id.map);
         currentPosition = findViewById(R.id.currentPosition);
+        reset = findViewById(R.id.reset);
         bus3 = findViewById(R.id.bus_3);
-        bus3bis =findViewById(R.id.bus_3bis);
+        bus3bis = findViewById(R.id.bus_3bis);
         bus11 = findViewById(R.id.bus_11);
         bus16 = findViewById(R.id.bus_16);
         bus17 = findViewById(R.id.bus_17);
@@ -121,12 +148,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus27 = findViewById(R.id.bus_27);
         subway = findViewById(R.id.subway);
         scroll_menu = findViewById(R.id.stations_menu);
-        OkHttpClient client = new OkHttpClient();
-
-        setNavigationViewListener();
+        menu_linear = findViewById(R.id.menu_linear);
+        arrow_down = findViewById(R.id.arrow_down);
+        arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        final ProgressDialog mProgressDialog;
+
+        OkHttpClient client = new OkHttpClient();
+
+
+        Animation anim = new AlphaAnimation(0.60f, 1.0f);
+        anim.setDuration(500); //You can manage the blinking time with this parameter
+        anim.setStartOffset(20);
+        anim.setRepeatMode(Animation.REVERSE);
+        anim.setRepeatCount(Animation.INFINITE);
+        currentPosition.startAnimation(anim);
+
+        arrow_down.setOnClickListener(v -> {
+            menu_linear.setVisibility(View.VISIBLE);
+            arrow_down.setVisibility(View.INVISIBLE);
+            arrow_up.setVisibility(View.VISIBLE);
+
+        });
+
+        arrow_up.setOnClickListener(v -> {
+            menu_linear.setVisibility(View.INVISIBLE);
+            arrow_up.setVisibility(View.INVISIBLE);
+            arrow_down.setVisibility(View.VISIBLE);
+        });
+
+        setNavigationViewListener();
+
         setSupportActionBar(toolbar);
+        toolbar.setOverflowIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.search));
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.setDrawerIndicatorEnabled(true);
@@ -140,11 +195,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
 //        setMapOfflineSource();
         Runnable downloadMapToCache = () -> runOnUiThread(() -> {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "22-Navigator")
+                    .setSmallIcon(R.drawable.tramway)
+                    .setContentTitle("textTitle")
+                    .setContentText("textContent")
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             CacheManager cacheManager = new CacheManager(myMap);
             BoundingBox bbox = new BoundingBox(35.23286, -0.540047, 35.128473, -0.708618);
-            cacheManager.downloadAreaAsync(this, bbox, 12, 17);
+//            cacheManager.downloadAreaAsync(this, bbox, 12, 17);
+            cacheManager.downloadAreaAsyncNoUI(this, bbox, 12, 17, new CacheManager.CacheManagerCallback() {
+
+                @Override
+                public void onTaskComplete() {
+                    Log.d("DownloadMap", "Finished");
+                    builder.setContentText("Download completed")
+                            // Removes the progress bar
+                            .setProgress(0,0,false);
+                    mNotifyManager.notify(1, mBuilder.build());
+                }
+
+                @Override
+                public void updateProgress(int progress, int currentZoomLevel, int zoomMin, int zoomMax) {
+                    Log.d("DownloadMap", "Updated "+progress);
+                    mBuilder.setProgress(4048, progress, false);
+                    mNotifyManager.notify(1, mBuilder.build());
+                }
+
+                @Override
+                public void downloadStarted() {
+                    Log.d("DownloadMap", "Started");
+
+                }
+
+                @Override
+                public void setPossibleTilesInArea(int total) {
+                    Log.d("DownloadMap", "Fixed "+total);
+
+                }
+
+                @Override
+                public void onTaskFailed(int errors) {
+                    Log.d("DownloadMap", "Failed");
+                }
+            });
         });
-        Executors.newSingleThreadExecutor().execute(downloadMapToCache);
+        Executors.newFixedThreadPool(4).execute(downloadMapToCache);
 
 
         if ((ContextCompat.checkSelfPermission(
@@ -182,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(echelle);
         numberOfOverlays++;
         myMap.setMultiTouchControls(true);
-        RotationGestureOverlay mRotationGestureOverlay = new RotationGestureOverlay(myMap);
+        mRotationGestureOverlay = new RotationGestureOverlay(myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.setMultiTouchControls(true);
 
@@ -209,37 +304,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus3.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A03");
-            tracerCheminBus(chemin, myMap,255,0,0);
+            tracerCheminBus(chemin, myMap, 255, 0, 0);
             Log.d("Ligne : ", "A03");
         });
         bus3bis.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A03 bis");
-            tracerCheminBus(chemin, myMap,255,0,0);
+            tracerCheminBus(chemin, myMap, 255, 0, 0);
             Log.d("Ligne : ", "A03 bis");
         });
         bus11.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A11");
-            tracerCheminBus(chemin, myMap,0,0,0);
+            tracerCheminBus(chemin, myMap, 0, 0, 0);
             Log.d("Ligne : ", "A11");
         });
         bus16.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A16");
-            tracerCheminBus(chemin, myMap,0,0,255);
+            tracerCheminBus(chemin, myMap, 0, 0, 255);
             Log.d("Ligne : ", "A16");
         });
         bus17.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A17");
-            tracerCheminBus(chemin, myMap,255,255,0);
+            tracerCheminBus(chemin, myMap, 255, 255, 0);
             Log.d("Ligne : ", "A17");
         });
         bus25.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A25");
-            tracerCheminBus(chemin, myMap,255,0,255);
+            tracerCheminBus(chemin, myMap, 255, 0, 255);
             Log.d("Ligne : ", "A25");
         });
         bus27.setOnClickListener(v -> {
             chemin = database.getAllPointsBusWithoutNumber("A27");
-            tracerCheminBus(chemin, myMap,0,255,255);
+            tracerCheminBus(chemin, myMap, 0, 255, 255);
             Log.d("Ligne : ", "A27");
         });
 
@@ -298,16 +393,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        Log.d("OverlaysNumber", String.valueOf(myMap.getOverlays().size()));
+
+        reset.setOnClickListener(v -> clearMap());
+
     }
 
-    private void addSubwayRoute() {
-        chemin = database.getAllPointsSub();
-        tracerCheminSubway(chemin, myMap);
+    private void clearMap() {
+        myMap.getOverlays().clear();
+        myMap.getOverlays().add(mLocationOverlay);
+        myMap.getOverlays().add(mRotationGestureOverlay);
+        myMap.getOverlays().add(echelle);
     }
 
     //Add subway station
     private void addStationTramway() {
-        stations = database.getAllSubwayStations();
+
         for (int i = 0; i < stations.size(); i++) {
             addStation(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
             numberOfOverlays++;
@@ -335,42 +436,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d("ItemSeelected", stations.get(0).nomFr);
         getLocation();
-        switch (item.getItemId()) {
-            case R.id.station1:
-                Log.d("ItemSelected1", String.valueOf(item.getTitle().toString().equals(stations.get(0).nomFr + " " + stations.get(0).nomAr)));
-//                cleanMap(myMap);
-                drawRouteOnlineOnFoot(currentLocation, stations.get(0).coordonnees);
-                numberOfOverlays++;
-                break;
-            case R.id.station2:
-//                cleanMap(myMap);
-                Log.d("ItemSelected2", String.valueOf(item.getTitle().toString().equals(stations.get(1).nomFr + " " + stations.get(1).nomAr)));
-                drawRouteOnlineOnFoot(currentLocation, stations.get(1).coordonnees);
-                numberOfOverlays++;
-                break;
-            case R.id.station3:
-//                cleanMap(myMap);
-                Log.d("ItemSelected3", String.valueOf(item.getTitle().toString().equals(stations.get(2).nomFr + " " + stations.get(2).nomAr)));
-                drawRouteOnlineOnFoot(currentLocation, stations.get(2).coordonnees);
-                numberOfOverlays++;
-                break;
-            case R.id.station4:
-//                cleanMap(myMap);
-                Log.d("ItemSelected4", String.valueOf(item.getTitle().toString().equals(stations.get(3).nomFr + " " + stations.get(3).nomAr)));
-                drawRouteOnlineOnFoot(currentLocation, stations.get(3).coordonnees);
-                numberOfOverlays++;
-                break;
-            case R.id.station5:
-                Log.d("ItemSelected5", String.valueOf(item.getTitle().toString().equals(stations.get(4).nomFr + " " + stations.get(4).nomAr)));
-//                cleanMap(myMap);
-                drawRouteOnlineOnFoot(currentLocation, stations.get(4).coordonnees);
-                numberOfOverlays++;
-                break;
+        for (int i = 0; i < stations.size(); i++) {
+            if (item.getItemId() == ids[i]) {
+                int random = (int) Math.round(Math.random() * 6);
+                Log.d("Couleurs", String.valueOf(random));
+                drawRouteOnlineOnFoot(currentLocation, stations.get(i).coordonnees, couleurs[random]);
+                myMap.getController().setCenter(stations.get(i).coordonnees);
+                myMap.getController().setZoom(15.0);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public void getLocation() {
         if (mLocationOverlay.getMyLocation() != null) {
@@ -537,12 +615,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setColor(Color.rgb(230, 138, 0));
         line.setDensityMultiplier(0.1f);
         line.setPoints(chemin);
-//        line.setGeodesic(true);
+        line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
 
     }
 
-    private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView,int red,int green, int blue) {
+    private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue) {
         Polyline line = new Polyline();
         line.setWidth(6);
 //        line.getOutlinePaint();
@@ -585,7 +663,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onClose() {
-
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
                 }
             });
             marker1.showInfoWindow();
@@ -620,14 +698,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     InfoWindow.closeAllInfoWindowsOn(myMap);
                     TextView station = mView.findViewById(R.id.nomStation);
                     station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            // this code will be executed after 2 seconds
+                            InfoWindow.closeAllInfoWindowsOn(myMap);
+                        }
+                    }, 8000);
                 }
 
                 @Override
                 public void onClose() {
-
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
                 }
+
             });
             marker1.showInfoWindow();
+
             mapView.getController().setCenter(marker1.getPosition());
             mapView.getController().setZoom(16.0);
             return true;
@@ -723,7 +811,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //new GeoPoint(35.193098292023045, -0.6314308284717288)
 
-    private void travelPlanner() {
+/*    private void travelPlanner() {
         GeoPoint destinationStation = new GeoPoint(35.19181984486152, -0.6367524076104305);
         StationDetails closestSubwayStationGetOn;
         StationDetails closestSubwayStationGetOff;
@@ -779,7 +867,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Log.d("TravelPlanner", points.toString());
         Log.d("TestClosest", String.valueOf(closestSubwayStationGetOn));
-    }
+    }*/
 
 
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
@@ -814,16 +902,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-    private void drawRouteOnlineOnFoot(GeoPoint start, GeoPoint end) {
+    private void drawRouteOnlineOnFoot(GeoPoint start, GeoPoint end, int color) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add((start));
         roadPoints.add(end);
-
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
         Road road = roadManager.getRoad(roadPoints);
 
-        Polyline route = RoadManager.buildRoadOverlay(road);
+        Polyline route = RoadManager.buildRoadOverlay(road, color, 8.0f);
+        Log.d("couleurs", String.valueOf(color));
+        route.setDensityMultiplier(15.0f);
+//        route.setColor(getApplicationContext().getResources().getColor(R.color.red));
+
+
         myMap.getOverlays().add(route);
 
 //        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);

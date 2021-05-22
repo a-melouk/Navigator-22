@@ -96,7 +96,6 @@
             android:id="@+id/station22"
             android:title="@string/les_cascades"
             android:visible="false" />
-
     </group>
 
 </menu>
