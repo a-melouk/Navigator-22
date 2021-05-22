@@ -49,11 +49,13 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
@@ -83,13 +85,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String urlRouteSubway = "http://192.168.1.15:3000/subway";
     String urlRouteBus = "http://192.168.1.15:3000/bus";
     private String myResponse;
-    int numberOfOverlays = 1;
 
 
     static MapView myMap;
     ScaleBarOverlay echelle;
     MyLocationNewOverlay mLocationOverlay;
     RotationGestureOverlay mRotationGestureOverlay;
+    MapEventsOverlay mapEventsOverlay;
 
     ImageView currentPosition, reset;
     LinearLayout menu_linear;
@@ -255,21 +257,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
-        numberOfOverlays++;
-//        history.add(mLocationOverlay.getMyLocation());
+        mapEventsOverlay = new MapEventsOverlay( new MapEventsReceiver() {
+            @Override
+            public boolean singleTapConfirmedHelper(GeoPoint p) {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+                return true;
+            }
+
+            @Override
+            public boolean longPressHelper(GeoPoint p) {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+                clearMap();
+                return false;
+            }
+        });
+        myMap.getOverlays().add(mapEventsOverlay);
 
         echelle = new ScaleBarOverlay(myMap);
         myMap.getOverlays().add(echelle);
-        numberOfOverlays++;
         myMap.setMultiTouchControls(true);
         mRotationGestureOverlay = new RotationGestureOverlay(myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.setMultiTouchControls(true);
 
         myMap.getOverlays().add(mRotationGestureOverlay);
-        numberOfOverlays++;
 //        addMarker(myMap, new GeoPoint(35.19181984486152, -0.6367524076104305));
-        numberOfOverlays++;
 
 
         currentPosition.setOnClickListener(v -> {
@@ -382,6 +394,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         reset.setOnClickListener(v -> clearMap());
 
+
+
+    }
+
+    private boolean singleTapConfirmedHelper(Marker m) {
+        InfoWindow.closeAllInfoWindowsOn(myMap);
+        return true;
     }
 
     private void clearMap() {
@@ -389,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(mLocationOverlay);
         myMap.getOverlays().add(mRotationGestureOverlay);
         myMap.getOverlays().add(echelle);
+        myMap.getOverlays().add(mapEventsOverlay);
     }
 
     //Add subway station
@@ -396,7 +416,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         for (int i = 0; i < stations.size(); i++) {
             addStation(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
-            numberOfOverlays++;
         }
     }
 
@@ -680,17 +699,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
-                    InfoWindow.closeAllInfoWindowsOn(myMap);
+//                    InfoWindow.closeAllInfoWindowsOn(myMap);
                     TextView station = mView.findViewById(R.id.nomStation);
                     station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
-                    InfoWindow.closeAllInfoWindowsOn(myMap);
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            // this code will be executed after 2 seconds
-                            InfoWindow.closeAllInfoWindowsOn(myMap);
-                        }
-                    }, 8000);
+
+
+//                    new Timer().schedule(new TimerTask() {
+//                        @Override
+//                        public void run() {
+//                            // this code will be executed after 2 seconds
+//                            InfoWindow.closeAllInfoWindowsOn(myMap);
+//                        }
+//                    }, 8000);
                 }
 
                 @Override
@@ -699,8 +719,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
 
             });
+//            marker1.showInfoWindow();
             marker1.showInfoWindow();
-
             mapView.getController().setCenter(marker1.getPosition());
             mapView.getController().setZoom(16.0);
             return true;
@@ -761,9 +781,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     String tracerShortestRoute(Marker marker, MapView mapView) {
-        if (mapView.getOverlays().size() > numberOfOverlays) {
-            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
-        }
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         getLocation();
         roadPoints.add((currentLocation));
