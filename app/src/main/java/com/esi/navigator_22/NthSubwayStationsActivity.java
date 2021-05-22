@@ -58,15 +58,26 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
             Log.d("databaseDelete12", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
 
 //            MainActivity.stations.size()
+            ArrayList<StationDetails> plusProches = new ArrayList<>();
             for (int i = 0; i < MainActivity.stations.size(); i++) {
+                double distanceOffline = 0.0;
+                StationDetails stationDetails = new StationDetails();
+                stationDetails.nomFr = MainActivity.stations.get(i).nomFr;
+                stationDetails.nomAr = MainActivity.stations.get(i).nomAr;
+                stationDetails.coordonnees = MainActivity.stations.get(i).coordonnees;
+                distanceOffline = getDistanceOffline(stationDetails.coordonnees, currentLocation);
+                stationDetails.distanceTo = distanceOffline;
+                plusProches.add(stationDetails);
+            }
+            sort(plusProches);
+            for (int i = 0; i < 7; i++) {
 
                 StationDetails availableStation = new StationDetails();
-                availableStation.nomAr = MainActivity.stations.get(i).nomAr;
-                availableStation.nomFr = MainActivity.stations.get(i).nomFr;
-                getRouteOnlineOnFoot(MainActivity.stations.get(i).coordonnees);
+                availableStation.nomAr = plusProches.get(i).nomAr;
+                availableStation.nomFr = plusProches.get(i).nomFr;
+                getRouteOnlineOnFoot(plusProches.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
-
                 database.addNearStation(availableStation);
 
             }
@@ -79,6 +90,19 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
 
         });
         t1.start();
+    }
+
+    private void sort(ArrayList<StationDetails> plusProches) {
+        StationDetails temp;
+        for (int i = 0; i < plusProches.size() - 1; i++)
+            for (int j = i; j < plusProches.size(); j++) {
+                if (plusProches.get(i).distanceTo > plusProches.get(j).distanceTo) {
+                    temp = plusProches.get(i);
+                    plusProches.set(i, plusProches.get(j));
+                    plusProches.set(j, temp);
+                }
+            }
+
     }
 
     private void copyToMyList(int number, ArrayList<StationDetails> list) {
