@@ -46,6 +46,8 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.routing.GoogleRoadManager;
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -764,6 +766,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
         Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
+//        roadManager.addRequestOption("routeType=pedestrian");
+//        Road road = roadManager.getRoad(roadPoints);
+
+
+
 //        RoadManager roadManager = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
 //        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(route);

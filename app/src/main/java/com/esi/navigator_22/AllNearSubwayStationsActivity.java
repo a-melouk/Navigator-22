@@ -1,5 +1,6 @@
 package com.esi.navigator_22;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,7 +51,15 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
 
 //        setContentView(R.layout.activity_subway_stations);
+        ProgressDialog barProgressDialog = new ProgressDialog(this);
 
+        barProgressDialog.setTitle("Recupérations des stations les plus proches ...");
+        barProgressDialog.setMessage("Download in progress ...");
+        barProgressDialog.setProgressStyle(barProgressDialog.STYLE_HORIZONTAL);
+        barProgressDialog.setProgress(0);
+        barProgressDialog.setMax(MainActivity.stations.size());
+        barProgressDialog.show();
+        barProgressDialog.setCancelable(false);
         t1 = new Thread(() -> {
             Log.d("databaseDelete13", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
@@ -60,7 +69,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
 //            MainActivity.stations.size()
             for (int i = 0; i < MainActivity.stations.size(); i++) {
-
+                barProgressDialog.incrementProgressBy(1);
                 StationDetails availableStation = new StationDetails();
                 availableStation.nomAr = MainActivity.stations.get(i).nomAr;
                 availableStation.nomFr = MainActivity.stations.get(i).nomFr;
@@ -70,7 +79,10 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
                 Log.d("Distance offline", MainActivity.stations.get(i).nomFr + " | " + getDistanceOffline(currentLocation, MainActivity.stations.get(i).coordonnees));
                 database.addNearStation(availableStation);
 
+                Log.d("progressBar11", String.valueOf(barProgressDialog.getProgress()));
+                Log.d("progressBar12", String.valueOf(i));
 
+                if (barProgressDialog.getProgress() == MainActivity.stations.size()) barProgressDialog.dismiss();
             }
 
             runOnUiThread(() -> {
@@ -86,7 +98,6 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         });
         t1.start();
     }
-
 
 
     private void getRouteOnlineOnFoot(GeoPoint geoPoint) {

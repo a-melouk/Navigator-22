@@ -1,5 +1,6 @@
 package com.esi.navigator_22;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,7 +51,15 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
 
 
 //        setContentView(R.layout.activity_subway_stations);
+        ProgressDialog barProgressDialog = new ProgressDialog(this);
 
+        barProgressDialog.setTitle("Recupérations des 5 stations les plus proches ...");
+        barProgressDialog.setMessage("Download in progress ...");
+        barProgressDialog.setProgressStyle(barProgressDialog.STYLE_HORIZONTAL);
+        barProgressDialog.setProgress(0);
+        barProgressDialog.setMax(5);
+        barProgressDialog.show();
+        barProgressDialog.setCancelable(false);
         t1 = new Thread(() -> {
             Log.d("databaseDelete11", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
@@ -79,6 +88,14 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
                 database.addNearStation(availableStation);
+                Log.d("progressBar11", String.valueOf(barProgressDialog.getProgress()));
+                barProgressDialog.incrementProgressBy(1);
+                Log.d("progressBar12", String.valueOf(barProgressDialog.getProgress()));
+                if (i == 6) {
+                    barProgressDialog.dismiss();
+                    Log.d("progressBar13", "Done!");
+                }
+
 
             }
 
