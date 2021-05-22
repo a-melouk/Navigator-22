@@ -114,9 +114,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     double distanceTo, timeTo;
     boolean drawn = false;
 
-    private NotificationManager mNotifyManager;
-    private NotificationCompat.Builder mBuilder;
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        final ProgressDialog mProgressDialog;
 
         OkHttpClient client = new OkHttpClient();
 
@@ -195,11 +191,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.setTileSource(TileSourceFactory.HIKEBIKEMAP);
 //        setMapOfflineSource();
         Runnable downloadMapToCache = () -> runOnUiThread(() -> {
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "22-Navigator")
-                    .setSmallIcon(R.drawable.tramway)
-                    .setContentTitle("textTitle")
-                    .setContentText("textContent")
-                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
             CacheManager cacheManager = new CacheManager(myMap);
             BoundingBox bbox = new BoundingBox(35.23286, -0.540047, 35.128473, -0.708618);
 //            cacheManager.downloadAreaAsync(this, bbox, 12, 17);
@@ -208,17 +199,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onTaskComplete() {
                     Log.d("DownloadMap", "Finished");
-                    builder.setContentText("Download completed")
-                            // Removes the progress bar
-                            .setProgress(0,0,false);
-                    mNotifyManager.notify(1, mBuilder.build());
                 }
 
                 @Override
                 public void updateProgress(int progress, int currentZoomLevel, int zoomMin, int zoomMax) {
                     Log.d("DownloadMap", "Updated "+progress);
-                    mBuilder.setProgress(4048, progress, false);
-                    mNotifyManager.notify(1, mBuilder.build());
                 }
 
                 @Override
