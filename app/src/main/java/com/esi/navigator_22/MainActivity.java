@@ -293,8 +293,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         subway.setOnClickListener(v -> {
             getLocation();
-            myMap.getController().setCenter(currentLocation);
-            myMap.getController().setZoom(16.0);
             chemin = database.getAllPointsSub();
             tracerCheminSubway(chemin, myMap);
             addStationTramway();
