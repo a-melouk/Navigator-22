@@ -13,21 +13,23 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/app_icon"
+        android:icon="@mipmap/navigator_22"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/app_icon_round"
+        android:roundIcon="@mipmap/navigator_22"
         android:supportsRtl="true"
         android:theme="@style/Theme.Navigator22"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".AllNearSubwayStationsActivity"
-            android:theme="@style/Theme.AppTheme"></activity>
+            android:theme="@style/Theme.AppTheme"/>
+
         <activity
             android:name=".NthSubwayStationsActivity"
-            android:theme="@style/Theme.AppTheme"></activity>
+            android:theme="@style/Theme.AppTheme"/>
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.AppTheme.NoActionBar">
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

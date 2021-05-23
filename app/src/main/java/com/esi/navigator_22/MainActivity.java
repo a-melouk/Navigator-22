@@ -127,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 getApplicationContext().getResources().getColor(R.color.red),
                 getApplicationContext().getResources().getColor(R.color.green),
                 getApplicationContext().getResources().getColor(R.color.blue),
-                getApplicationContext().getResources().getColor(R.color.orange),
                 getApplicationContext().getResources().getColor(R.color.yellow),
                 getApplicationContext().getResources().getColor(R.color.dark_blue)};
 
@@ -445,11 +444,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         for (int i = 0; i < stations.size(); i++) {
             if (item.getItemId() == ids[i]) {
-                int random = (int) Math.round(Math.random() * 6);
+                int random = (int) Math.round(Math.random() * 5);
                 Log.d("Couleurs", String.valueOf(random));
                 drawRouteOnlineOnFoot(currentLocation, stations.get(i).coordonnees, couleurs[random]);
+                addMarker(myMap,stations.get(i).coordonnees,stations.get(i).nomFr+" "+stations.get(i).nomAr);
                 myMap.getController().setCenter(stations.get(i).coordonnees);
-                myMap.getController().setZoom(15.0);
+                myMap.getController().setZoom(17.0);
             }
         }
         return super.onOptionsItemSelected(item);
@@ -641,42 +641,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 //    0, 153, 255
 
-    public void addMarker(MapView mapMarker, GeoPoint positionMarker) {
+    public void addMarker(MapView mapMarker, GeoPoint positionMarker,String nom) {
         float[] distance = new float[1];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marker.setAlpha(1);
+        marker.setAlpha(0.8f);
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.tramway_pin));
 //        marker.setIcon(context.getResources().getDrawable(R.drawable.ic_tramway));
-        marker.setSnippet("Custom station");
+
 //        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
         marker.setPanToView(true);
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
+        marker.setSnippet(nom+"\n"+tracerRoute(marker.getPosition(), myMap, false));
+        marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+            @Override
+            public void onOpen(Object item) {
+                TextView station = mView.findViewById(R.id.nomStation);
+                station.setText(marker.getSnippet());
+            }
 
+            @Override
+            public void onClose() {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+            }
 
-        marker.setOnMarkerClickListener((marker1, mapView) -> {
-            tracerRoute(marker1, mapView, true);
-            marker1.setSnippet(tracerRoute(marker1, mapView, false));
-            marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
-                @Override
-                public void onOpen(Object item) {
-                    InfoWindow.closeAllInfoWindowsOn(myMap);
-                    TextView station = mView.findViewById(R.id.nomStation);
-                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
-                }
-
-                @Override
-                public void onClose() {
-                    InfoWindow.closeAllInfoWindowsOn(myMap);
-                }
-            });
-            marker1.showInfoWindow();
-            mapView.getController().setCenter(marker1.getPosition());
-            mapView.getController().setZoom(16.0);
-            return true;
         });
+//            marker.showInfoWindow();
+        marker.showInfoWindow();
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -696,23 +690,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         marker.setOnMarkerClickListener((marker1, mapView) -> {
-            tracerRoute(marker1, mapView, true);
-            marker1.setSnippet(tracerRoute(marker1, mapView, false));
+            tracerRoute(marker1.getPosition(), mapView, true);
+            marker1.setSnippet(tracerRoute(marker1.getPosition(), mapView, false));
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
-//                    InfoWindow.closeAllInfoWindowsOn(myMap);
                     TextView station = mView.findViewById(R.id.nomStation);
                     station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
-
-
-//                    new Timer().schedule(new TimerTask() {
-//                        @Override
-//                        public void run() {
-//                            // this code will be executed after 2 seconds
-//                            InfoWindow.closeAllInfoWindowsOn(myMap);
-//                        }
-//                    }, 8000);
                 }
 
                 @Override
@@ -756,12 +740,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-    String tracerRoute(Marker marker, MapView mapView, boolean draw) {
+    String tracerRoute(GeoPoint marker, MapView mapView, boolean draw) {
 //        cleanMap(mapView);
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         getLocation();
         roadPoints.add((currentLocation));
-        roadPoints.add(marker.getPosition());
+        roadPoints.add(marker);
 
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
         roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
@@ -776,7 +760,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(route);
         if (draw == true) {
-            Polyline route = RoadManager.buildRoadOverlay(road);
+            int random = (int) Math.round(Math.random() * 5);
+            Polyline route = RoadManager.buildRoadOverlay(road,couleurs[random],8.0f);
             mapView.getOverlays().add(route);
         } else {
         }
