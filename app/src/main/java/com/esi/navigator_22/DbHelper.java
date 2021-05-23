@@ -169,7 +169,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     public ArrayList<Station> getAllSubwayStations() {
         ArrayList<Station> stations = new ArrayList<Station>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_SUB;
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_SUB+" ORDER BY "+COLUMN_NOMFR;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
