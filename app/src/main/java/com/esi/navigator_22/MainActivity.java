@@ -680,8 +680,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marker.setAlpha(1);
-        marker.setIcon(context.getResources().getDrawable(R.drawable.ic_tramway));
+        marker.setAlpha(0.8f);
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.tramway_pin));
 //        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
         marker.setTitle(nomFrMarker + " " + nomArMarker);
         marker.setPanToView(true);
@@ -695,6 +695,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
                     TextView station = mView.findViewById(R.id.nomStation);
                     station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
                 }
@@ -741,7 +742,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     String tracerRoute(GeoPoint marker, MapView mapView, boolean draw) {
-//        cleanMap(mapView);
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         getLocation();
         roadPoints.add((currentLocation));
@@ -753,12 +753,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
 //        Road road = roadManager.getRoad(roadPoints);
-
-
-
 //        RoadManager roadManager = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
 //        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(route);
+
         if (draw == true) {
             int random = (int) Math.round(Math.random() * 5);
             Polyline route = RoadManager.buildRoadOverlay(road,couleurs[random],8.0f);
