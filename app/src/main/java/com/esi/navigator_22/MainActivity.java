@@ -2,8 +2,6 @@ package com.esi.navigator_22;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.NotificationManager;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -35,7 +33,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -46,8 +43,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.bonuspack.routing.GoogleRoadManager;
-import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -69,8 +64,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 
 import okhttp3.Call;
@@ -614,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void tracerCheminSubway(ArrayList<GeoPoint> chemin, MapView mapView) {
         Polyline line = new Polyline();
-        line.setWidth(12);
+        line.setWidth(8);
 //        line.getOutlinePaint();
         line.setColor(Color.rgb(230, 138, 0));
         line.setDensityMultiplier(0.1f);
@@ -626,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue) {
         Polyline line = new Polyline();
-        line.setWidth(6);
+        line.setWidth(8);
 //        line.getOutlinePaint();
         line.setColor(Color.rgb(red, green, blue));
         line.setDensityMultiplier(0.1f);
@@ -646,7 +639,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
-        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.tramway_pin));
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
 //        marker.setIcon(context.getResources().getDrawable(R.drawable.ic_tramway));
 
 //        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
@@ -679,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
-        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.tramway_pin));
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
 //        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
         marker.setTitle(nomFrMarker + " " + nomArMarker);
         marker.setPanToView(true);
