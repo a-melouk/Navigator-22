@@ -57,7 +57,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         barProgressDialog.setMessage("Download in progress ...");
         barProgressDialog.setProgressStyle(barProgressDialog.STYLE_HORIZONTAL);
         barProgressDialog.setProgress(0);
-        barProgressDialog.setMax(MainActivity.stations.size());
+        barProgressDialog.setMax(MainActivity.stationsSubway.size());
         barProgressDialog.show();
         barProgressDialog.setCancelable(false);
         t1 = new Thread(() -> {
@@ -68,25 +68,26 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             Log.d("databaseDelete5", String.valueOf(getDistanceOffline(new GeoPoint(35.2065503, -0.6191647), new GeoPoint(0.0, 0.0))));
 
 //            MainActivity.stations.size()
-            for (int i = 0; i < MainActivity.stations.size(); i++) {
+            for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                 barProgressDialog.incrementProgressBy(1);
                 StationDetails availableStation = new StationDetails();
-                availableStation.nomAr = MainActivity.stations.get(i).nomAr;
-                availableStation.nomFr = MainActivity.stations.get(i).nomFr;
-                getRouteOnlineOnFoot(MainActivity.stations.get(i).coordonnees);
+                availableStation.nomAr = MainActivity.stationsSubway.get(i).nomAr;
+                availableStation.nomFr = MainActivity.stationsSubway.get(i).nomFr;
+                getRouteOnlineOnFoot(MainActivity.stationsSubway.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
-                Log.d("Distance offline", MainActivity.stations.get(i).nomFr + " | " + getDistanceOffline(currentLocation, MainActivity.stations.get(i).coordonnees));
+                Log.d("allstation13", MainActivity.stationsSubway.get(i).nomFr + " | " + getDistanceOffline(currentLocation, MainActivity.stationsSubway.get(i).coordonnees));
+                Log.d("allstation14", MainActivity.stationsSubway.get(i).nomFr + " | " + availableStation.distanceTo);
                 database.addNearStation(availableStation);
 
                 Log.d("progressBar11", String.valueOf(barProgressDialog.getProgress()));
                 Log.d("progressBar12", String.valueOf(i));
 
-                if (barProgressDialog.getProgress() == MainActivity.stations.size()) barProgressDialog.dismiss();
+                if (barProgressDialog.getProgress() == MainActivity.stationsSubway.size()) barProgressDialog.dismiss();
             }
 
             runOnUiThread(() -> {
-                for (int i = 0; i < MainActivity.stations.size(); i++) {
+                for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                     myList.add(database.getAllNearestSubStationsSortedByDistance().get(i));
                     Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo);
 

@@ -61,24 +61,24 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
         barProgressDialog.show();
         barProgressDialog.setCancelable(false);
         t1 = new Thread(() -> {
-            Log.d("databaseDelete11", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
-
-            Log.d("databaseDelete12", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
-
 //            MainActivity.stations.size()
             ArrayList<StationDetails> plusProches = new ArrayList<>();
-            for (int i = 0; i < MainActivity.stations.size(); i++) {
+            for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                 double distanceOffline = 0.0;
                 StationDetails stationDetails = new StationDetails();
-                stationDetails.nomFr = MainActivity.stations.get(i).nomFr;
-                stationDetails.nomAr = MainActivity.stations.get(i).nomAr;
-                stationDetails.coordonnees = MainActivity.stations.get(i).coordonnees;
+                stationDetails.nomFr = MainActivity.stationsSubway.get(i).nomFr;
+                stationDetails.nomAr = MainActivity.stationsSubway.get(i).nomAr;
+                stationDetails.coordonnees = MainActivity.stationsSubway.get(i).coordonnees;
                 distanceOffline = getDistanceOffline(stationDetails.coordonnees, currentLocation);
                 stationDetails.distanceTo = distanceOffline;
                 plusProches.add(stationDetails);
             }
             sort(plusProches);
+            for (int i = 0; i < 7; i++) {
+
+            Log.d("allStation11",plusProches.get(i).nomFr);
+            }
             for (int i = 0; i < 7; i++) {
 
                 StationDetails availableStation = new StationDetails();
@@ -87,13 +87,11 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
                 getRouteOnlineOnFoot(plusProches.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
+                Log.d("allStation12",availableStation.nomFr+" "+availableStation.distanceTo);
                 database.addNearStation(availableStation);
-                Log.d("progressBar11", String.valueOf(barProgressDialog.getProgress()));
                 barProgressDialog.incrementProgressBy(1);
-                Log.d("progressBar12", String.valueOf(barProgressDialog.getProgress()));
                 if (i == 6) {
                     barProgressDialog.dismiss();
-                    Log.d("progressBar13", "Done!");
                 }
 
 
@@ -143,10 +141,10 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
 //        Road road = roadManager1.getRoad(roadPoints);
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(currentLocation, geoPoint);
-            Log.d("allStation", "Unavailable " + getDistanceOffline(currentLocation, geoPoint));
+//            Log.d("allStation10", "Unavailable " + getDistanceOffline(currentLocation, geoPoint));
             timeTo = 99999.0;
         } else {
-            Log.d("allStation", "Available " + getDistanceOffline(currentLocation, geoPoint));
+//            Log.d("allStation10", "Available " + getDistanceOffline(currentLocation, geoPoint));
             distanceTo = road.mLength;
             timeTo = road.mDuration / 60;
         }

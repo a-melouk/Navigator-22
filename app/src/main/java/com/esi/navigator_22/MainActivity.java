@@ -2,7 +2,6 @@ package com.esi.navigator_22;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -64,6 +63,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 
 import okhttp3.Call;
@@ -76,9 +76,10 @@ import okhttp3.Response;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String urlStations = "http://192.168.1.15:3000/stations";
-    String urlRouteSubway = "http://192.168.1.15:3000/subway";
-    String urlRouteBus = "http://192.168.1.15:3000/bus";
+    String urlStations = "http://192.168.1.5:3000/stations";
+    String urlRouteSubway = "http://192.168.1.5:3000/subway";
+    String urlRouteBus = "http://192.168.1.5:3000/bus";
+    String urlStationsBus = "http://192.168.1.5:3000/stations_buses";
     private String myResponse;
 
 
@@ -92,13 +93,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout menu_linear;
     ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up;
 
-    Station a = new Station();
+    Station stationSubway = new Station();
+    StationBus stationBus = new StationBus();
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
-    static ArrayList<Station> stations = new ArrayList<>();
+    static ArrayList<Station> stationsSubway = new ArrayList<>();
+    static ArrayList<StationBus> stationsBus = new ArrayList<>();
+    static ArrayList<StationBus> stationsBusByNumber = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     double minZ = 13.0;
     double maxZ = 19.0;
@@ -126,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        stations = database.getAllSubwayStations();
+        stationsSubway = database.getAllStationsSubway();
+        stationsBus = database.getAllStationsBus();
 
 
         myMap = findViewById(R.id.map);
@@ -161,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             menu_linear.setVisibility(View.VISIBLE);
             arrow_down.setVisibility(View.INVISIBLE);
             arrow_up.setVisibility(View.VISIBLE);
-
         });
 
         arrow_up.setOnClickListener(v -> {
@@ -199,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void updateProgress(int progress, int currentZoomLevel, int zoomMin, int zoomMax) {
-                    Log.d("DownloadMap", "Updated "+progress);
+                    Log.d("DownloadMap", "Updated " + progress);
                 }
 
                 @Override
@@ -210,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void setPossibleTilesInArea(int total) {
-                    Log.d("DownloadMap", "Fixed "+total);
+                    Log.d("DownloadMap", "Fixed " + total);
 
                 }
 
@@ -251,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
-        mapEventsOverlay = new MapEventsOverlay( new MapEventsReceiver() {
+        mapEventsOverlay = new MapEventsOverlay(new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
                 InfoWindow.closeAllInfoWindowsOn(myMap);
@@ -288,42 +292,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getLocation();
             chemin = database.getAllPointsSub();
             tracerCheminSubway(chemin, myMap);
-            addStationTramway();
+            addStationsSubway();
         });
 
         bus3.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A03");
+            chemin = database.getAllPointsBusByNumber("A03");
             tracerCheminBus(chemin, myMap, 255, 0, 0);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A03");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A03");
         });
         bus3bis.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A03 bis");
+            chemin = database.getAllPointsBusByNumber("A03 bis");
             tracerCheminBus(chemin, myMap, 255, 0, 0);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A03 bis");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A03 bis");
         });
         bus11.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A11");
+            chemin = database.getAllPointsBusByNumber("A11");
             tracerCheminBus(chemin, myMap, 0, 0, 0);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A11");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A11");
         });
         bus16.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A16");
+            chemin = database.getAllPointsBusByNumber("A16");
             tracerCheminBus(chemin, myMap, 0, 0, 255);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A16");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A16");
         });
         bus17.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A17");
-            tracerCheminBus(chemin, myMap, 255, 255, 0);
+            chemin = database.getAllPointsBusByNumber("A17");
+            tracerCheminBus(chemin, myMap, 0, 255, 0);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A17");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A17");
         });
         bus25.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A25");
+            chemin = database.getAllPointsBusByNumber("A25");
             tracerCheminBus(chemin, myMap, 255, 0, 255);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A25");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A25");
         });
         bus27.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusWithoutNumber("A27");
+            chemin = database.getAllPointsBusByNumber("A27");
             tracerCheminBus(chemin, myMap, 0, 255, 255);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A27");
+            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A27");
         });
 
@@ -379,6 +397,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        request = new Request.Builder()
+                .url(urlStationsBus)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    fetchAllStationsBus(response);
+
+                }
+            }
+        });
+
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -387,34 +423,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         reset.setOnClickListener(v -> clearMap());
 
 
-
-    }
-
-    private boolean singleTapConfirmedHelper(Marker m) {
-        InfoWindow.closeAllInfoWindowsOn(myMap);
-        return true;
-    }
-
-    private void clearMap() {
-        myMap.getOverlays().clear();
-        myMap.getOverlays().add(mLocationOverlay);
-        myMap.getOverlays().add(mRotationGestureOverlay);
-        myMap.getOverlays().add(echelle);
-        myMap.getOverlays().add(mapEventsOverlay);
-    }
-
-    //Add subway station
-    private void addStationTramway() {
-
-        for (int i = 0; i < stations.size(); i++) {
-            addStation(this, myMap, stations.get(i).coordonnees, stations.get(i).nomFr, stations.get(i).nomAr);
-        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        ArrayList<Station> stations = database.getAllSubwayStations();
+        ArrayList<Station> stations = database.getAllStationsSubway();
         SubMenu tramwaySubMenu = menu.addSubMenu("Stations de Tramway");
         SubMenu busSubMenu = menu.addSubMenu("Stations de bus");
 
@@ -433,13 +447,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         getLocation();
-        for (int i = 0; i < stations.size(); i++) {
+        for (int i = 0; i < stationsSubway.size(); i++) {
             if (item.getItemId() == ids[i]) {
                 int random = (int) Math.round(Math.random() * 5);
                 Log.d("Couleurs", String.valueOf(random));
-                drawRouteOnlineOnFoot(currentLocation, stations.get(i).coordonnees, couleurs[random]);
-                addMarker(myMap,stations.get(i).coordonnees,stations.get(i).nomFr+" "+stations.get(i).nomAr);
-                myMap.getController().setCenter(stations.get(i).coordonnees);
+                drawRouteOnlineOnFoot(currentLocation, stationsSubway.get(i).coordonnees, couleurs[random]);
+                addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr + " " + stationsSubway.get(i).nomAr);
+                myMap.getController().setCenter(stationsSubway.get(i).coordonnees);
                 myMap.getController().setZoom(17.0);
             }
         }
@@ -468,46 +482,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NotNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         toggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d("LogGps", "onDestroy");
-        arreterLocalisation();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        myMap.onResume();
-        Log.d("LogGps", "onResume");
-        mLocationOverlay.enableMyLocation();
-//        getLocation();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        myMap.onPause();
-        Log.d("LogGps", "onPause");
-//        mLocationOverlay.disableMyLocation();
-//        getLocation();
-    }
-
-    @Override
-    public void onBackPressed() {
-        Log.d("LogGps", "Back button pressed");
-        new AlertDialog.Builder(this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Fermer l'application")
-                .setMessage("Voulez-vous vraiment fermer l'application?")
-                .setPositiveButton("Oui", (dialog, which) -> super.onBackPressed())
-                .setNegativeButton("Non", null)
-                .show();
     }
 
     private void arreterLocalisation() {
@@ -515,15 +492,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mLocationOverlay.disableFollowLocation();
     }
 
+
+    //Fetching
     private void fetchAllStations(Response response) throws IOException {
-        myResponse = response.body().string();
+        myResponse = Objects.requireNonNull(response.body()).string();
         JSONArray jsonarray = null;
         try {
             jsonarray = new JSONArray(myResponse);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < jsonarray.length(); i++) {
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
             JSONObject jsonobject = null;
             try {
                 jsonobject = jsonarray.getJSONObject(i);
@@ -532,12 +511,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             try {
                 assert jsonobject != null;
-                a.nomFr = jsonobject.getString("nomFr");
+                stationSubway.nomFr = jsonobject.getString("nomFr");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             try {
-                a.nomAr = jsonobject.getString("nomAr");
+                stationSubway.nomAr = jsonobject.getString("nomAr");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -551,8 +530,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            a.coordonnees = point;
-            database.addStation(a);
+            stationSubway.coordonnees = point;
+            database.addStationSubway(stationSubway);
+        }
+    }
+
+    private void fetchAllStationsBus(Response response) throws IOException {
+        myResponse = Objects.requireNonNull(response.body()).string();
+        JSONArray jsonarray = null;
+        try {
+            jsonarray = new JSONArray(myResponse);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
+            JSONObject jsonobject = null;
+            try {
+                jsonobject = jsonarray.getJSONObject(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                assert jsonobject != null;
+                stationBus.nomFr = jsonobject.getString("nomFr");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                stationBus.numLigne = jsonobject.getString("numero");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                point.setLatitude(jsonobject.getDouble("latitude"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                point.setLongitude(jsonobject.getDouble("longitude"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            stationBus.coordonnees = point;
+            Log.d("StationBus", stationBus.toString());
+            database.addStationBus(stationBus);
         }
     }
 
@@ -564,7 +585,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < jsonarray.length(); i++) {
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
             JSONObject jsonobject;
             GeoPoint po = new GeoPoint(0.0, 0.0);
             try {
@@ -579,14 +600,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void fetchRouteBus(Response response) throws IOException {
-        myResponse = response.body().string();
+        myResponse = Objects.requireNonNull(response.body()).string();
         JSONArray jsonarray = null;
         try {
             jsonarray = new JSONArray(myResponse);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < jsonarray.length(); i++) {
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
             JSONObject jsonobject = null;
             GeoPoint po = new GeoPoint(0.0, 0.0);
             RouteBus pointBus = new RouteBus(new GeoPoint(0.0, 0.0), "Ligne de bus");
@@ -605,6 +626,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+
+    //Adding Overlays
+    private void addStationsSubway() {
+
+        for (int i = 0; i < stationsSubway.size(); i++) {
+            addStationSubway(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr, stationsSubway.get(i).nomAr);
+        }
+    }
+
+    private void addStationsBus(ArrayList<StationBus> stationsBus) {
+        for (int i = 0; i < stationsBus.size(); i++) {
+            addStationBus(myMap, stationsBus.get(i).coordonnees, stationsBus.get(i).nomFr, stationsBus.get(i).numLigne);
+        }
+
+    }
+
     private void tracerCheminSubway(ArrayList<GeoPoint> chemin, MapView mapView) {
         Polyline line = new Polyline();
         line.setWidth(8);
@@ -619,10 +656,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue) {
         Polyline line = new Polyline();
-        line.setWidth(8);
+        line.setWidth(10);
 //        line.getOutlinePaint();
         line.setColor(Color.rgb(red, green, blue));
-        line.setDensityMultiplier(0.1f);
+        line.setDensityMultiplier(0.5f);
         line.setPoints(chemin);
 //        line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
@@ -630,9 +667,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-//    0, 153, 255
-
-    public void addMarker(MapView mapMarker, GeoPoint positionMarker,String nom) {
+    public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom) {
         float[] distance = new float[1];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
@@ -646,7 +681,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPanToView(true);
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
-        marker.setSnippet(nom+"\n"+tracerRoute(marker.getPosition(), myMap, false));
+        marker.setSnippet(nom + "\n" + tracerRoute(marker.getPosition(), myMap, false));
         marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
             @Override
             public void onOpen(Object item) {
@@ -665,7 +700,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    public void addStation(Context context, MapView mapMarker, GeoPoint positionMarker, String nomFrMarker, String nomArMarker) {
+    public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker, String nomArMarker) {
         float[] distance = new float[1];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
@@ -705,31 +740,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    Bundle send = new Bundle();
+    public void addStationBus(MapView mapMarker, GeoPoint positionMarker, String nomFr, String numLigne) {
+        Marker marker = new Marker(mapMarker);
+        marker.setPosition(positionMarker);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAlpha(0.8f);
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus));
+//        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
+        marker.setTitle(nomFr + " " + numLigne);
+        marker.setPanToView(true);
+        mapMarker.invalidate();
+        mapMarker.getOverlays().add(marker);
 
-    @Override
-    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
-        getLocation();
-        if (item.getItemId() == R.id.allSubwayStations) {
-            Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
-            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
-            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
-            intent.putExtras(send);
-            MainActivity.this.startActivity(intent);
-        } else if (item.getItemId() == R.id.closestStations) {
-            Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
-            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
-            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
-            intent.putExtras(send);
-            MainActivity.this.startActivity(intent);
-        }
 
-        return true;
-    }
+        marker.setOnMarkerClickListener((marker1, mapView) -> {
+//            tracerRoute(marker1.getPosition(), mapView, true);
+//            marker1.setSnippet(tracerRoute(marker1.getPosition(), mapView, false));
+//            marker1.setSnippet(nomFr+" "+numLigne);
 
-    private void setNavigationViewListener() {
-        NavigationView navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
+            marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+                @Override
+                public void onOpen(Object item) {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                    TextView station = mView.findViewById(R.id.nomStation);
+//                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
+                    station.setText(marker1.getTitle());
+                }
+
+                @Override
+                public void onClose() {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                }
+
+            });
+//            marker1.showInfoWindow();
+            marker1.showInfoWindow();
+            mapView.getController().setCenter(marker1.getPosition());
+            mapView.getController().setZoom(17.0);
+            return true;
+        });
     }
 
     String tracerRoute(GeoPoint marker, MapView mapView, boolean draw) {
@@ -750,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (draw == true) {
             int random = (int) Math.round(Math.random() * 5);
-            Polyline route = RoadManager.buildRoadOverlay(road,couleurs[random],8.0f);
+            Polyline route = RoadManager.buildRoadOverlay(road, couleurs[random], 8.0f);
             mapView.getOverlays().add(route);
         } else {
         }
@@ -761,6 +810,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return distanceTo + "\n" + timeTo;
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     String tracerShortestRoute(Marker marker, MapView mapView) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
@@ -786,14 +852,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return distanceTo + "\n" + timeTo;
 
     }
-
-    static String format(double number) {
-        DecimalFormat df = new DecimalFormat("#.##");
-        return df.format(number);
-    }
-
-
-    //new GeoPoint(35.193098292023045, -0.6314308284717288)
 
 /*    private void travelPlanner() {
         GeoPoint destinationStation = new GeoPoint(35.19181984486152, -0.6367524076104305);
@@ -853,14 +911,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("TestClosest", String.valueOf(closestSubwayStationGetOn));
     }*/
 
-
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
         float[] distance = new float[2];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
                 targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
         return distance[0] / 1000;
     }
-
 
     private void getRouteOnlineOnFootDetails(GeoPoint start, GeoPoint end) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
@@ -886,6 +942,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+
+
+
+
+
     private void drawRouteOnlineOnFoot(GeoPoint start, GeoPoint end, int color) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add((start));
@@ -908,6 +969,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //Sort ArrayList by Distance
     void sort(ArrayList<StationDetails> stationDetails) {
         StationDetails temp;
         for (int i = 0; i < stationDetails.size() - 1; i++)
@@ -920,9 +1003,82 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
     }
 
-//    void cleanMap(MapView mapView) {
-//        if (mapView.getOverlays().size() > numberOfOverlays) {
-//            mapView.getOverlays().remove(mapView.getOverlays().get(numberOfOverlays));
-//        }
-//    }
+    //Menu Navigation
+    private void setNavigationViewListener() {
+        NavigationView navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
+        getLocation();
+        Bundle send = new Bundle();
+        if (item.getItemId() == R.id.allSubwayStations) {
+            Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
+        } else if (item.getItemId() == R.id.closestStations) {
+            Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
+        }
+        return true;
+    }
+
+
+    //Clean Map from all markers and polylines
+    private void clearMap() {
+        myMap.getOverlays().clear();
+        myMap.getOverlays().add(mLocationOverlay);
+        myMap.getOverlays().add(mRotationGestureOverlay);
+        myMap.getOverlays().add(echelle);
+        myMap.getOverlays().add(mapEventsOverlay);
+    }
+
+    //Formatting the values to #.##
+    static String format(double number) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return df.format(number);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("LogGps", "onDestroy");
+        arreterLocalisation();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        myMap.onResume();
+        Log.d("LogGps", "onResume");
+        mLocationOverlay.enableMyLocation();
+//        getLocation();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        myMap.onPause();
+        Log.d("LogGps", "onPause");
+//        mLocationOverlay.disableMyLocation();
+//        getLocation();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.d("LogGps", "Back button pressed");
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Fermer l'application")
+                .setMessage("Voulez-vous vraiment fermer l'application?")
+                .setPositiveButton("Oui", (dialog, which) -> super.onBackPressed())
+                .setNegativeButton("Non", null)
+                .show();
+    }
 }
