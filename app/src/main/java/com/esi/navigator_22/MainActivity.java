@@ -36,6 +36,8 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.esi.navigator_22.ro.Arete;
+import com.esi.navigator_22.ro.Graph;
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ImageView currentPosition, reset;
     LinearLayout menu_linear;
-    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up,bus_22;
+    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
 
     Station stationSubway = new Station();
     StationBus stationBus = new StationBus();
@@ -143,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus11 = findViewById(R.id.bus_11);
         bus16 = findViewById(R.id.bus_16);
         bus17 = findViewById(R.id.bus_17);
-        bus_22= findViewById(R.id.bus_22);
+        bus_22 = findViewById(R.id.bus_22);
         bus25 = findViewById(R.id.bus_25);
         bus27 = findViewById(R.id.bus_27);
         subway = findViewById(R.id.subway);
@@ -334,8 +336,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         bus_22.setOnClickListener(v -> {
-            chemin=database.getAllPointsBusByNumber("A22");
-            tracerCheminBus(chemin, myMap, 105,105,105);
+            chemin = database.getAllPointsBusByNumber("A22");
+            tracerCheminBus(chemin, myMap, 105, 105, 105);
             stationsBusByNumber = database.getAllStationsBusByNumber("A22");
             addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A22");
@@ -433,7 +435,59 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         reset.setOnClickListener(v -> clearMap());
 
 
+        ArrayList<StationDetails> travelPlanner = new ArrayList<>();
+        double timeInterval = 150;
+        travelPlanner.add(new StationDetails("Wiam", 0.4929, 6.566666666666666));
+        travelPlanner.add(new StationDetails("Fac de droit", 0.6816, 9.091666666666667));
+        travelPlanner.add(new StationDetails("Daira", 0.7868999999999999, 10.498333333333333));
+        travelPlanner.add(new StationDetails("Niâama", 1.165, 15.531666666666666));
+        travelPlanner.add(new StationDetails("Environnement ", 1.2261, 16.35));
+        travelPlanner.add(new StationDetails("Sidi Djilali", 1.3222, 17.634999999999998));
+        travelPlanner.add(new StationDetails("AADL Benhamouda", 1.4276, 19.043333333333333));
+        travelPlanner.add(new StationDetails("Houari Boumediene", 1.5672000000000001, 20.901666666666664));
+        travelPlanner.add(new StationDetails("Benhamouda", 1.7253, 23.005));
+        travelPlanner.add(new StationDetails("Gare routière Nord", 1.7665, 23.551666666666666));
+        travelPlanner.add(new StationDetails("Campus", 1.8282, 24.378333333333334));
+        travelPlanner.add(new StationDetails("Radio", 2.0629, 27.543333333333333));
+        travelPlanner.add(new StationDetails("Frères Adnane", 2.3035, 30.715));
+        travelPlanner.add(new StationDetails("Les Cascades", 2.4981999999999998, 33.318333333333335));
+        travelPlanner.add(new StationDetails("Amir Abdelakder", 2.5745, 34.32833333333333));
+        travelPlanner.add(new StationDetails("Salle Adda Boudjelal", 2.6175, 34.906666666666666));
+        travelPlanner.add(new StationDetails("La Maternité", 2.623, 34.98166666666667));
+        travelPlanner.add(new StationDetails("4 Horloges", 2.6940999999999997, 35.92333333333333));
+        travelPlanner.add(new StationDetails("Gare routière Est", 2.7691, 36.92333333333333));
+        travelPlanner.add(new StationDetails("Jardin PUBLIC", 3.5172, 46.931666666666665));
+        travelPlanner.add(new StationDetails("Gare routière sud", 4.164899999999999, 55.568333333333335));
+        travelPlanner.add(new StationDetails("gare ferroviaire", 32.8602, 438.14166666666665));
+
+        bestChoiceOnTramway(currentLocation);
     }
+
+    private void bestChoiceOnTramway(GeoPoint currentLocation) {
+        double timeBetweenStations = 150;
+        Graph graph = new Graph();
+        int nombreSommets = stationsSubway.size() + 1;
+        int nombreAretes = stationsSubway.size() * 2 - 1;
+        boolean oriente = false;
+        graph = new Graph(oriente, nombreSommets, nombreAretes);
+        for (int i = 0; i < stationsSubway.size(); i++) {
+            ArrayList<StationDetails> stationDetails1 = new ArrayList<>();
+            ArrayList<StationDetails> stationDetails2 = new ArrayList<>();
+            StationDetails station;
+            stationDetails1 = database.getAllNearestSubStationsSortedByDistance();
+            station = stationDetails1.get(i);
+            station.nomAr = String.valueOf(i);
+            stationDetails2.add(station);
+            graph.Ajouter(new Arete(Integer.valueOf(station.nomAr) + 0, Integer.valueOf(station.nomAr) + 1, 0, timeBetweenStations,station.nomFr));
+//            Log.d("dijikstra10", stationDetails2.toString());
+            graph.Ajouter(new Arete(stationsSubway.size(),i,stationDetails1.get(i).distanceTo,stationDetails1.get(i).timeTo,stationDetails1.get(i).nomFr));
+            Log.d("dijikstra11", i+" | "+station.nomFr);
+        }
+        Log.d("dijikstra13", graph.toString());
+        graph.Djiskra(22);
+
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -767,7 +821,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setOnMarkerClickListener((marker1, mapView) -> {
 //            tracerRoute(marker1.getPosition(), mapView, true);
             getLocation();
-            marker1.setSnippet(fetchRoute(currentLocation,marker1.getPosition(), true));
+            marker1.setSnippet(fetchRoute(currentLocation, marker1.getPosition(), true));
 //            marker1.setSnippet(nomFr+" "+numLigne);
 
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
@@ -813,7 +867,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(start, end);
             timeTo = 99999.0;
-            Log.d("FetchRoute","indisponible");
+            Log.d("FetchRoute", "indisponible");
             return "Route indisponible";
         }
         if (draw == true) {
@@ -825,7 +879,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String dist = format(road.mLength);
         String distanceTo = "km " + dist + " كم";
         String timeTo = "minutes " + duration + " دقيقة";
-        Log.d("FetchRoute","disponible");
+        Log.d("FetchRoute", "disponible");
         return distanceTo + "\n" + timeTo;
 
     }

@@ -89,7 +89,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                     myList.add(database.getAllNearestSubStationsSortedByDistance().get(i));
-                    Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo);
+                    Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo + " | "+myList.get(i).timeTo);
 
                 }
                 loading.setVisibility(View.INVISIBLE);
@@ -120,7 +120,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         } else {
             Log.d("allStation", "Available " + getDistanceOffline(currentLocation, geoPoint));
             distanceTo = road.mLength;
-            timeTo = road.mDuration / 60;
+            timeTo = road.mDuration;
         }
 
     }
