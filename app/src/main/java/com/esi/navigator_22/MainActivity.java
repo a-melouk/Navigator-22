@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ImageView currentPosition, reset;
     LinearLayout menu_linear;
-    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up;
+    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up,bus_22;
 
     Station stationSubway = new Station();
     StationBus stationBus = new StationBus();
@@ -142,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus11 = findViewById(R.id.bus_11);
         bus16 = findViewById(R.id.bus_16);
         bus17 = findViewById(R.id.bus_17);
+        bus_22= findViewById(R.id.bus_22);
         bus25 = findViewById(R.id.bus_25);
         bus27 = findViewById(R.id.bus_27);
         subway = findViewById(R.id.subway);
@@ -330,6 +332,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A17");
         });
+
+        bus_22.setOnClickListener(v -> {
+            chemin=database.getAllPointsBusByNumber("A22");
+            tracerCheminBus(chemin, myMap, 105,105,105);
+            stationsBusByNumber = database.getAllStationsBusByNumber("A22");
+            addStationsBus(stationsBusByNumber);
+            Log.d("Ligne : ", "A22");
+        });
         bus25.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A25");
             tracerCheminBus(chemin, myMap, 255, 0, 255);
@@ -451,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (item.getItemId() == ids[i]) {
                 int random = (int) Math.round(Math.random() * 5);
                 Log.d("Couleurs", String.valueOf(random));
-                drawRouteOnlineOnFoot(currentLocation, stationsSubway.get(i).coordonnees, couleurs[random]);
+                fetchRoute(currentLocation, stationsSubway.get(i).coordonnees, true);
                 addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr + " " + stationsSubway.get(i).nomAr);
                 myMap.getController().setCenter(stationsSubway.get(i).coordonnees);
                 myMap.getController().setZoom(17.0);
@@ -681,7 +691,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPanToView(true);
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
-        marker.setSnippet(nom + "\n" + tracerRoute(marker.getPosition(), myMap, false));
+        getLocation();
+        marker.setSnippet(nom + "\n" + fetchRoute(currentLocation, marker.getPosition(), true));
         marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
             @Override
             public void onOpen(Object item) {
@@ -716,8 +727,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         marker.setOnMarkerClickListener((marker1, mapView) -> {
-            tracerRoute(marker1.getPosition(), mapView, true);
-            marker1.setSnippet(tracerRoute(marker1.getPosition(), mapView, false));
+            getLocation();
+            marker1.setSnippet(fetchRoute(currentLocation, marker1.getPosition(), true));
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
                 @Override
                 public void onOpen(Object item) {
@@ -755,7 +766,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         marker.setOnMarkerClickListener((marker1, mapView) -> {
 //            tracerRoute(marker1.getPosition(), mapView, true);
-//            marker1.setSnippet(tracerRoute(marker1.getPosition(), mapView, false));
+            getLocation();
+            marker1.setSnippet(fetchRoute(currentLocation,marker1.getPosition(), true));
 //            marker1.setSnippet(nomFr+" "+numLigne);
 
             marker1.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
@@ -781,51 +793,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    String tracerRoute(GeoPoint marker, MapView mapView, boolean draw) {
+
+    String fetchRoute(GeoPoint start, GeoPoint end, boolean draw) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         getLocation();
-        roadPoints.add((currentLocation));
-        roadPoints.add(marker);
+        roadPoints.add((start));
+        roadPoints.add(end);
 
-        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-        Road road = roadManager.getRoad(roadPoints);
+//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+//        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//        Road road = roadManager.getRoad(roadPoints);
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
 //        Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager = new GraphHopperRoadManager("9b8e0c01-5851-4b2d-9cc5-184a5a9f40c8", false);
-//        roadManager.addRequestOption("vehicle=foot");
-//        Road road = roadManager.getRoad(route);
+        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+        roadManager.addRequestOption("vehicle=foot");
+        Road road = roadManager.getRoad(roadPoints);
 
+        if (road.mLength == 0) {
+            distanceTo = getDistanceOffline(start, end);
+            timeTo = 99999.0;
+            Log.d("FetchRoute","indisponible");
+            return "Route indisponible";
+        }
         if (draw == true) {
             int random = (int) Math.round(Math.random() * 5);
             Polyline route = RoadManager.buildRoadOverlay(road, couleurs[random], 8.0f);
-            mapView.getOverlays().add(route);
-        } else {
+            myMap.getOverlays().add(route);
         }
         String duration = format(road.mDuration / 60);
         String dist = format(road.mLength);
         String distanceTo = "km " + dist + " كم";
         String timeTo = "minutes " + duration + " دقيقة";
+        Log.d("FetchRoute","disponible");
         return distanceTo + "\n" + timeTo;
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     String tracerShortestRoute(Marker marker, MapView mapView) {
@@ -942,11 +945,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
-
-
-
-
-
     private void drawRouteOnlineOnFoot(GeoPoint start, GeoPoint end, int color) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
         roadPoints.add((start));
@@ -968,26 +966,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        Road road = roadManager1.getRoad(roadPoints);
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     //Sort ArrayList by Distance

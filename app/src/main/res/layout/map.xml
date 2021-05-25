@@ -59,6 +59,12 @@
             android:src="@drawable/bus_17" />
 
         <ImageView
+            android:id="@+id/bus_22"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/bus_22" />
+
+        <ImageView
             android:id="@+id/bus_25"
             android:layout_width="48dp"
             android:layout_height="48dp"
