@@ -7,28 +7,11 @@ public class StationDetails extends Station {
     double timeTo;
 
 
-    public StationDetails(String nomFr, String nomAr, double distanceTo, double timeTo) {
-        this.nomFr = nomFr;
-        this.nomAr = nomAr;
+    public StationDetails(String nomFr, String nomAr, GeoPoint coordonnees, int numero, double distanceTo, double timeTo) {
+        super(nomFr, nomAr, coordonnees, numero);
         this.distanceTo = distanceTo;
         this.timeTo = timeTo;
     }
-
-
-    public StationDetails(String nomFr, String nomAr, GeoPoint coordonnees, double distanceTo, double timeTo) {
-        this.nomFr = nomFr;
-        this.nomAr = nomAr;
-        this.coordonnees = coordonnees;
-        this.distanceTo = distanceTo;
-        this.timeTo = timeTo;
-    }
-
-    public StationDetails(String nomFr, double distanceTo, double timeTo) {
-        this.nomFr = nomFr;
-        this.distanceTo = distanceTo;
-        this.timeTo = timeTo;
-    }
-
 
     public StationDetails() {
     }
@@ -37,11 +20,12 @@ public class StationDetails extends Station {
     @Override
     public String toString() {
         return "StationDetails{" +
-                ", nomAr='" + nomAr + '\'' +
+                "distanceTo=" + distanceTo +
+                ", timeTo=" + timeTo +
                 ", nomFr='" + nomFr + '\'' +
-                "distanceTo='" + distanceTo + '\'' +
-                "timeTo='" + timeTo + '\'' +
-
+                ", nomAr='" + nomAr + '\'' +
+                ", coordonnees=" + coordonnees +
+                ", numero=" + numero +
                 '}';
     }
 }

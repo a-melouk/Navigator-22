@@ -79,10 +79,10 @@ import okhttp3.Response;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String urlStations = "http://192.168.1.5:3000/stations";
-    String urlRouteSubway = "http://192.168.1.5:3000/subway";
-    String urlRouteBus = "http://192.168.1.5:3000/bus";
-    String urlStationsBus = "http://192.168.1.5:3000/stations_buses";
+    String urlStations = "http://192.168.1.6:3000/stations";
+    String urlRouteSubway = "http://192.168.1.6:3000/subway";
+    String urlRouteBus = "http://192.168.1.6:3000/bus";
+    String urlStationsBus = "http://192.168.1.6:3000/stations_buses";
     private String myResponse;
 
 
@@ -437,28 +437,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ArrayList<StationDetails> travelPlanner = new ArrayList<>();
         double timeInterval = 150;
-        travelPlanner.add(new StationDetails("Wiam", 0.4929, 6.566666666666666));
-        travelPlanner.add(new StationDetails("Fac de droit", 0.6816, 9.091666666666667));
-        travelPlanner.add(new StationDetails("Daira", 0.7868999999999999, 10.498333333333333));
-        travelPlanner.add(new StationDetails("Niâama", 1.165, 15.531666666666666));
-        travelPlanner.add(new StationDetails("Environnement ", 1.2261, 16.35));
-        travelPlanner.add(new StationDetails("Sidi Djilali", 1.3222, 17.634999999999998));
-        travelPlanner.add(new StationDetails("AADL Benhamouda", 1.4276, 19.043333333333333));
-        travelPlanner.add(new StationDetails("Houari Boumediene", 1.5672000000000001, 20.901666666666664));
-        travelPlanner.add(new StationDetails("Benhamouda", 1.7253, 23.005));
-        travelPlanner.add(new StationDetails("Gare routière Nord", 1.7665, 23.551666666666666));
-        travelPlanner.add(new StationDetails("Campus", 1.8282, 24.378333333333334));
-        travelPlanner.add(new StationDetails("Radio", 2.0629, 27.543333333333333));
-        travelPlanner.add(new StationDetails("Frères Adnane", 2.3035, 30.715));
-        travelPlanner.add(new StationDetails("Les Cascades", 2.4981999999999998, 33.318333333333335));
-        travelPlanner.add(new StationDetails("Amir Abdelakder", 2.5745, 34.32833333333333));
-        travelPlanner.add(new StationDetails("Salle Adda Boudjelal", 2.6175, 34.906666666666666));
-        travelPlanner.add(new StationDetails("La Maternité", 2.623, 34.98166666666667));
-        travelPlanner.add(new StationDetails("4 Horloges", 2.6940999999999997, 35.92333333333333));
-        travelPlanner.add(new StationDetails("Gare routière Est", 2.7691, 36.92333333333333));
-        travelPlanner.add(new StationDetails("Jardin PUBLIC", 3.5172, 46.931666666666665));
-        travelPlanner.add(new StationDetails("Gare routière sud", 4.164899999999999, 55.568333333333335));
-        travelPlanner.add(new StationDetails("gare ferroviaire", 32.8602, 438.14166666666665));
+//        travelPlanner.add(new StationDetails("Wiam", 0.4929, 6.566666666666666));
+//        travelPlanner.add(new StationDetails("Fac de droit", 0.6816, 9.091666666666667));
+//        travelPlanner.add(new StationDetails("Daira", 0.7868999999999999, 10.498333333333333));
+//        travelPlanner.add(new StationDetails("Niâama", 1.165, 15.531666666666666));
+//        travelPlanner.add(new StationDetails("Environnement ", 1.2261, 16.35));
+//        travelPlanner.add(new StationDetails("Sidi Djilali", 1.3222, 17.634999999999998));
+//        travelPlanner.add(new StationDetails("AADL Benhamouda", 1.4276, 19.043333333333333));
+//        travelPlanner.add(new StationDetails("Houari Boumediene", 1.5672000000000001, 20.901666666666664));
+//        travelPlanner.add(new StationDetails("Benhamouda", 1.7253, 23.005));
+//        travelPlanner.add(new StationDetails("Gare routière Nord", 1.7665, 23.551666666666666));
+//        travelPlanner.add(new StationDetails("Campus", 1.8282, 24.378333333333334));
+//        travelPlanner.add(new StationDetails("Radio", 2.0629, 27.543333333333333));
+//        travelPlanner.add(new StationDetails("Frères Adnane", 2.3035, 30.715));
+//        travelPlanner.add(new StationDetails("Les Cascades", 2.4981999999999998, 33.318333333333335));
+//        travelPlanner.add(new StationDetails("Amir Abdelakder", 2.5745, 34.32833333333333));
+//        travelPlanner.add(new StationDetails("Salle Adda Boudjelal", 2.6175, 34.906666666666666));
+//        travelPlanner.add(new StationDetails("La Maternité", 2.623, 34.98166666666667));
+//        travelPlanner.add(new StationDetails("4 Horloges", 2.6940999999999997, 35.92333333333333));
+//        travelPlanner.add(new StationDetails("Gare routière Est", 2.7691, 36.92333333333333));
+//        travelPlanner.add(new StationDetails("Jardin PUBLIC", 3.5172, 46.931666666666665));
+//        travelPlanner.add(new StationDetails("Gare routière sud", 4.164899999999999, 55.568333333333335));
+//        travelPlanner.add(new StationDetails("gare ferroviaire", 32.8602, 438.14166666666665));
 
         bestChoiceOnTramway(currentLocation);
     }
@@ -470,20 +470,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int nombreAretes = stationsSubway.size() * 2 - 1;
         boolean oriente = false;
         graph = new Graph(oriente, nombreSommets, nombreAretes);
+        ArrayList<StationDetails> stationDetails1 = database.getAllNearestSubStations();
+        sort(stationDetails1);
         for (int i = 0; i < stationsSubway.size(); i++) {
-            ArrayList<StationDetails> stationDetails1 = new ArrayList<>();
-            ArrayList<StationDetails> stationDetails2 = new ArrayList<>();
             StationDetails station;
-            stationDetails1 = database.getAllNearestSubStationsSortedByDistance();
             station = stationDetails1.get(i);
-            station.nomAr = String.valueOf(i);
-            stationDetails2.add(station);
-            graph.Ajouter(new Arete(Integer.valueOf(station.nomAr) + 0, Integer.valueOf(station.nomAr) + 1, 0, timeBetweenStations,station.nomFr));
-//            Log.d("dijikstra10", stationDetails2.toString());
-            graph.Ajouter(new Arete(stationsSubway.size(),i,stationDetails1.get(i).distanceTo,stationDetails1.get(i).timeTo,stationDetails1.get(i).nomFr));
-            Log.d("dijikstra11", i+" | "+station.nomFr);
+            Log.d("dijikstra100", station.nomFr);
+            graph.Ajouter(new Arete(Integer.valueOf(stationDetails1.get(i).numero + 0), Integer.valueOf(stationDetails1.get(i).numero) + 1, 0, timeBetweenStations, stationDetails1.get(i).nomFr));
+            Log.d("dijikstra10", stationDetails1.get(15).nomFr);
+
         }
-        Log.d("dijikstra13", graph.toString());
+        for (int i = 0; i < stationsSubway.size(); i++) {
+            graph.Ajouter(new Arete(stationsSubway.size(), i, stationDetails1.get(i).distanceTo, stationDetails1.get(i).timeTo, stationDetails1.get(i).nomFr));
+        }
+        Log.d("DijikstraEdited10", graph.toString());
         graph.Djiskra(22);
 
     }
@@ -581,6 +581,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             try {
                 stationSubway.nomAr = jsonobject.getString("nomAr");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                stationSubway.numero = jsonobject.getInt("numero");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -1027,7 +1032,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         StationDetails temp;
         for (int i = 0; i < stationDetails.size() - 1; i++)
             for (int j = i; j < stationDetails.size(); j++) {
-                if (stationDetails.get(i).distanceTo > stationDetails.get(j).distanceTo) {
+                if (stationDetails.get(i).numero > stationDetails.get(j).numero) {
                     temp = stationDetails.get(i);
                     stationDetails.set(i, stationDetails.get(j));
                     stationDetails.set(j, temp);

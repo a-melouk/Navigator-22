@@ -28,7 +28,7 @@ public class Arete {
                 ", arrive=" + arrive +
                 ", distance=" + distance +
                 ", time=" + time +
-                ", nom='" + nom + '\'' +
+                ", nom='" + nom + '\'' +"\n"+
                 '}';
     }
 }

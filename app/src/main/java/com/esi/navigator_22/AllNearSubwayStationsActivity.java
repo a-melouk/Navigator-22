@@ -61,16 +61,17 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         barProgressDialog.show();
         barProgressDialog.setCancelable(false);
         t1 = new Thread(() -> {
-            Log.d("databaseDelete13", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
+//            Log.d("databaseDelete13", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
-            Log.d("databaseDelete14", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
+//            Log.d("databaseDelete14", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
 
-            Log.d("databaseDelete5", String.valueOf(getDistanceOffline(new GeoPoint(35.2065503, -0.6191647), new GeoPoint(0.0, 0.0))));
+//            Log.d("databaseDelete5", String.valueOf(getDistanceOffline(new GeoPoint(35.2065503, -0.6191647), new GeoPoint(0.0, 0.0))));
 
 //            MainActivity.stations.size()
             for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                 barProgressDialog.incrementProgressBy(1);
                 StationDetails availableStation = new StationDetails();
+                availableStation.numero = MainActivity.stationsSubway.get(i).numero;
                 availableStation.nomAr = MainActivity.stationsSubway.get(i).nomAr;
                 availableStation.nomFr = MainActivity.stationsSubway.get(i).nomFr;
                 getRouteOnlineOnFoot(MainActivity.stationsSubway.get(i).coordonnees);

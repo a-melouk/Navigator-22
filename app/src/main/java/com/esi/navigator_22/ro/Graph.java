@@ -8,7 +8,8 @@ public class Graph {
     int nombre_sommets, nombre_aretes;
     ArrayList<Arete> aretes;
 
-    public Graph() {}
+    public Graph() {
+    }
 
     public Graph(boolean oriente, int nombre_sommets, int nombre_aretes) {
         this.oriente = oriente;
@@ -101,7 +102,7 @@ public class Graph {
                 "oriente=" + oriente +
                 ", nombre_sommets=" + nombre_sommets +
                 ", nombre_aretes=" + nombre_aretes +
-                ", aretes=" + aretes +
-                '}';
+                "," + "\n + aretes = " + aretes +"\n "+
+        '}';
     }
 }
