@@ -67,8 +67,9 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
             for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                 double distanceOffline = 0.0;
                 StationDetails stationDetails = new StationDetails();
+                stationDetails.type = MainActivity.stationsSubway.get(i).type;
                 stationDetails.nomFr = MainActivity.stationsSubway.get(i).nomFr;
-                stationDetails.nomAr = MainActivity.stationsSubway.get(i).nomAr;
+                stationDetails.numero = MainActivity.stationsSubway.get(i).numero;
                 stationDetails.coordonnees = MainActivity.stationsSubway.get(i).coordonnees;
                 distanceOffline = getDistanceOffline(stationDetails.coordonnees, currentLocation);
                 stationDetails.distanceTo = distanceOffline;
@@ -82,7 +83,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
             for (int i = 0; i < 7; i++) {
 
                 StationDetails availableStation = new StationDetails();
-                availableStation.nomAr = plusProches.get(i).nomAr;
+                availableStation.type = plusProches.get(i).type;
                 availableStation.nomFr = plusProches.get(i).nomFr;
                 getRouteOnlineOnFoot(plusProches.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
@@ -121,9 +122,9 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
     }
 
     private void copyToMyList(int number, ArrayList<StationDetails> list) {
-        ArrayList<StationDetails> temp = database.getNthNearestSubStationsSortedByDistance(number);
-        for (int i = 0; i < number; i++)
-            list.add(temp.get(i));
+//        ArrayList<StationDetails> temp = database.getNthNearestSubStationsSortedByDistance(number);
+//        for (int i = 0; i < number; i++)
+//            list.add(temp.get(i));
     }
 
     private void getRouteOnlineOnFoot(GeoPoint geoPoint) {

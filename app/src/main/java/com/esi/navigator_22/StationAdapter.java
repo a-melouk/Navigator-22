@@ -38,7 +38,7 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
 
 
         subway.setImageResource(R.drawable.ic_tramway);
-        nomAr.setText(getItem(position).nomAr);
+        nomAr.setText(getItem(position).type);
         nomFr.setText(getItem(position).nomFr);
         distance.setText(String.valueOf(getItem(position).distanceTo));
         time.setText(String.valueOf(getItem(position).timeTo));

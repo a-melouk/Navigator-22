@@ -19,11 +19,11 @@ public class DbHelper extends SQLiteOpenHelper {
     private static DbHelper mInstance = null;
     private final Context mCxt;
 
-
-    private static final String TABLE_STATIONS_SUB = "stations_sub";
-    private static final String TABLE_STATIONS_BUS = "stations_bus";
     private static final String TABLE_CHEMIN_SUB = "chemin_sub";
     private static final String TABLE_CHEMIN_BUS = "chemin_bus";
+    private static final String TABLE_STATIONS = "stations";
+    private static final String TABLE_CORRESPONDANCE = "correspondance";
+
     private static final String TABLE_NEAREST_SUB_STATIONS = "nearest_sub_stations";
 
     public static DbHelper getInstance(Context ctx) {
@@ -39,46 +39,40 @@ public class DbHelper extends SQLiteOpenHelper {
         return mInstance;
     }
 
-//    private static final String COLUMN_TIMESTAMP = "timestamp";
+    //    private static final String COLUMN_TIMESTAMP = "timestamp";
 //    private static final String COLUMN_ID = "id";
-
-
-    private static final String COLUMN_NOMFR = "nomFR";
-    private static final String COLUMN_NOMAR = "nomAR";
-
     private static final String COLUMN_LATITUDE = "latitude";
     private static final String COLUMN_LONGITUDE = "longitude";
+
+    private static final String COLUMN_NOMFR = "nomFR";
+    private static final String COLUMN_TYPE = "type";
+
 
     private static final String COLUMN_DISTANCE = "distanceTo";
     private static final String COLUMN_TIME = "timeTo";
 
-    private static final String COLUMN_NUMLIGNE = "numLigne";
     private static final String COLUMN_NUMERO = "numero";
+    private static final String COLUMN_NUMLIGNE = "numLigne";
 
-    private static final String CREATE_TABLE_StationSub = "CREATE TABLE "
-            + TABLE_STATIONS_SUB + "("
-            + COLUMN_NUMERO + " INTEGER ,"
+    private static final String CREATE_TABLE_Station = "CREATE TABLE "
+            + TABLE_STATIONS + "("
+            + COLUMN_TYPE + " TEXT ,"
             + COLUMN_NOMFR + " TEXT ,"
-            + COLUMN_NOMAR + " TEXT ,"
+            + COLUMN_NUMERO + " TEXT ,"
             + COLUMN_LATITUDE + " REAL ,"
             + COLUMN_LONGITUDE + " REAL ,"
-            + "PRIMARY KEY (" + COLUMN_NOMFR + " , " + COLUMN_NOMAR + ")"
+            + "PRIMARY KEY (" + COLUMN_NOMFR + " , " + COLUMN_NUMERO + " , " + COLUMN_TYPE + ")"
             + ")";
-
-    private static final String CREATE_TABLE_StationBus = "CREATE TABLE "
-            + TABLE_STATIONS_BUS + "("
-            + COLUMN_NOMFR + " TEXT ,"
-            + COLUMN_NUMLIGNE + " TEXT ,"
-            + COLUMN_LATITUDE + " REAL ,"
-            + COLUMN_LONGITUDE + " REAL ,"
-            + "PRIMARY KEY (" + COLUMN_NOMFR + " , " + COLUMN_NUMLIGNE + ")"
-            + ")";
-
 
     private static final String CREATE_TABLE_CheminSub = "CREATE TABLE "
             + TABLE_CHEMIN_SUB + "("
-//            + COLUMN_TIMESTAMP + " TEXT ,"
-//            + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+            + COLUMN_LATITUDE + " REAL ,"
+            + COLUMN_LONGITUDE + " REAL ,"
+            + "PRIMARY KEY(" + COLUMN_LATITUDE + "," + COLUMN_LONGITUDE + ")"
+            + ")";
+
+    private static final String CREATE_TABLE_Correspondance = "CREATE TABLE "
+            + TABLE_CORRESPONDANCE + "("
             + COLUMN_LATITUDE + " REAL ,"
             + COLUMN_LONGITUDE + " REAL ,"
             + "PRIMARY KEY(" + COLUMN_LATITUDE + "," + COLUMN_LONGITUDE + ")"
@@ -86,21 +80,20 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private static final String CREATE_TABLE_CheminBus = "CREATE TABLE "
             + TABLE_CHEMIN_BUS + "("
-//            + COLUMN_TIMESTAMP + " TEXT ,"
             + COLUMN_NUMLIGNE + " TEXT ,"
             + COLUMN_LATITUDE + " REAL ,"
             + COLUMN_LONGITUDE + " REAL ,"
             + "PRIMARY KEY(" + COLUMN_LATITUDE + "," + COLUMN_LONGITUDE + "," + COLUMN_NUMLIGNE + ")"
             + ")";
 
-    private static final String CREATE_TABLE_Closest_Subway_Stations = "CREATE TABLE "
+    private static final String CREATE_TABLE_Closest_Stations = "CREATE TABLE "
             + TABLE_NEAREST_SUB_STATIONS + "("
-            + COLUMN_NUMERO + " INTEGER ,"
+            + COLUMN_TYPE + " TEXT ,"
             + COLUMN_NOMFR + " TEXT ,"
-            + COLUMN_NOMAR + " TEXT ,"
+            + COLUMN_NUMERO + " TEXT ,"
             + COLUMN_DISTANCE + " REAL ,"
             + COLUMN_TIME + " REAL ,"
-            + "PRIMARY KEY(" + COLUMN_NOMFR + ")"
+            + "PRIMARY KEY (" + COLUMN_NOMFR + " , " + COLUMN_NUMERO + " , " + COLUMN_TYPE + ")"
             + ")";
 
     private DbHelper(Context context) {
@@ -111,17 +104,17 @@ public class DbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(CREATE_TABLE_StationSub);
-        sqLiteDatabase.execSQL(CREATE_TABLE_StationBus);
+        sqLiteDatabase.execSQL(CREATE_TABLE_Station);
         sqLiteDatabase.execSQL(CREATE_TABLE_CheminSub);
-        sqLiteDatabase.execSQL(CREATE_TABLE_Closest_Subway_Stations);
+        sqLiteDatabase.execSQL(CREATE_TABLE_Closest_Stations);
         sqLiteDatabase.execSQL(CREATE_TABLE_CheminBus);
+        sqLiteDatabase.execSQL(CREATE_TABLE_Correspondance);
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_STATIONS_SUB);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_STATIONS_BUS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_STATIONS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CHEMIN_SUB);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NEAREST_SUB_STATIONS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CHEMIN_BUS);
@@ -135,35 +128,24 @@ public class DbHelper extends SQLiteOpenHelper {
 
     }
 
-    long addStationSubway(Station station) {
+    long addStation(Station station) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_TYPE, station.type);
+        contentValues.put(COLUMN_NOMFR, station.nomFr);
         contentValues.put(COLUMN_NUMERO, station.numero);
-        contentValues.put(COLUMN_NOMFR, station.nomFr);
-        contentValues.put(COLUMN_NOMAR, station.nomAr);
         contentValues.put(COLUMN_LATITUDE, station.coordonnees.getLatitude());
         contentValues.put(COLUMN_LONGITUDE, station.coordonnees.getLongitude());
-        long word_id = db.insert(TABLE_STATIONS_SUB, null, contentValues);
-        return word_id;
-    }
-
-    long addStationBus(StationBus station) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_NOMFR, station.nomFr);
-        contentValues.put(COLUMN_NUMLIGNE, station.numLigne);
-        contentValues.put(COLUMN_LATITUDE, station.coordonnees.getLatitude());
-        contentValues.put(COLUMN_LONGITUDE, station.coordonnees.getLongitude());
-        long word_id = db.insert(TABLE_STATIONS_BUS, null, contentValues);
+        long word_id = db.insert(TABLE_STATIONS, null, contentValues);
         return word_id;
     }
 
     long addNearStation(StationDetails stationDetails) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(COLUMN_NUMERO, stationDetails.numero);
+        contentValues.put(COLUMN_TYPE, stationDetails.type);
         contentValues.put(COLUMN_NOMFR, stationDetails.nomFr);
-        contentValues.put(COLUMN_NOMAR, stationDetails.nomAr);
+        contentValues.put(COLUMN_NUMERO, stationDetails.numero);
         contentValues.put(COLUMN_DISTANCE, stationDetails.distanceTo);
         contentValues.put(COLUMN_TIME, stationDetails.timeTo);
         long word_id = db.insert(TABLE_NEAREST_SUB_STATIONS, null, contentValues);
@@ -181,6 +163,15 @@ public class DbHelper extends SQLiteOpenHelper {
         return word_id;
     }
 
+    long addPointCorrespondance(GeoPoint point) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_LATITUDE, point.getLatitude());
+        contentValues.put(COLUMN_LONGITUDE, point.getLongitude());
+        long word_id = db.insert(TABLE_CORRESPONDANCE, null, contentValues);
+        return word_id;
+    }
+
     long addPointBus(RouteBus point) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -190,69 +181,6 @@ public class DbHelper extends SQLiteOpenHelper {
         contentValues.put(COLUMN_LONGITUDE, point.coordinates.getLongitude());
         long word_id = db.insert(TABLE_CHEMIN_BUS, null, contentValues);
         return word_id;
-    }
-
-
-    public ArrayList<Station> getAllStationsSubway() {
-        ArrayList<Station> stations = new ArrayList<Station>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_SUB + " ORDER BY " + COLUMN_NOMFR;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-        if (c.moveToFirst()) {
-            do {
-                Station s = new Station();
-                GeoPoint g = new GeoPoint(0.0, 0.0);
-                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
-                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
-                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
-                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
-                s.coordonnees = g;
-                stations.add(s);
-            } while (c.moveToNext());
-        }
-        return stations;
-    }
-
-    public ArrayList<Station> getAllStationsSubwayOrderedByNumber() {
-        ArrayList<Station> stations = new ArrayList<Station>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_SUB + " ORDER BY CAST(" + COLUMN_NUMERO + " AS INTEGER)";
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-        if (c.moveToFirst()) {
-            do {
-                Station s = new Station();
-                GeoPoint g = new GeoPoint(0.0, 0.0);
-                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
-                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
-                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
-                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
-                s.coordonnees = g;
-                stations.add(s);
-            } while (c.moveToNext());
-        }
-        return stations;
-    }
-
-    public ArrayList<StationBus> getAllStationsBus() {
-        ArrayList<StationBus> stations = new ArrayList<StationBus>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_BUS + " ORDER BY " + COLUMN_NOMFR;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery(selectQuery, null);
-        if (c.moveToFirst()) {
-            do {
-                StationBus s = new StationBus();
-                GeoPoint g = new GeoPoint(0.0, 0.0);
-                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.numLigne = c.getString((c.getColumnIndex(COLUMN_NUMLIGNE)));
-                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
-                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
-                s.coordonnees = g;
-                stations.add(s);
-            } while (c.moveToNext());
-        }
-        return stations;
     }
 
     public ArrayList<GeoPoint> getAllPointsSub() {
@@ -273,26 +201,22 @@ public class DbHelper extends SQLiteOpenHelper {
         return pointChemins;
     }
 
-    public ArrayList<RouteBus> getAllPointsBus() {
-        ArrayList<RouteBus> pointCheminsBus = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_CHEMIN_BUS;
+    public ArrayList<GeoPoint> getAllPointsCorrespondance() {
+        ArrayList<GeoPoint> pointChemins = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_CORRESPONDANCE;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             do {
                 GeoPoint g = new GeoPoint(0.0, 0.0);
-                RouteBus routeBus = new RouteBus();
-                routeBus.numLigne = c.getString(c.getColumnIndex(COLUMN_NUMLIGNE));
+//                s.timestamp = c.getString((c.getColumnIndex(COLUMN_TIMESTAMP)));
 //                s.id = c.getInt((c.getColumnIndex(COLUMN_ID)));
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
-                routeBus.coordinates.setLatitude(g.getLatitude());
-                routeBus.coordinates.setLongitude(g.getLongitude());
-
-                pointCheminsBus.add(routeBus);
+                pointChemins.add(g);
             } while (c.moveToNext());
         }
-        return pointCheminsBus;
+        return pointChemins;
     }
 
     public ArrayList<GeoPoint> getAllPointsBusByNumber(String numero) {
@@ -311,74 +235,157 @@ public class DbHelper extends SQLiteOpenHelper {
         return pointCheminsBus;
     }
 
-    public ArrayList<StationBus> getAllStationsBusByNumber(String numero) {
-        ArrayList<StationBus> stationsBus = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_BUS + " WHERE " + COLUMN_NUMLIGNE + "= \"" + numero + "\"";
+    ArrayList<Station> getAllStations() {
+        ArrayList<Station> stations = new ArrayList<Station>();
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " ORDER BY " + COLUMN_NOMFR;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                Station s = new Station();
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                s.type = c.getString(c.getColumnIndex(COLUMN_TYPE));
+                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
+                s.numero = c.getString((c.getColumnIndex(COLUMN_NUMERO)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
+                s.coordonnees = g;
+                stations.add(s);
+            } while (c.moveToNext());
+        }
+        return stations;
+    }
+
+    ArrayList<Station> getAllTramwayStations() {
+        ArrayList<Station> stations = new ArrayList<Station>();
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_TYPE + " = 'tramway'" + " ORDER BY CAST(" + COLUMN_NUMERO + " AS INTEGER)";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                Station s = new Station();
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                s.type = c.getString(c.getColumnIndex(COLUMN_TYPE));
+                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
+                s.numero = c.getString((c.getColumnIndex(COLUMN_NUMERO)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
+                s.coordonnees = g;
+                stations.add(s);
+                Log.d("TramwayStation", s.toString());
+            } while (c.moveToNext());
+        }
+        return stations;
+    }
+
+
+    ArrayList<Station> getAllBusStations() {
+        ArrayList<Station> stations = new ArrayList<Station>();
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_TYPE + " = 'bus'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                Station s = new Station();
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                s.type = c.getString(c.getColumnIndex(COLUMN_TYPE));
+                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
+                s.numero = c.getString((c.getColumnIndex(COLUMN_NUMERO)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
+                s.coordonnees = g;
+                stations.add(s);
+            } while (c.moveToNext());
+        }
+        return stations;
+    }
+
+    ArrayList<Station> getAllBusStationsByNumber(String numero) {
+        ArrayList<Station> stations = new ArrayList<Station>();
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_TYPE + " = 'bus' AND " + COLUMN_NUMERO + " = '" + numero + "'";
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                Station s = new Station();
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                s.type = c.getString(c.getColumnIndex(COLUMN_TYPE));
+                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
+                s.numero = c.getString((c.getColumnIndex(COLUMN_NUMERO)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
+                s.coordonnees = g;
+                stations.add(s);
+                Log.d("BusStation", s.toString());
+            } while (c.moveToNext());
+        }
+        return stations;
+    }
+
+
+    public ArrayList<Station> getAllBusStationsByName(String name) {
+        ArrayList<Station> stationsBus = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_NOMFR + "= '" + name + "'" + " AND " + COLUMN_TYPE + " = 'bus'";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             do {
                 GeoPoint g = new GeoPoint(0.0, 0.0);
-                StationBus stationBus = new StationBus("Default", "numero", g);
+                Station station = new Station("A", "Name", g);
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
-                stationBus.nomFr = c.getString(c.getColumnIndex(COLUMN_NOMFR));
-                stationBus.coordonnees = g;
-                stationBus.numLigne = c.getString(c.getColumnIndex(COLUMN_NUMLIGNE));
-                stationsBus.add(stationBus);
+                station.nomFr = c.getString(c.getColumnIndex(COLUMN_NOMFR));
+                station.coordonnees = g;
+                station.numero = c.getString(c.getColumnIndex(COLUMN_NUMERO));
+                stationsBus.add(station);
+                Log.d("SearchBusStationByName",station.toString());
             } while (c.moveToNext());
         }
         return stationsBus;
     }
 
-    public ArrayList<StationBus> getAllStationsBusByName(String nomFr) {
-        ArrayList<StationBus> stationsBus = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS_BUS + " WHERE " + COLUMN_NOMFR + "= \"" + nomFr + "\"";
+    public ArrayList<Station> getAllStationsByName(String nomFr) {
+        ArrayList<Station> stationsBus = new ArrayList<>();
+//        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_NOMFR + "= \"" + nomFr + "\"";
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_NOMFR + "like \"" + nomFr + "\"";
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             do {
                 GeoPoint g = new GeoPoint(0.0, 0.0);
-                StationBus stationBus = new StationBus("Default", "Default", g);
+                Station station = new Station("DefaultNumber", "DefaultName", g);
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
-                stationBus.nomFr = c.getString(c.getColumnIndex(COLUMN_NOMFR));
-                stationBus.coordonnees = g;
-                stationBus.numLigne = c.getString(c.getColumnIndex(COLUMN_NUMLIGNE));
-                stationsBus.add(stationBus);
+                station.nomFr = c.getString(c.getColumnIndex(COLUMN_NOMFR));
+                station.coordonnees = g;
+                station.numero = c.getString(c.getColumnIndex(COLUMN_NUMERO));
+                stationsBus.add(station);
+                Log.d("SearchStationByName",station.toString());
             } while (c.moveToNext());
         }
         return stationsBus;
     }
 
-    public ArrayList<StationDetails> getAllNearestSubStationsSortedByDistance() {
+    /*public ArrayList<StationDetails> getAllNearestSubStationsSortedByDistance() {
         ArrayList<StationDetails> stationDetails = new ArrayList<>();
-        Log.d("CursorProblem10", "0");
         String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_DISTANCE;
-        Log.d("CursorProblem10", "1");
         SQLiteDatabase db = this.getReadableDatabase();
-        Log.d("CursorProblem10", "2");
         Cursor c = db.rawQuery(selectQuery, null);
-        Log.d("CursorProblem10", "3");
         if (c.moveToFirst()) {
             do {
                 StationDetails s = new StationDetails();
-                Log.d("CursorProblem10", "4");
                 s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
-                Log.d("CursorProblem10", "5");
                 s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
                 s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
                 s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
-                Log.d("CursorProblem10", "6");
                 stationDetails.add(s);
             } while (c.moveToNext());
         }
-        Log.d("CursorProblem10", "7");
-        return stationDetails;
-    }
 
-    public ArrayList<StationDetails> getAllNearestSubStations() {
+        return stationDetails;
+    }*/
+
+    /*public ArrayList<StationDetails> getAllNearestSubStations() {
         ArrayList<StationDetails> stationDetails = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_NUMERO;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -386,18 +393,19 @@ public class DbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 StationDetails s = new StationDetails();
-                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
+
                 s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
+                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
+
                 s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
                 s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
                 stationDetails.add(s);
             } while (c.moveToNext());
         }
         return stationDetails;
-    }
+    }*/
 
-    public ArrayList<StationDetails> getAllNearestSubStationsSortedByTime() {
+    /*public ArrayList<StationDetails> getAllNearestSubStationsSortedByTime() {
         ArrayList<StationDetails> stationDetails = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_TIME;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -405,18 +413,18 @@ public class DbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 StationDetails s = new StationDetails();
-                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
+                s.type = c.getString(c.getColumnIndex(COLUMN_TYPE));
                 s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
+                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
                 s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
                 s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
                 stationDetails.add(s);
             } while (c.moveToNext());
         }
         return stationDetails;
-    }
+    }*/
 
-    public ArrayList<StationDetails> getNthNearestSubStationsSortedByDistance(int number) {
+    /*public ArrayList<StationDetails> getNthNearestSubStationsSortedByDistance(int number) {
         ArrayList<StationDetails> stationDetails = new ArrayList<>();
         String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_DISTANCE + " LIMIT " + number;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -424,18 +432,18 @@ public class DbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 StationDetails s = new StationDetails();
-                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
                 s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
+                s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
+                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
                 s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
                 s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
                 stationDetails.add(s);
             } while (c.moveToNext());
         }
         return stationDetails;
-    }
+    }*/
 
-    public StationDetails getNearestSubStationsSortedByDistance() {
+/*    public StationDetails getNearestSubStationsSortedByDistance() {
         StationDetails stationDetails = new StationDetails();
         String selectQuery = "SELECT * FROM " + TABLE_NEAREST_SUB_STATIONS + " ORDER BY " + COLUMN_DISTANCE + " LIMIT " + 1;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -443,16 +451,16 @@ public class DbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 StationDetails s = new StationDetails();
-                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
                 s.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFR)));
-                s.nomAr = c.getString((c.getColumnIndex(COLUMN_NOMAR)));
+                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
+                s.numero = c.getInt((c.getColumnIndex(COLUMN_NUMERO)));
                 s.distanceTo = c.getDouble((c.getColumnIndex(COLUMN_DISTANCE)));
                 s.timeTo = c.getDouble((c.getColumnIndex(COLUMN_TIME)));
                 stationDetails = s;
             } while (c.moveToNext());
         }
         return stationDetails;
-    }
+    }*/
 
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();

@@ -71,9 +71,9 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
                 barProgressDialog.incrementProgressBy(1);
                 StationDetails availableStation = new StationDetails();
-                availableStation.numero = MainActivity.stationsSubway.get(i).numero;
-                availableStation.nomAr = MainActivity.stationsSubway.get(i).nomAr;
+                availableStation.type = MainActivity.stationsSubway.get(i).type;
                 availableStation.nomFr = MainActivity.stationsSubway.get(i).nomFr;
+                availableStation.numero = MainActivity.stationsSubway.get(i).numero;
                 getRouteOnlineOnFoot(MainActivity.stationsSubway.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
@@ -89,7 +89,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
             runOnUiThread(() -> {
                 for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
-                    myList.add(database.getAllNearestSubStationsSortedByDistance().get(i));
+//                    myList.add(database.getAllNearestSubStationsSortedByDistance().get(i));
                     Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo + " | "+myList.get(i).timeTo);
 
                 }

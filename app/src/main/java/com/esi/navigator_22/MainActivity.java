@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -14,10 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -36,8 +34,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.esi.navigator_22.ro.Arete;
-import com.esi.navigator_22.ro.Graph;
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
@@ -79,10 +75,10 @@ import okhttp3.Response;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String urlStations = "http://192.168.1.6:3000/stations";
-    String urlRouteSubway = "http://192.168.1.6:3000/subway";
-    String urlRouteBus = "http://192.168.1.6:3000/bus";
-    String urlStationsBus = "http://192.168.1.6:3000/stations_buses";
+    String urlStations = "http://192.168.1.4:3000/stations_sba";
+    String urlRouteSubway = "http://192.168.1.4:3000/subway";
+    String urlRouteBus = "http://192.168.1.4:3000/bus";
+    String urlCorrespondance = "http://192.168.1.4:3000/correspondance";
     private String myResponse;
 
 
@@ -96,8 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout menu_linear;
     ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
 
-    Station stationSubway = new Station();
-    StationBus stationBus = new StationBus();
+    Station station = new Station();
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
@@ -133,8 +128,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        stationsSubway = database.getAllStationsSubway();
-        stationsBus = database.getAllStationsBus();
+//        stationsSubway = database.getAllStationsSubway();
+//        stationsBus = database.getAllStationsBus();
 
 
         myMap = findViewById(R.id.map);
@@ -296,64 +291,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getLocation();
             chemin = database.getAllPointsSub();
             tracerCheminSubway(chemin, myMap);
-            addStationsSubway();
+            chemin = database.getAllPointsCorrespondance();
+            tracerCorrespondance(chemin, myMap);
+//            addStationsSubway();
         });
 
         bus3.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A03");
             tracerCheminBus(chemin, myMap, 255, 0, 0);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A03");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A03");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A03");
         });
         bus3bis.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A03 bis");
             tracerCheminBus(chemin, myMap, 255, 0, 0);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A03 bis");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A03 bis");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A03 bis");
         });
         bus11.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A11");
             tracerCheminBus(chemin, myMap, 0, 0, 0);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A11");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A11");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A11");
         });
         bus16.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A16");
             tracerCheminBus(chemin, myMap, 0, 0, 255);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A16");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A16");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A16");
         });
         bus17.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A17");
             tracerCheminBus(chemin, myMap, 0, 255, 0);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A17");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A17");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A17");
         });
 
         bus_22.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A22");
             tracerCheminBus(chemin, myMap, 105, 105, 105);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A22");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A22");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A22");
         });
         bus25.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A25");
             tracerCheminBus(chemin, myMap, 255, 0, 255);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A25");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A25");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A25");
         });
         bus27.setOnClickListener(v -> {
             chemin = database.getAllPointsBusByNumber("A27");
             tracerCheminBus(chemin, myMap, 0, 255, 255);
-            stationsBusByNumber = database.getAllStationsBusByNumber("A27");
-            addStationsBus(stationsBusByNumber);
+//            stationsBusByNumber = database.getAllStationsBusByNumber("A27");
+//            addStationsBus(stationsBusByNumber);
             Log.d("Ligne : ", "A27");
         });
 
@@ -382,12 +379,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
+                Log.d("Nouvelle station1", "fail");
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     fetchAllStations(response);
+                    Log.d("Nouvelle station2", "success");
                 }
             }
         });
@@ -410,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         request = new Request.Builder()
-                .url(urlStationsBus)
+                .url(urlCorrespondance)
                 .build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -421,8 +420,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    fetchAllStationsBus(response);
-
+                    fetchRouteCorrespondance(response);
                 }
             }
         });
@@ -437,6 +435,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ArrayList<StationDetails> travelPlanner = new ArrayList<>();
         double timeInterval = 150;
+
+//        database.getAllTramwayStations();
+//        database.getAllBusStationsByNumber("A03");
+//        database.getAllBusStationsByName("Prado");
+
+
 //        travelPlanner.add(new StationDetails("Wiam", 0.4929, 6.566666666666666));
 //        travelPlanner.add(new StationDetails("Fac de droit", 0.6816, 9.091666666666667));
 //        travelPlanner.add(new StationDetails("Daira", 0.7868999999999999, 10.498333333333333));
@@ -460,10 +464,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        travelPlanner.add(new StationDetails("Gare routière sud", 4.164899999999999, 55.568333333333335));
 //        travelPlanner.add(new StationDetails("gare ferroviaire", 32.8602, 438.14166666666665));
 
-        bestChoiceOnTramway(currentLocation);
+//        bestChoiceOnTramway(currentLocation);
     }
 
-    private void bestChoiceOnTramway(GeoPoint currentLocation) {
+/*    private void bestChoiceOnTramway(GeoPoint currentLocation) {
         double timeBetweenStations = 150;
         Graph graph = new Graph();
         int nombreSommets = stationsSubway.size() + 1;
@@ -486,10 +490,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Log.d("DijikstraEdited10", graph.toString());
         graph.Djiskra(22);
 
-    }
+    }*/
 
 
-    @Override
+/*    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
         ArrayList<Station> stations = database.getAllStationsSubway();
@@ -506,7 +510,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.stations_sba, menu);
         return true;
-    }
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -516,7 +520,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int random = (int) Math.round(Math.random() * 5);
                 Log.d("Couleurs", String.valueOf(random));
                 fetchRoute(currentLocation, stationsSubway.get(i).coordonnees, true);
-                addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr + " " + stationsSubway.get(i).nomAr);
+                addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr + " " + stationsSubway.get(i).type);
                 myMap.getController().setCenter(stationsSubway.get(i).coordonnees);
                 myMap.getController().setZoom(17.0);
             }
@@ -575,58 +579,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             try {
                 assert jsonobject != null;
-                stationSubway.nomFr = jsonobject.getString("nomFr");
+                station.nomFr = jsonobject.getString("nomFr");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             try {
-                stationSubway.nomAr = jsonobject.getString("nomAr");
+                station.type = jsonobject.getString("type");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             try {
-                stationSubway.numero = jsonobject.getInt("numero");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                point.setLatitude(jsonobject.getDouble("latitude"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                point.setLongitude(jsonobject.getDouble("longitude"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            stationSubway.coordonnees = point;
-            database.addStationSubway(stationSubway);
-        }
-    }
-
-    private void fetchAllStationsBus(Response response) throws IOException {
-        myResponse = Objects.requireNonNull(response.body()).string();
-        JSONArray jsonarray = null;
-        try {
-            jsonarray = new JSONArray(myResponse);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
-            JSONObject jsonobject = null;
-            try {
-                jsonobject = jsonarray.getJSONObject(i);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                assert jsonobject != null;
-                stationBus.nomFr = jsonobject.getString("nomFr");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                stationBus.numLigne = jsonobject.getString("numero");
+                station.numero = jsonobject.getString("numero");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -640,9 +603,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            stationBus.coordonnees = point;
-            Log.d("StationBus", stationBus.toString());
-            database.addStationBus(stationBus);
+            station.coordonnees = point;
+            Log.d("Nouvelle station", station.toString());
+            database.addStation(station);
         }
     }
 
@@ -668,6 +631,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void fetchRouteCorrespondance(Response response) throws IOException {
+        myResponse = response.body().string();
+        JSONArray jsonarray = null;
+        try {
+            jsonarray = new JSONArray(myResponse);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
+            JSONObject jsonobject;
+            GeoPoint po = new GeoPoint(0.0, 0.0);
+            try {
+                jsonobject = jsonarray.getJSONObject(i);
+                po.setLatitude(jsonobject.getDouble("latitude"));
+                po.setLongitude(jsonobject.getDouble("longitude"));
+                database.addPointCorrespondance(po);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void fetchRouteBus(Response response) throws IOException {
         myResponse = Objects.requireNonNull(response.body()).string();
         JSONArray jsonarray = null;
@@ -685,7 +670,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 po.setLatitude(jsonobject.getDouble("latitude"));
                 po.setLongitude(jsonobject.getDouble("longitude"));
                 pointBus.numLigne = (jsonobject.getString("numero"));
-                Log.d("BusBus", jsonobject.toString());
                 pointBus.coordinates.setLatitude(po.getLatitude());
                 pointBus.coordinates.setLongitude(po.getLongitude());
                 database.addPointBus(pointBus);
@@ -697,19 +681,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     //Adding Overlays
-    private void addStationsSubway() {
+/*    private void addStationsSubway() {
 
         for (int i = 0; i < stationsSubway.size(); i++) {
             addStationSubway(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr, stationsSubway.get(i).nomAr);
         }
-    }
+    }*/
 
-    private void addStationsBus(ArrayList<StationBus> stationsBus) {
+    /*private void addStationsBus(ArrayList<StationBus> stationsBus) {
         for (int i = 0; i < stationsBus.size(); i++) {
             addStationBus(myMap, stationsBus.get(i).coordonnees, stationsBus.get(i).nomFr, stationsBus.get(i).numLigne);
         }
 
-    }
+    }*/
 
     private void tracerCheminSubway(ArrayList<GeoPoint> chemin, MapView mapView) {
         Polyline line = new Polyline();
@@ -720,7 +704,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setPoints(chemin);
         line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
+    }
 
+    private void tracerCorrespondance(ArrayList<GeoPoint> chemin, MapView mapView) {
+        Polyline line = new Polyline();
+        line.setWidth(12);
+//        line.getOutlinePaint();
+        line.setColor(Color.rgb(0, 0, 0));
+        line.setDensityMultiplier(0.1f);
+        line.setPoints(chemin);
+        line.setGeodesic(true);
+        line.getOutlinePaint().setPathEffect(new DashPathEffect(new float[]{2, 4}, 0));
+        mapView.getOverlayManager().add(line);
     }
 
     private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue) {
@@ -1028,7 +1023,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     //Sort ArrayList by Distance
-    void sort(ArrayList<StationDetails> stationDetails) {
+/*    void sort(ArrayList<StationDetails> stationDetails) {
         StationDetails temp;
         for (int i = 0; i < stationDetails.size() - 1; i++)
             for (int j = i; j < stationDetails.size(); j++) {
@@ -1038,7 +1033,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     stationDetails.set(j, temp);
                 }
             }
-    }
+    }*/
 
     //Menu Navigation
     private void setNavigationViewListener() {

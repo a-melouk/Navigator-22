@@ -3,32 +3,32 @@ package com.esi.navigator_22;
 import org.osmdroid.util.GeoPoint;
 
 public class Station {
+    String type;
     String nomFr;
-    String nomAr;
+    String numero;
     GeoPoint coordonnees;
-    int numero;
 
-    public Station(GeoPoint coordonnees, String nomAr, String nomFr) {
-        this.nomFr = nomFr;
-        this.nomAr = nomAr;
-        this.coordonnees = coordonnees;
-    }
 
     public Station() {
     }
 
-    public Station(String nomFr, String nomAr, GeoPoint coordonnees, int numero) {
+    public Station(String type, String nomFr, String numero, GeoPoint coordonnees) {
+        this.type = type;
         this.nomFr = nomFr;
-        this.nomAr = nomAr;
         this.coordonnees = coordonnees;
         this.numero = numero;
+    }
+
+    public Station(String numero, String nomFr, GeoPoint coordonnees) {
+        this.nomFr = nomFr;
+        this.numero = numero;
+        this.coordonnees = coordonnees;
     }
 
     @Override
     public String toString() {
         return "Station{" +
                 "nomFr='" + nomFr + '\'' +
-                ", nomAr='" + nomAr + '\'' +
                 ", coordonnees=" + coordonnees +
                 ", numero=" + numero +
                 '}';
