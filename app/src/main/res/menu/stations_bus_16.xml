@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/bus_stations_16"
+        android:icon="@drawable/ic_bus"
+        android:title="Stations Bus A16"
+        app:showAsAction="never">
+
+        <item
+            android:id="@+id/station_16_1"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_2"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_3"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_4"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_5"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_6"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_7"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_8"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_9"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_10"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_11"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_12"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_13"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_14"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_15"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+        <item
+            android:id="@+id/station_16_16"
+            android:title="@string/les_cascades"
+            android:visible="false" />
+    </group>
+
+</menu>

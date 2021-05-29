@@ -94,8 +94,6 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
                 if (i == 6) {
                     barProgressDialog.dismiss();
                 }
-
-
             }
 
             runOnUiThread(() -> {
@@ -122,9 +120,9 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
     }
 
     private void copyToMyList(int number, ArrayList<StationDetails> list) {
-//        ArrayList<StationDetails> temp = database.getNthNearestSubStationsSortedByDistance(number);
-//        for (int i = 0; i < number; i++)
-//            list.add(temp.get(i));
+        ArrayList<StationDetails> temp = database.getNthNearestSubStationsSortedByDistance(number);
+        for (int i = 0; i < number; i++)
+            list.add(temp.get(i));
     }
 
     private void getRouteOnlineOnFoot(GeoPoint geoPoint) {

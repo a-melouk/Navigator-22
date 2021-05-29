@@ -82,7 +82,7 @@
         android:id="@+id/currentPosition"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/map"
+        android:src="@drawable/current"
         app:layout_constraintBottom_toTopOf="@+id/horGuideline90"
         app:layout_constraintStart_toStartOf="@+id/verGuideline75" />
 

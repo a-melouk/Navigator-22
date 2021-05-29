@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -15,7 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -40,7 +42,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -99,15 +100,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     DbHelper database = DbHelper.getInstance(this);
     static ArrayList<Station> stationsSubway = new ArrayList<>();
-    static ArrayList<StationBus> stationsBus = new ArrayList<>();
-    static ArrayList<StationBus> stationsBusByNumber = new ArrayList<>();
+    static ArrayList<Station> stationsBus = new ArrayList<>();
+    static ArrayList<Station> stationsBus3 = new ArrayList<>();
+    static ArrayList<Station> stationsBus3bis = new ArrayList<>();
+    static ArrayList<Station> stationsBus11 = new ArrayList<>();
+    static ArrayList<Station> stationsBus16 = new ArrayList<>();
+    static ArrayList<Station> stationsBus17 = new ArrayList<>();
+    static ArrayList<Station> stationsBus22 = new ArrayList<>();
+    static ArrayList<Station> stationsBus25 = new ArrayList<>();
+    static ArrayList<Station> stationsBus27 = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     double minZ = 13.0;
     double maxZ = 19.0;
     DrawerLayout drawerLayout;
     LinearLayout scroll_menu;
     ActionBarDrawerToggle toggle;
-    int[] ids = new int[22];
+    int[] ids_tramway = new int[22];
+    int[] ids_bus3 = new int[15];
+    int[] ids_bus3bis = new int[9];
+    int[] ids_bus11 = new int[14];
+    int[] ids_bus16 = new int[16];
+    int[] ids_bus17 = new int[12];
+    int[] ids_bus22 = new int[8];
+    int[] ids_bus25 = new int[10];
+    int[] ids_bus27 = new int[7];
     int[] couleurs;
 
     double distanceTo, timeTo;
@@ -116,8 +132,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ids = new int[]{R.id.station1, R.id.station2, R.id.station3, R.id.station4, R.id.station5, R.id.station6, R.id.station7, R.id.station8, R.id.station9,
-                R.id.station10, R.id.station11, R.id.station12, R.id.station13, R.id.station14, R.id.station15, R.id.station16, R.id.station17, R.id.station18, R.id.station19, R.id.station20, R.id.station21, R.id.station22};
+        ids_tramway = new int[]{R.id.station1, R.id.station2, R.id.station3, R.id.station4, R.id.station5, R.id.station6, R.id.station7, R.id.station8, R.id.station9,
+                R.id.station10, R.id.station11, R.id.station12, R.id.station13, R.id.station14, R.id.station15, R.id.station16, R.id.station17, R.id.station18,
+                R.id.station19, R.id.station20, R.id.station21, R.id.station22};
+        ids_bus3 = new int[]{R.id.station_3_1, R.id.station_3_2, R.id.station_3_3, R.id.station_3_4, R.id.station_3_5, R.id.station_3_6, R.id.station_3_7, R.id.station_3_8,
+                R.id.station_3_9,
+                R.id.station_3_10, R.id.station_3_11, R.id.station_3_12, R.id.station_3_13, R.id.station_3_14, R.id.station_3_15};
+        ids_bus3bis = new int[]{R.id.station_3bis_1, R.id.station_3bis_2, R.id.station_3bis_3, R.id.station_3bis_4, R.id.station_3bis_5, R.id.station_3bis_6, R.id.station_3bis_7,
+                R.id.station_3bis_8, R.id.station_3bis_9};
+        ids_bus11 = new int[]{R.id.station_11_1, R.id.station_11_2, R.id.station_11_3, R.id.station_11_4, R.id.station_11_5, R.id.station_11_6, R.id.station_11_7, R.id.station_11_8,
+                R.id.station_11_9,
+                R.id.station_11_10, R.id.station_11_11, R.id.station_11_12, R.id.station_11_13, R.id.station_11_14};
+
+        ids_bus16 = new int[]{R.id.station_16_1, R.id.station_16_2, R.id.station_16_3, R.id.station_16_4, R.id.station_16_5, R.id.station_16_6, R.id.station_16_7, R.id.station_16_8,
+                R.id.station_16_9,
+                R.id.station_16_10, R.id.station_16_11, R.id.station_16_12, R.id.station_16_13, R.id.station_16_14, R.id.station_16_15, R.id.station_16_15};
+
+        ids_bus17 = new int[]{R.id.station_17_1, R.id.station_17_2, R.id.station_17_3, R.id.station_17_4, R.id.station_17_5, R.id.station_17_6, R.id.station_17_7, R.id.station_17_8,
+                R.id.station_17_9,
+                R.id.station_17_10, R.id.station_17_11, R.id.station_17_12};
+
+        ids_bus22 = new int[]{R.id.station_22_1, R.id.station_22_2, R.id.station_22_3, R.id.station_22_4, R.id.station_22_5, R.id.station_22_6, R.id.station_22_7, R.id.station_22_8,};
+
+        ids_bus25 = new int[]{R.id.station_25_1, R.id.station_25_2, R.id.station_25_3, R.id.station_25_4, R.id.station_25_5, R.id.station_25_6, R.id.station_25_7, R.id.station_25_8,
+                R.id.station_25_9,
+                R.id.station_25_10};
+
+        ids_bus27 = new int[]{R.id.station_27_1, R.id.station_27_2, R.id.station_27_3, R.id.station_27_4, R.id.station_27_5, R.id.station_27_6, R.id.station_27_7};
+
         couleurs = new int[]{getApplicationContext().getResources().getColor(R.color.black),
                 getApplicationContext().getResources().getColor(R.color.red),
                 getApplicationContext().getResources().getColor(R.color.green),
@@ -127,11 +169,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-//        stationsSubway = database.getAllStationsSubway();
-//        stationsBus = database.getAllStationsBus();
-
-
         myMap = findViewById(R.id.map);
         currentPosition = findViewById(R.id.currentPosition);
         reset = findViewById(R.id.reset);
@@ -154,9 +191,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         OkHttpClient client = new OkHttpClient();
 
 
-        Animation anim = new AlphaAnimation(0.60f, 1.0f);
-        anim.setDuration(500); //You can manage the blinking time with this parameter
-        anim.setStartOffset(20);
+        Animation anim = new AlphaAnimation(0.8f, 1.0f);
+        anim.setDuration(1000); //You can manage the blinking time with this parameter
+        anim.setStartOffset(0);
         anim.setRepeatMode(Animation.REVERSE);
         anim.setRepeatCount(Animation.INFINITE);
         currentPosition.startAnimation(anim);
@@ -223,7 +260,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
         });
-        Executors.newFixedThreadPool(4).execute(downloadMapToCache);
+        Executors.newFixedThreadPool(1).execute(downloadMapToCache);
 
 
         if ((ContextCompat.checkSelfPermission(
@@ -235,7 +272,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else {
             // You can directly ask for the permission.
             Toast.makeText(this, "Localisation requise", Toast.LENGTH_LONG).show();
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1
             );
 //            getLocation();
             Log.d("LogGps", "Permission check");
@@ -279,80 +317,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         myMap.getOverlays().add(mRotationGestureOverlay);
 //        addMarker(myMap, new GeoPoint(35.19181984486152, -0.6367524076104305));
-
-
-        currentPosition.setOnClickListener(v -> {
-            getLocation();
-            myMap.getController().setCenter(currentLocation);
-            myMap.getController().setZoom(16.0);
-        });
-
-        subway.setOnClickListener(v -> {
-            getLocation();
-            chemin = database.getAllPointsSub();
-            tracerCheminSubway(chemin, myMap);
-            chemin = database.getAllPointsCorrespondance();
-            tracerCorrespondance(chemin, myMap);
-//            addStationsSubway();
-        });
-
-        bus3.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A03");
-            tracerCheminBus(chemin, myMap, 255, 0, 0);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A03");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A03");
-        });
-        bus3bis.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A03 bis");
-            tracerCheminBus(chemin, myMap, 255, 0, 0);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A03 bis");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A03 bis");
-        });
-        bus11.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A11");
-            tracerCheminBus(chemin, myMap, 0, 0, 0);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A11");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A11");
-        });
-        bus16.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A16");
-            tracerCheminBus(chemin, myMap, 0, 0, 255);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A16");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A16");
-        });
-        bus17.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A17");
-            tracerCheminBus(chemin, myMap, 0, 255, 0);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A17");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A17");
-        });
-
-        bus_22.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A22");
-            tracerCheminBus(chemin, myMap, 105, 105, 105);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A22");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A22");
-        });
-        bus25.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A25");
-            tracerCheminBus(chemin, myMap, 255, 0, 255);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A25");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A25");
-        });
-        bus27.setOnClickListener(v -> {
-            chemin = database.getAllPointsBusByNumber("A27");
-            tracerCheminBus(chemin, myMap, 0, 255, 255);
-//            stationsBusByNumber = database.getAllStationsBusByNumber("A27");
-//            addStationsBus(stationsBusByNumber);
-            Log.d("Ligne : ", "A27");
-        });
 
 
         Request request = new Request.Builder()
@@ -428,44 +392,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        Log.d("OverlaysNumber", String.valueOf(myMap.getOverlays().size()));
+        stationsSubway = database.getAllTramwayStations();
+        stationsBus = database.getAllBusStations();
+        stationsBus3 = searchBusStationByNumber("A03");
+        stationsBus3bis = searchBusStationByNumber("A03 bis");
+        stationsBus11 = searchBusStationByNumber("A11");
+        stationsBus16 = searchBusStationByNumber("A16");
+        stationsBus17 = searchBusStationByNumber("A17");
+        stationsBus22 = searchBusStationByNumber("A22");
+        stationsBus25 = searchBusStationByNumber("A25");
+        stationsBus27 = searchBusStationByNumber("A27");
+        currentPosition.setOnClickListener(v -> {
+            getLocation();
+            myMap.getController().setCenter(currentLocation);
+            myMap.getController().setZoom(16.0);
+        });
 
+        subway.setOnClickListener(v -> {
+            getLocation();
+            chemin = database.getAllPointsSub();
+            tracerCheminSubway(chemin, myMap);
+            chemin = database.getAllPointsCorrespondance();
+            tracerCorrespondance(chemin, myMap);
+            addStationsSubway();
+        });
+
+        bus3.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A03");
+            tracerCheminBus(chemin, myMap, 255, 0, 0);
+            addBusStationByNumber("A03");
+        });
+        bus3bis.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A03 bis");
+            tracerCheminBus(chemin, myMap, 255, 0, 0);
+            addBusStationByNumber("A03 bis");
+        });
+        bus11.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A11");
+            tracerCheminBus(chemin, myMap, 0, 0, 0);
+            addBusStationByNumber("A11");
+        });
+        bus16.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A16");
+            tracerCheminBus(chemin, myMap, 0, 0, 255);
+            addBusStationByNumber("A16");
+        });
+        bus17.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A17");
+            tracerCheminBus(chemin, myMap, 0, 255, 0);
+            addBusStationByNumber("A17");
+        });
+
+        bus_22.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A22");
+            tracerCheminBus(chemin, myMap, 105, 105, 105);
+            addBusStationByNumber("A22");
+        });
+        bus25.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A25");
+            tracerCheminBus(chemin, myMap, 255, 0, 255);
+            addBusStationByNumber("A25");
+        });
+        bus27.setOnClickListener(v -> {
+            chemin = database.getAllPointsBusByNumber("A27");
+            tracerCheminBus(chemin, myMap, 0, 255, 255);
+            addBusStationByNumber("A27");
+        });
         reset.setOnClickListener(v -> clearMap());
-
-
-        ArrayList<StationDetails> travelPlanner = new ArrayList<>();
-        double timeInterval = 150;
-
-//        database.getAllTramwayStations();
-//        database.getAllBusStationsByNumber("A03");
-//        database.getAllBusStationsByName("Prado");
-
-
-//        travelPlanner.add(new StationDetails("Wiam", 0.4929, 6.566666666666666));
-//        travelPlanner.add(new StationDetails("Fac de droit", 0.6816, 9.091666666666667));
-//        travelPlanner.add(new StationDetails("Daira", 0.7868999999999999, 10.498333333333333));
-//        travelPlanner.add(new StationDetails("Niâama", 1.165, 15.531666666666666));
-//        travelPlanner.add(new StationDetails("Environnement ", 1.2261, 16.35));
-//        travelPlanner.add(new StationDetails("Sidi Djilali", 1.3222, 17.634999999999998));
-//        travelPlanner.add(new StationDetails("AADL Benhamouda", 1.4276, 19.043333333333333));
-//        travelPlanner.add(new StationDetails("Houari Boumediene", 1.5672000000000001, 20.901666666666664));
-//        travelPlanner.add(new StationDetails("Benhamouda", 1.7253, 23.005));
-//        travelPlanner.add(new StationDetails("Gare routière Nord", 1.7665, 23.551666666666666));
-//        travelPlanner.add(new StationDetails("Campus", 1.8282, 24.378333333333334));
-//        travelPlanner.add(new StationDetails("Radio", 2.0629, 27.543333333333333));
-//        travelPlanner.add(new StationDetails("Frères Adnane", 2.3035, 30.715));
-//        travelPlanner.add(new StationDetails("Les Cascades", 2.4981999999999998, 33.318333333333335));
-//        travelPlanner.add(new StationDetails("Amir Abdelakder", 2.5745, 34.32833333333333));
-//        travelPlanner.add(new StationDetails("Salle Adda Boudjelal", 2.6175, 34.906666666666666));
-//        travelPlanner.add(new StationDetails("La Maternité", 2.623, 34.98166666666667));
-//        travelPlanner.add(new StationDetails("4 Horloges", 2.6940999999999997, 35.92333333333333));
-//        travelPlanner.add(new StationDetails("Gare routière Est", 2.7691, 36.92333333333333));
-//        travelPlanner.add(new StationDetails("Jardin PUBLIC", 3.5172, 46.931666666666665));
-//        travelPlanner.add(new StationDetails("Gare routière sud", 4.164899999999999, 55.568333333333335));
-//        travelPlanner.add(new StationDetails("gare ferroviaire", 32.8602, 438.14166666666665));
-
-//        bestChoiceOnTramway(currentLocation);
     }
+
 
 /*    private void bestChoiceOnTramway(GeoPoint currentLocation) {
         double timeBetweenStations = 150;
@@ -493,39 +488,341 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }*/
 
 
-/*    @Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        ArrayList<Station> ligne;
+        SubMenu tramwaySubMenu = menu.addSubMenu(R.id.subway_stations, R.id.subway_stations, 1, "Stations de Tramway");
+        SubMenu busSubMenu = menu.addSubMenu(R.id.bus_stations_menu, R.id.bus_station_menu, 1, "Stations de bus");
+        SubMenu ligne3 = busSubMenu.addSubMenu(R.id.bus_stations_3, R.id.bus_stations_3, 1, "Ligne 3");
+        SubMenu ligne3bis = busSubMenu.addSubMenu(R.id.bus_stations_3_bis, R.id.bus_stations_3_bis, 1, "Ligne 3 bis");
+        SubMenu ligne11 = busSubMenu.addSubMenu(R.id.bus_stations_11, R.id.bus_stations_11, 1, "Ligne 11");
+        SubMenu ligne16 = busSubMenu.addSubMenu(R.id.bus_stations_16, R.id.bus_stations_16, 1, "Ligne 16");
+        SubMenu ligne17 = busSubMenu.addSubMenu(R.id.bus_stations_17, R.id.bus_stations_17, 1, "Ligne 17");
+        SubMenu ligne22 = busSubMenu.addSubMenu(R.id.bus_stations_22, R.id.bus_stations_22, 1, "Ligne 22");
+        SubMenu ligne25 = busSubMenu.addSubMenu(R.id.bus_stations_25, R.id.bus_stations_25, 1, "Ligne 25");
+        SubMenu ligne27 = busSubMenu.addSubMenu(R.id.bus_stations_27, R.id.bus_stations_27, 1, "Ligne 27");
 
-        ArrayList<Station> stations = database.getAllStationsSubway();
-        SubMenu tramwaySubMenu = menu.addSubMenu("Stations de Tramway");
-        SubMenu busSubMenu = menu.addSubMenu("Stations de bus");
+        for (int i = 0; i < stationsSubway.size(); i++) {
+            tramwaySubMenu.add(R.id.subway_stations, ids_tramway[i], 1, stationsSubway.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A03");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne3.add(R.id.bus_stations_3, ids_bus3[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A03 bis");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne3bis.add(R.id.bus_stations_3_bis, ids_bus3bis[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A11");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne11.add(R.id.bus_stations_11, ids_bus11[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A16");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne16.add(R.id.bus_stations_16, ids_bus16[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A17");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne17.add(R.id.bus_stations_17, ids_bus17[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A22");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne22.add(R.id.bus_stations_22, ids_bus22[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A25");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne25.add(R.id.bus_stations_25, ids_bus25[i], 1, ligne.get(i).nomFr);
+        }
+        ligne = searchBusStationByNumber("A27");
+        for (int i = 0; i < ligne.size(); i++) {
+            ligne27.add(R.id.bus_stations_27, ids_bus27[i], 1, ligne.get(i).nomFr);
+        }
 
-        for (int i = 0; i < 7; i++) {
-            busSubMenu.addSubMenu("Ligne " + i);
-        }
-        for (int i = 0; i < stations.size(); i++) {
-            tramwaySubMenu.add(R.id.subway_stations, ids[i], 1, stations.get(i).nomFr + " " + stations.get(i).nomAr);
-        }
 
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.stations_sba, menu);
+        menuInflater.inflate(R.menu.stations_tramway, menu);
         return true;
-    }*/
+    }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Log.d("MenuClick11", String.valueOf(item.getTitle()) + " v " + String.valueOf(item.getGroupId()) + " v " + String.valueOf(item.getItemId()));
+        Log.d("MenuClick12", String.valueOf(ids_bus3[0]));
         getLocation();
-        for (int i = 0; i < stationsSubway.size(); i++) {
-            if (item.getItemId() == ids[i]) {
-                int random = (int) Math.round(Math.random() * 5);
-                Log.d("Couleurs", String.valueOf(random));
-                fetchRoute(currentLocation, stationsSubway.get(i).coordonnees, true);
-                addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr + " " + stationsSubway.get(i).type);
-                myMap.getController().setCenter(stationsSubway.get(i).coordonnees);
-                myMap.getController().setZoom(17.0);
+        int i, verify, parcours;
+        if (item.getGroupId() == R.id.subway_stations) {
+            i = item.getItemId();
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsSubway.size()) {
+                if (i == ids_tramway[parcours]) {
+                    Log.d("MenuTramway11", String.valueOf(item.getTitle()));
+//                    fetchRoute(currentLocation, stationsSubway.get(parcours).coordonnees, true);
+                    addMarker(myMap, stationsSubway.get(parcours).coordonnees, stationsSubway.get(parcours).nomFr, "tramway");
+                    verify = 0;
+                } else {
+                    Log.d("MenuTramway12", String.valueOf(parcours));
+                    parcours++;
+
+                }
+            }
+        } else if (item.getGroupId() == R.id.bus_stations_3) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus3.size()) {
+                if (item.getItemId() == ids_bus3[parcours]) {
+                    addMarker(myMap, stationsBus3.get(parcours).coordonnees, stationsBus3.get(parcours).nomFr, "bus" );
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
             }
         }
+        else if (item.getGroupId() == R.id.bus_stations_3_bis) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus3bis.size()) {
+                if (item.getItemId() == ids_bus3bis[parcours]) {
+                    addMarker(myMap, stationsBus3bis.get(parcours).coordonnees, stationsBus3bis.get(parcours).nomFr, "bus" );
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+        else if (item.getGroupId() == R.id.bus_stations_11) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus11.size()) {
+                if (item.getItemId() == ids_bus11[parcours]) {
+                    addMarker(myMap, stationsBus11.get(parcours).coordonnees, stationsBus11.get(parcours).nomFr, "bus");
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+        else if (item.getGroupId() == R.id.bus_stations_16) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus16.size()) {
+                if (item.getItemId() == ids_bus16[parcours]) {
+                    addMarker(myMap, stationsBus16.get(parcours).coordonnees, stationsBus16.get(parcours).nomFr, "bus" );
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+        else if (item.getGroupId() == R.id.bus_stations_17) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus17.size()) {
+                if (item.getItemId() == ids_bus17[parcours]) {
+                    addMarker(myMap, stationsBus17.get(parcours).coordonnees, stationsBus17.get(parcours).nomFr,  "bus");
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+        else if (item.getGroupId() == R.id.bus_stations_22) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus22.size()) {
+                if (item.getItemId() == ids_bus22[parcours]) {
+                    addMarker(myMap, stationsBus22.get(parcours).coordonnees, stationsBus22.get(parcours).nomFr,  "bus");
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+        else if (item.getGroupId() == R.id.bus_stations_25) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus25.size()) {
+                if (item.getItemId() == ids_bus25[parcours]) {
+                    addMarker(myMap, stationsBus25.get(parcours).coordonnees, stationsBus25.get(parcours).nomFr, "bus" );
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+        else if (item.getGroupId() == R.id.bus_stations_27) {
+            verify = 1;
+            parcours = 0;
+            while (verify != 0 && parcours < stationsBus27.size()) {
+                if (item.getItemId() == ids_bus27[parcours]) {
+                    addMarker(myMap, stationsBus27.get(parcours).coordonnees, stationsBus27.get(parcours).nomFr,  "bus");
+                    verify = 0;
+                } else {
+                    parcours++;
+                }
+            }
+        }
+
+
+
+
+            /*else if (i == R.id.bus_stations_3_bis) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus3bis.size()) {
+                    if (i == ids_bus3bis[parcours]) {
+                        Log.d("MenuBus3bis", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus3bis.get(parcours).coordonnees, stationsBus3bis.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus3bis", String.valueOf(parcours));
+                    }
+                }
+            } else if (i == R.id.bus_stations_11) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus11.size()) {
+                    if (i == ids_bus11[parcours]) {
+                        Log.d("MenuBus11", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus11.get(parcours).coordonnees, stationsBus11.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus11", String.valueOf(parcours));
+                    }
+                }
+            } else if (i == R.id.bus_stations_16) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus16.size()) {
+                    if (i == ids_bus16[parcours]) {
+                        Log.d("MenuBus16", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus16.get(parcours).coordonnees, stationsBus16.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus16", String.valueOf(parcours));
+                    }
+                }
+            } else if (i == R.id.bus_stations_17) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus17.size()) {
+                    if (i == ids_bus17[parcours]) {
+                        Log.d("MenuBus17", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus17.get(parcours).coordonnees, stationsBus17.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus17", String.valueOf(parcours));
+                    }
+                }
+            } else if (i == R.id.bus_stations_22) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus22.size()) {
+                    if (i == ids_bus22[parcours]) {
+                        Log.d("MenuBus22", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus22.get(parcours).coordonnees, stationsBus22.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus22", String.valueOf(parcours));
+                    }
+                }
+            } else if (i == R.id.bus_stations_25) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus25.size()) {
+                    if (i == ids_bus25[parcours]) {
+                        Log.d("MenuBus25", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus25.get(parcours).coordonnees, stationsBus25.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus25", String.valueOf(parcours));
+                    }
+                }
+            } else if (i == R.id.bus_stations_27) {
+                i = item.getItemId();
+                verify = 1;
+                parcours = 0;
+                while (verify != 0 && parcours < stationsBus27.size()) {
+                    if (i == ids_bus27[parcours]) {
+                        Log.d("MenuBus27", String.valueOf(item.getTitle()));
+                        addMarker(myMap, stationsBus27.get(parcours).coordonnees, stationsBus27.get(parcours).nomFr);
+                        verify = 0;
+                    } else {
+                        parcours++;
+                        Log.d("MenuBus27", String.valueOf(parcours));
+                    }
+                }
+            }
+*/
+
+
+//            for (int i = 0; i < stationsSubway.size(); i++) {
+//                if (item.getItemId() == ids_tramway[0]) {
+//                    Log.d("MenuTramwayStation", item.getTitle() + "");
+//                    fetchRoute(currentLocation, stationsSubway.get(i).coordonnees, true);
+//                    addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr);
+//                    myMap.getController().setCenter(stationsSubway.get(i).coordonnees);
+//                    myMap.getController().setZoom(16.0);
+
+
+//        } else if (item.getGroupId() == R.id.bus_station_menu)
+//            Log.d("StationMenuBus", String.valueOf(item.getTitle()));
+
+
+//        if (item.getItemId() == R.id.subway_stations) {
+//            Log.d("SubwayStationsMenu","Clicked");
+//            for (int i = 0; i < stationsSubway.size(); i++) {
+//                if (item.getItemId() == ids_tramway[i]) {
+//                    Log.d("Station",item.getItemId()+"");
+////                fetchRoute(currentLocation, stationsSubway.get(i).coordonnees, true);
+////                    addMarker(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr);
+////                    myMap.getController().setCenter(stationsSubway.get(i).coordonnees);
+////                    myMap.getController().setZoom(16.0);
+//                }
+//            }
+//        }
+//        for (int i = 0; i < stationsBus3.size(); i++) {
+//            if (item.getItemId() == ids_bus3[i]) {
+////                fetchRoute(currentLocation, stationsBus3.get(i).coordonnees, true);
+////                addMarker(myMap, stationsBus3.get(i).coordonnees, stationsBus3.get(i).nomFr);
+////                myMap.getController().setCenter(stationsBus3.get(i).coordonnees);
+////                myMap.getController().setZoom(16.0);
+//            }
+//        }
+
         return super.onOptionsItemSelected(item);
+    }
+
+
+    ArrayList<Station> searchBusStationByNumber(String name) {
+        ArrayList<Station> result = new ArrayList<>();
+        for (int i = 0; i < stationsBus.size(); i++) {
+            if (stationsBus.get(i).numero.equals(name)) {
+                result.add(stationsBus.get(i));
+            } else {
+            }
+
+        }
+        return result;
+    }
+
+    void addBusStationByNumber(String name) {
+        ArrayList<Station> busStations = searchBusStationByNumber(name);
+        Log.d("StationsBus99", String.valueOf(busStations.size()));
+        for (int i = 0; i < busStations.size(); i++)
+            addStationBus(myMap, busStations.get(i).coordonnees, busStations.get(i).nomFr, busStations.get(i).numero);
     }
 
 
@@ -681,12 +978,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     //Adding Overlays
-/*    private void addStationsSubway() {
+    private void addStationsSubway() {
 
         for (int i = 0; i < stationsSubway.size(); i++) {
-            addStationSubway(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr, stationsSubway.get(i).nomAr);
+            addStationSubway(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr);
         }
-    }*/
+    }
 
     /*private void addStationsBus(ArrayList<StationBus> stationsBus) {
         for (int i = 0; i < stationsBus.size(); i++) {
@@ -711,14 +1008,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setWidth(12);
 //        line.getOutlinePaint();
         line.setColor(Color.rgb(0, 0, 0));
-        line.setDensityMultiplier(0.1f);
+        line.setDensityMultiplier(0.9f);
         line.setPoints(chemin);
         line.setGeodesic(true);
-        line.getOutlinePaint().setPathEffect(new DashPathEffect(new float[]{2, 4}, 0));
         mapView.getOverlayManager().add(line);
     }
 
-    private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue) {
+    private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red,
+                                 int green, int blue) {
         Polyline line = new Polyline();
         line.setWidth(10);
 //        line.getOutlinePaint();
@@ -731,14 +1028,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom) {
+    public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom, String type) {
         float[] distance = new float[1];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
+        if (type.equals("tramway"))
         marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
+        else marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus));
 //        marker.setIcon(context.getResources().getDrawable(R.drawable.ic_tramway));
 
 //        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
@@ -765,7 +1064,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker, String nomArMarker) {
+    public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String
+            nomFrMarker) {
         float[] distance = new float[1];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
@@ -774,7 +1074,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setAlpha(0.8f);
         marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
 //        marker.setSnippet(nomFrMarker + "\n " + " " + nomArMarker);
-        marker.setTitle(nomFrMarker + " " + nomArMarker);
+        marker.setTitle(nomFrMarker);
         marker.setPanToView(true);
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
@@ -805,7 +1105,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public void addStationBus(MapView mapMarker, GeoPoint positionMarker, String nomFr, String numLigne) {
+    public void addStationBus(MapView mapMarker, GeoPoint positionMarker, String
+            nomFr, String numLigne) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -830,7 +1131,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     InfoWindow.closeAllInfoWindowsOn(myMap);
                     TextView station = mView.findViewById(R.id.nomStation);
 //                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
-                    station.setText(marker1.getTitle());
+                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
                 }
 
                 @Override
@@ -854,15 +1155,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         roadPoints.add((start));
         roadPoints.add(end);
 
-//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-//        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-//        Road road = roadManager.getRoad(roadPoints);
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+        Road road = roadManager.getRoad(roadPoints);
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
 //        Road road = roadManager.getRoad(roadPoints);
-        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-        roadManager.addRequestOption("vehicle=foot");
-        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        roadManager.addRequestOption("vehicle=foot");
+//        Road road = roadManager.getRoad(roadPoints);
 
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(start, end);

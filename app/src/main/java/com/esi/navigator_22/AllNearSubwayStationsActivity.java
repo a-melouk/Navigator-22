@@ -18,6 +18,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class AllNearSubwayStationsActivity extends AppCompatActivity {
@@ -27,14 +28,15 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
     double distanceTo;
     double timeTo;
     Thread t1;
+    DecimalFormat df;
     DbHelper database = DbHelper.getInstance(this);
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subway_stations);
+        df = new DecimalFormat("#.##");
         Bundle b = getIntent().getExtras();
         double currentLocationLatitude = b.getDouble("currentLocationLatitude");
         double currentLocationLongitude = b.getDouble("currentLocationLongitude");
@@ -59,7 +61,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(MainActivity.stationsSubway.size());
         barProgressDialog.show();
-        barProgressDialog.setCancelable(false);
+        barProgressDialog.setCancelable(true);
         t1 = new Thread(() -> {
 //            Log.d("databaseDelete13", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
             database.deleteAllNearestSubwayStation();
@@ -69,6 +71,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
 //            MainActivity.stations.size()
             for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
+                Log.d("TestAllNearest", i + "");
                 barProgressDialog.incrementProgressBy(1);
                 StationDetails availableStation = new StationDetails();
                 availableStation.type = MainActivity.stationsSubway.get(i).type;
@@ -84,13 +87,14 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
                 Log.d("progressBar11", String.valueOf(barProgressDialog.getProgress()));
                 Log.d("progressBar12", String.valueOf(i));
 
-                if (barProgressDialog.getProgress() == MainActivity.stationsSubway.size()) barProgressDialog.dismiss();
             }
 
             runOnUiThread(() -> {
                 for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
-//                    myList.add(database.getAllNearestSubStationsSortedByDistance().get(i));
-                    Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo + " | "+myList.get(i).timeTo);
+                    myList.add(database.getAllNearestSubStationsSortedByTime().get(i));
+                    Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo + " | " + myList.get(i).timeTo);
+                    if (barProgressDialog.getProgress() == MainActivity.stationsSubway.size())
+                        barProgressDialog.dismiss();
 
                 }
                 loading.setVisibility(View.INVISIBLE);
@@ -116,12 +120,14 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(currentLocation, geoPoint);
+
             Log.d("allStation", "Unavailable " + getDistanceOffline(currentLocation, geoPoint));
             timeTo = 99999.0;
         } else {
             Log.d("allStation", "Available " + getDistanceOffline(currentLocation, geoPoint));
-            distanceTo = road.mLength;
-            timeTo = road.mDuration;
+            String temp = df.format(distanceTo);
+            distanceTo = Double.valueOf(df.format(road.mLength));
+            timeTo = Double.valueOf(df.format(road.mDuration));
         }
 
     }
@@ -139,15 +145,15 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 //        roadManager2.addRequestOption("vehicle=car");
 //        Road road = roadManager2.getRoad(roadPoints);
 
-        distanceTo = road.mLength;
-        timeTo = road.mDuration / 60;
+        distanceTo = Double.valueOf(df.format(road.mLength));
+        timeTo = Double.valueOf(df.format(road.mDuration / 60));
     }
 
 
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
         float[] distance = new float[2];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
-        return distance[0] / 1000;
+        return Double.valueOf(df.format(distance[0] / 1000));
     }
 
 
