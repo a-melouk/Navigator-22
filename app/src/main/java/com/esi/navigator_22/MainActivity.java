@@ -80,10 +80,10 @@ import okhttp3.Response;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String urlStations = "http://192.168.1.4:3000/stations_sba";
-    String urlRouteSubway = "http://192.168.1.4:3000/subway";
-    String urlRouteBus = "http://192.168.1.4:3000/bus";
-    String urlCorrespondance = "http://192.168.1.4:3000/correspondance";
+    String urlStations = "http://192.168.1.9:3000/stations_sba";
+    String urlRouteSubway = "http://192.168.1.9:3000/subway";
+    String urlRouteBus = "http://192.168.1.9:3000/bus";
+    String urlCorrespondance = "http://192.168.1.9:3000/correspondance";
     private String myResponse;
 
 
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DbHelper database = DbHelper.getInstance(this);
     static ArrayList<Station> stationsSubway = new ArrayList<>();
     static ArrayList<Station> stationsBus = new ArrayList<>();
+    static ArrayList<RouteBus> routeBus = new ArrayList<>();
     static ArrayList<Station> stationsBus3 = new ArrayList<>();
     static ArrayList<Station> stationsBus3bis = new ArrayList<>();
     static ArrayList<Station> stationsBus11 = new ArrayList<>();
@@ -114,6 +115,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static ArrayList<Station> stationsBus25 = new ArrayList<>();
     static ArrayList<Station> stationsBus27 = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
+    ArrayList<RouteBus> cheminBus = new ArrayList<>();
     double minZ = 13.0;
     double maxZ = 19.0;
     DrawerLayout drawerLayout;
@@ -131,7 +133,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int[] click = new int[18];
     int bus3_click = 1, bus3bis_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1,
             bus27_click = 1, tramway_click = 1;
-    Map<String, Integer> clicks;
     static ArrayList<CustomOverlay> customOverlays = new ArrayList<>();
 
     double distanceTo, timeTo;
@@ -397,6 +398,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         stationsSubway = database.getAllTramwayStations();
         stationsBus = database.getAllBusStations();
+        routeBus = database.getAllPointsBus();
         stationsBus3 = searchBusStationByNumber("A03");
         stationsBus3bis = searchBusStationByNumber("A03 bis");
         stationsBus11 = searchBusStationByNumber("A11");
@@ -405,12 +407,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         stationsBus22 = searchBusStationByNumber("A22");
         stationsBus25 = searchBusStationByNumber("A25");
         stationsBus27 = searchBusStationByNumber("A27");
-
-        for (int i = 1; i < 19; i++) {
-            click[i - 1] = i;
-        }
-        clicks = new TreeMap<>();
-
 
         currentPosition.setOnClickListener(v -> {
             getLocation();
@@ -442,8 +438,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus3_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A03");
-                addBus(chemin, myMap, 255, 0, 0, "A03");
+                cheminBus = searchBusRouteByNumber("A03");
+                addBus(cheminBus, myMap, 255, 0, 0, "A03");
                 bus3_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -458,9 +454,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus3bis_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A03 bis");
-                addBus(chemin, myMap, 255, 0, 0, "A03 bis");
-                clicks.put("3bis", myMap.getOverlays().size());
+                cheminBus = searchBusRouteByNumber("A03 bis");
+                addBus(cheminBus, myMap, 255, 0, 0, "A03 bis");
                 bus3bis_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -475,9 +470,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus11_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A11");
-                addBus(chemin, myMap, 0, 0, 0, "A11");
-                clicks.put("11", myMap.getOverlays().size());
+                cheminBus = searchBusRouteByNumber("A11");
+                addBus(cheminBus, myMap, 0, 0, 0, "A11");
                 bus11_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -493,9 +487,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus16_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A16");
-                addBus(chemin, myMap, 0, 0, 255, "A16");
-                clicks.put("16", myMap.getOverlays().size());
+                cheminBus = searchBusRouteByNumber("A16");
+                addBus(cheminBus, myMap, 0, 0, 255, "A16");
                 bus16_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -510,10 +503,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus17_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A17");
+                cheminBus = searchBusRouteByNumber("A17");
                 Log.d("A17", chemin.size() + "");
-                addBus(chemin, myMap, 0, 255, 0, "A17");
-                clicks.put("17", myMap.getOverlays().size());
+                addBus(cheminBus, myMap, 0, 255, 0, "A17");
                 bus17_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -528,9 +520,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus22_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A22");
-                addBus(chemin, myMap, 105, 105, 105, "A22");
-                clicks.put("22", myMap.getOverlays().size());
+                cheminBus = searchBusRouteByNumber("A22");
+                addBus(cheminBus, myMap, 105, 105, 105, "A22");
                 bus22_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -545,9 +536,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus25_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A25");
-                addBus(chemin, myMap, 255, 0, 255, "A25");
-                clicks.put("25", myMap.getOverlays().size());
+                cheminBus = searchBusRouteByNumber("A25");
+                addBus(cheminBus, myMap, 255, 0, 255, "A25");
                 bus25_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -562,9 +552,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             int i = bus27_click;
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
-                chemin = database.getAllPointsBusByNumber("A27");
-                addBus(chemin, myMap, 0, 255, 255, "A27");
-                clicks.put("27", myMap.getOverlays().size());
+                cheminBus = searchBusRouteByNumber("A27");
+                addBus(cheminBus, myMap, 0, 255, 255, "A27");
                 bus27_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -579,6 +568,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("MapOverlays",myMap.getOverlays().size()+"");
             clearMap();
         });
+
+        ArrayList<RouteBus> test = searchBusRouteByNumber("A03");
+        Log.d("A03ligne",test.size()+"");
 
 
     }
@@ -791,12 +783,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 result.add(stationsBus.get(i));
             } else {
             }
-
+        }
+        return result;
+    }
+    ArrayList<RouteBus> searchBusRouteByNumber(String name) {
+        ArrayList<RouteBus> result = new ArrayList<>();
+        for (int i = 0; i < routeBus.size(); i++) {
+            if (routeBus.get(i).numLigne.equals(name)) {
+                result.add(routeBus.get(i));
+            } else {
+            }
         }
         return result;
     }
 
-    void addBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue, String numero) {
+    void addBus(ArrayList<RouteBus> chemin, MapView mapView, int red, int green, int blue, String numero) {
         tracerCheminBus(chemin, mapView, red, green, blue, numero);
         addBusStationByNumber(numero);
 
@@ -841,12 +842,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void tracerCheminBus(ArrayList<GeoPoint> chemin, MapView mapView, int red, int green, int blue, String numero) {
+    private void tracerCheminBus(ArrayList<RouteBus> chemin, MapView mapView, int red, int green, int blue, String numero) {
         Polyline line = new Polyline();
         line.setWidth(10);
         line.setColor(Color.rgb(red, green, blue));
         line.setDensityMultiplier(0.5f);
-        line.setPoints(chemin);
+        ArrayList<GeoPoint> route = new ArrayList<>();
+        for (int i=0 ; i<chemin.size();i++)
+            route.add(chemin.get(i).coordinates);
+        line.setPoints(route);
         mapView.getOverlayManager().add(line);
         customOverlays.add(customOverlays.size(), new CustomOverlay(numero, line));
         mapView.invalidate();
@@ -1000,7 +1004,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Adding Overlays
     private void addStationsSubway() {
-
         for (int i = 0; i < stationsSubway.size(); i++) {
             addStationSubway(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr);
         }
@@ -1030,10 +1033,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         customOverlays.add(customOverlays.size(), new CustomOverlay("correspondance", line));
     }
 
-
     public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom, String type) {
-        float[] distance = new float[1];
-        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -1064,8 +1064,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @SuppressLint("UseCompatLoadingForDrawables")
     public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
-        float[] distance = new float[1];
-        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), positionMarker.getLatitude(), positionMarker.getLongitude(), distance);
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -1076,7 +1074,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
         customOverlays.add(customOverlays.size(), new CustomOverlay("tramway", marker));
-
 
         marker.setOnMarkerClickListener((marker1, mapView) -> {
             getLocation();

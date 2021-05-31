@@ -27,26 +27,17 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String TABLE_NEAREST_SUB_STATIONS = "nearest_sub_stations";
 
     public static DbHelper getInstance(Context ctx) {
-        /**
-         * use the application context as suggested by CommonsWare.
-         * this will ensure that you dont accidentally leak an Activitys
-         * context (see this article for more information:
-         * http://android-developers.blogspot.nl/2009/01/avoiding-memory-leaks.html)
-         */
         if (mInstance == null) {
             mInstance = new DbHelper(ctx);
         }
         return mInstance;
     }
 
-    //    private static final String COLUMN_TIMESTAMP = "timestamp";
-//    private static final String COLUMN_ID = "id";
     private static final String COLUMN_LATITUDE = "latitude";
     private static final String COLUMN_LONGITUDE = "longitude";
 
     private static final String COLUMN_NOMFR = "nomFR";
     private static final String COLUMN_TYPE = "type";
-
 
     private static final String COLUMN_DISTANCE = "distanceTo";
     private static final String COLUMN_TIME = "timeTo";
@@ -99,7 +90,6 @@ public class DbHelper extends SQLiteOpenHelper {
     private DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.mCxt = context;
-
     }
 
     @Override
@@ -118,6 +108,7 @@ public class DbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CHEMIN_SUB);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NEAREST_SUB_STATIONS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CHEMIN_BUS);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CORRESPONDANCE);
         onCreate(sqLiteDatabase);
     }
 
@@ -155,8 +146,6 @@ public class DbHelper extends SQLiteOpenHelper {
     long addPointSub(GeoPoint point) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-//        contentValues.put(COLUMN_TIMESTAMP, pointChemin.timestamp);
-//        contentValues.put(COLUMN_ID, pointChemin.id);
         contentValues.put(COLUMN_LATITUDE, point.getLatitude());
         contentValues.put(COLUMN_LONGITUDE, point.getLongitude());
         long word_id = db.insert(TABLE_CHEMIN_SUB, null, contentValues);
@@ -175,7 +164,6 @@ public class DbHelper extends SQLiteOpenHelper {
     long addPointBus(RouteBus point) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-//        contentValues.put(COLUMN_TIMESTAMP, pointChemin.timestamp);
         contentValues.put(COLUMN_NUMLIGNE, point.numLigne);
         contentValues.put(COLUMN_LATITUDE, point.coordinates.getLatitude());
         contentValues.put(COLUMN_LONGITUDE, point.coordinates.getLongitude());
@@ -191,8 +179,6 @@ public class DbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 GeoPoint g = new GeoPoint(0.0, 0.0);
-//                s.timestamp = c.getString((c.getColumnIndex(COLUMN_TIMESTAMP)));
-//                s.id = c.getInt((c.getColumnIndex(COLUMN_ID)));
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
                 pointChemins.add(g);
@@ -209,8 +195,6 @@ public class DbHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 GeoPoint g = new GeoPoint(0.0, 0.0);
-//                s.timestamp = c.getString((c.getColumnIndex(COLUMN_TIMESTAMP)));
-//                s.id = c.getInt((c.getColumnIndex(COLUMN_ID)));
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
                 pointChemins.add(g);
@@ -230,6 +214,27 @@ public class DbHelper extends SQLiteOpenHelper {
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
                 pointCheminsBus.add(g);
+            } while (c.moveToNext());
+        }
+        return pointCheminsBus;
+    }
+
+    public ArrayList<RouteBus> getAllPointsBus() {
+        ArrayList<RouteBus> pointCheminsBus = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_CHEMIN_BUS;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+                RouteBus routeBus = new RouteBus();
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                String name;
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
+                name = c.getString(c.getColumnIndex(COLUMN_NUMLIGNE));
+                routeBus.coordinates=g;
+                routeBus.numLigne=name;
+                pointCheminsBus.add(routeBus);
             } while (c.moveToNext());
         }
         return pointCheminsBus;
@@ -277,7 +282,6 @@ public class DbHelper extends SQLiteOpenHelper {
         }
         return stations;
     }
-
 
     ArrayList<Station> getAllBusStations() {
         ArrayList<Station> stations = new ArrayList<Station>();
