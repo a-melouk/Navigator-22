@@ -4,6 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="30dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/horGuideline80"-->
+<!--        app:menu="@menu/stations_tramway"-->
+<!--        android:background="@color/blue"-->
+<!--        />-->
+
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="wrap_content"
@@ -100,7 +109,7 @@
         android:layout_height="48dp"
         android:src="@drawable/arrow_down"
         app:layout_constraintBottom_toTopOf="@id/horGuideline20"
-        app:layout_constraintStart_toStartOf="@id/verGuideline87" />
+        app:layout_constraintStart_toStartOf="@id/verGuideline75" />
 
     <ImageView
         android:id="@+id/arrow_up"
@@ -109,7 +118,7 @@
         android:src="@drawable/arrow_up"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/horGuideline20"
-        app:layout_constraintStart_toStartOf="@id/verGuideline87" />
+        app:layout_constraintStart_toStartOf="@id/verGuideline75" />
 
 
     <androidx.constraintlayout.widget.Guideline

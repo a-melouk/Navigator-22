@@ -21,28 +21,10 @@
             app:popupTheme="@style/Theme.AppTheme.PopupOverlay"
             app:titleTextColor="@color/black" />
 
-
     </com.google.android.material.appbar.AppBarLayout>
 
 
     <include layout="@layout/content_main" />
-
-
-    <ImageView
-        android:id="@+id/subway"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/ic_tramway"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline20"
-        app:layout_constraintStart_toStartOf="@+id/verGuideline75" />
-
-    <ImageView
-        android:id="@+id/bus_3"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:src="@drawable/bus_3"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline30"
-        app:layout_constraintStart_toStartOf="@+id/verGuideline75" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

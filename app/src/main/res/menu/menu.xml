@@ -14,9 +14,6 @@
                 android:id="@+id/closestStations"
                 android:icon="@drawable/ic_tramway"
                 android:title="Closest subway stations" />
-
         </menu>
-
-
     </item>
 </menu>

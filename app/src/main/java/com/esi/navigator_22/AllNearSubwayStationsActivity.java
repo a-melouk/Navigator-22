@@ -1,6 +1,7 @@
 package com.esi.navigator_22;
 
 import android.app.ProgressDialog;
+import android.icu.number.NumberFormatter;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 public class AllNearSubwayStationsActivity extends AppCompatActivity {
@@ -26,9 +28,9 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
     ListView listView;
     MyLocationNewOverlay myLocationNewOverlay;
     double distanceTo;
-    double timeTo;
+    int timeTo;
     Thread t1;
-    DecimalFormat df;
+    NumberFormat df;
     DbHelper database = DbHelper.getInstance(this);
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -36,7 +38,8 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subway_stations);
-        df = new DecimalFormat("#.##");
+        String format ="0.00";
+        df = new DecimalFormat(format);
         Bundle b = getIntent().getExtras();
         double currentLocationLatitude = b.getDouble("currentLocationLatitude");
         double currentLocationLongitude = b.getDouble("currentLocationLongitude");
@@ -122,12 +125,12 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             distanceTo = getDistanceOffline(currentLocation, geoPoint);
 
             Log.d("allStation", "Unavailable " + getDistanceOffline(currentLocation, geoPoint));
-            timeTo = 99999.0;
+            timeTo = 99999;
         } else {
             Log.d("allStation", "Available " + getDistanceOffline(currentLocation, geoPoint));
-            String temp = df.format(distanceTo);
-            distanceTo = Double.valueOf(df.format(road.mLength));
-            timeTo = Double.valueOf(df.format(road.mDuration));
+            distanceTo = road.mLength;
+            Log.d("Formatting", String.valueOf(distanceTo));
+            timeTo = (int) Math.round(road.mDuration/60);
         }
 
     }
@@ -145,15 +148,15 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 //        roadManager2.addRequestOption("vehicle=car");
 //        Road road = roadManager2.getRoad(roadPoints);
 
-        distanceTo = Double.valueOf(df.format(road.mLength));
-        timeTo = Double.valueOf(df.format(road.mDuration / 60));
+        distanceTo = road.mLength;
+        timeTo = (int) Math.round(road.mDuration/60);
     }
 
 
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
         float[] distance = new float[2];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
-        return Double.valueOf(df.format(distance[0] / 1000));
+        return distance[0] / 1000;
     }
 
 

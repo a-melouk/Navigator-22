@@ -31,17 +31,17 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
         convertView = layoutInflater.inflate(mResource, parent, false);
         ImageView subway = convertView.findViewById(R.id.imageSubway);
-        TextView nomAr = convertView.findViewById(R.id.nomAr);
+//        TextView nomAr = convertView.findViewById(R.id.nomAr);
         TextView nomFr = convertView.findViewById(R.id.nomFr);
         TextView distance = convertView.findViewById(R.id.distance);
         TextView time = convertView.findViewById(R.id.time);
 
 
         subway.setImageResource(R.drawable.ic_tramway);
-        nomAr.setText(getItem(position).numero);
+//        nomAr.setText(getItem(position).numero);
         nomFr.setText(getItem(position).nomFr);
         distance.setText(String.valueOf(getItem(position).distanceTo));
-        time.setText(String.valueOf(getItem(position).timeTo));
+        time.setText(String.valueOf((int) getItem(position).timeTo));
 
         return convertView;
     }
