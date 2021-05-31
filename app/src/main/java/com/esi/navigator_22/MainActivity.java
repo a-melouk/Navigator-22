@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         myMap = findViewById(R.id.map);
+        myMap.setUseDataConnection(false);
         currentPosition = findViewById(R.id.currentPosition);
         reset = findViewById(R.id.reset);
         bus3 = findViewById(R.id.bus_3);
@@ -418,98 +419,96 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         subway.setOnClickListener(v -> {
-            getLocation();
-            chemin = database.getAllPointsSub();
-            tracerCheminSubway(chemin, myMap);
-            chemin = database.getAllPointsCorrespondance();
-            tracerCorrespondance(chemin, myMap);
-            addStationsSubway();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            int i = tramway_click;
+            if (i == 1) {
+                chemin = database.getAllPointsSub();
+                tracerCheminSubway(chemin, myMap);
+                chemin = database.getAllPointsCorrespondance();
+                tracerCorrespondance(chemin, myMap);
+                addStationsSubway();
+                tramway_click++;
+            } else {
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("tramway") || customOverlays.get(k).name.equals("correspondance"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
+                tramway_click--;
+            }
         });
 
 
         bus3.setOnClickListener(v -> {
             int i = bus3_click;
-            int i1 = searchBusStationByNumber("A03").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A03");
                 addBus(chemin, myMap, 255, 0, 0, "A03");
-                clicks.put("3", myMap.getOverlays().size());
                 bus3_click++;
             } else {
-                int j = clicks.get("3");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-
-                } while (j >= clicks.get("3") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A03"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus3_click--;
             }
         });
 
         bus3bis.setOnClickListener(v -> {
             int i = bus3bis_click;
-            int i1 = searchBusStationByNumber("A03 bis").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A03 bis");
                 addBus(chemin, myMap, 255, 0, 0, "A03 bis");
                 clicks.put("3bis", myMap.getOverlays().size());
                 bus3bis_click++;
             } else {
-                int j = clicks.get("3bis");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("3bis") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A03 bis"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus3bis_click--;
             }
         });
 
         bus11.setOnClickListener(v -> {
             int i = bus11_click;
-            int i1 = searchBusStationByNumber("A11").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A11");
                 addBus(chemin, myMap, 0, 0, 0, "A11");
                 clicks.put("11", myMap.getOverlays().size());
                 bus11_click++;
             } else {
-                int j = clicks.get("11");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("11") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A11"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus11_click--;
             }
         });
+
+
         bus16.setOnClickListener(v -> {
             int i = bus16_click;
-            int i1 = searchBusStationByNumber("A16").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A16");
                 addBus(chemin, myMap, 0, 0, 255, "A16");
                 clicks.put("16", myMap.getOverlays().size());
                 bus16_click++;
             } else {
-                int j = clicks.get("16");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("16") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A16"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus16_click--;
             }
         });
 
         bus17.setOnClickListener(v -> {
             int i = bus17_click;
-            int i1 = searchBusStationByNumber("A17").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A17");
                 Log.d("A17", chemin.size() + "");
@@ -517,97 +516,68 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 clicks.put("17", myMap.getOverlays().size());
                 bus17_click++;
             } else {
-                int j = clicks.get("17");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("17") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A17"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus17_click--;
             }
         });
 
         bus_22.setOnClickListener(v -> {
             int i = bus22_click;
-            int i1 = searchBusStationByNumber("A22").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A22");
                 addBus(chemin, myMap, 105, 105, 105, "A22");
                 clicks.put("22", myMap.getOverlays().size());
                 bus22_click++;
             } else {
-                int j = clicks.get("22");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("22") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A22"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus22_click--;
             }
         });
 
         bus25.setOnClickListener(v -> {
             int i = bus25_click;
-            int i1 = searchBusStationByNumber("A25").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A25");
                 addBus(chemin, myMap, 255, 0, 255, "A25");
                 clicks.put("25", myMap.getOverlays().size());
                 bus25_click++;
             } else {
-                int j = clicks.get("25");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("25") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A25"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus25_click--;
             }
         });
 
         bus27.setOnClickListener(v -> {
             int i = bus27_click;
-            int i1 = searchBusStationByNumber("A27").size();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
             if (i == 1) {
                 chemin = database.getAllPointsBusByNumber("A27");
                 addBus(chemin, myMap, 0, 255, 255, "A27");
                 clicks.put("27", myMap.getOverlays().size());
                 bus27_click++;
             } else {
-                int j = clicks.get("27");
-                do {
-                    myMap.getOverlays().remove(j - 1);
-                    j = j - 1;
-                    Log.d("Calcul1", j + " - " + i1);
-                    myMap.invalidate();
-                } while (j >= clicks.get("27") - i1);
+                for (int k = 0; k < customOverlays.size(); k++)
+                    if (customOverlays.get(k).name.equals("A27"))
+                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
+                myMap.invalidate();
                 bus27_click--;
             }
         });
 
         reset.setOnClickListener(v -> {
-//            Log.d("HashMap",clicks.values()+"");
-            Log.d("HashMap3", clicks.get("3") + " | " + (searchBusStationByNumber("A03").size() + 1));
-            Log.d("HashMap3bis", clicks.get("3bis") + " | " + (searchBusStationByNumber("A03 bis").size() + 1));
-            Log.d("HashMap11", clicks.get("11") + " | " + (searchBusStationByNumber("A11").size() + 1));
-//            Log.d("HashMap16", clicks.get("16") + "");
-//            Log.d("HashMap17",clicks.get("17")+"");
-//            Log.d("HashMap22",clicks.get("22")+"");
-//            Log.d("HashMap25",clicks.get("25")+"");
-//            Log.d("HashMap27",clicks.get("27")+"");
-//            Log.d("HashMap27", clicks.get("27") + "");
-            Log.d("HashMapOverlays", myMap.getOverlays().size() + "\n\n");
-            Log.d("HashMapOverlayss", customOverlays.size() + "\n\n");
-            for (int i = 0; i < customOverlays.size(); i++)
-                if (customOverlays.get(i).name.equals("A03"))
-                    Log.d("HashMap", customOverlays.get(i) + "\n");
-            Log.d("HashMap", myMap.getOverlays().get(4) + "\n");
-            Log.d("HashMap", myMap.getOverlays().get(5) + "\n");
-//            clicks.clear();
-//            clearMap();
+            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            clearMap();
         });
 
 
@@ -832,7 +802,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void addStationBus(MapView mapMarker, GeoPoint positionMarker, String nomFr, String numLigne) {
+    void addStationBus(MapView mapMarker, GeoPoint positionMarker, String nomFr, String numLigne) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -1045,6 +1015,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setPoints(chemin);
         line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
+        customOverlays.add(customOverlays.size(), new CustomOverlay("tramway", line));
     }
 
     private void tracerCorrespondance(ArrayList<GeoPoint> chemin, MapView mapView) {
@@ -1056,6 +1027,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setPoints(chemin);
         line.setGeodesic(true);
         mapView.getOverlayManager().add(line);
+        customOverlays.add(customOverlays.size(), new CustomOverlay("correspondance", line));
     }
 
 
@@ -1103,6 +1075,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPanToView(true);
         mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
+        customOverlays.add(customOverlays.size(), new CustomOverlay("tramway", marker));
 
 
         marker.setOnMarkerClickListener((marker1, mapView) -> {
@@ -1207,16 +1180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(echelle);
         myMap.getOverlays().add(mapEventsOverlay);
         myMap.invalidate();
-        bus3bis_click = bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = 1;
-    }
-
-    private void clearMap(int number) {
-        myMap.getOverlays().remove(number);
-        myMap.getOverlays().add(mLocationOverlay);
-        myMap.getOverlays().add(mRotationGestureOverlay);
-        myMap.getOverlays().add(echelle);
-        myMap.getOverlays().add(mapEventsOverlay);
-        myMap.invalidate();
+        bus3bis_click = bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = tramway_click = 1;
     }
 
     //Formatting the values to #.##
