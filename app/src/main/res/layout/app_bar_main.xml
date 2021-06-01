@@ -20,19 +20,21 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="match_parent"
 
                 android:orientation="horizontal">
 
 
                 <EditText
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
+                    android:layout_height="wrap_content"
                     android:hint="Search.."
                     android:maxLength="32"
-                    android:maxLines="1"
+                    android:maxEms="14"
+                    android:maxLines="2"
                     android:orientation="horizontal"
-                    android:textColor="@color/black"
+                    android:textColor="@color/bleu"
+                    android:textStyle="bold"
                     app:layout_constraintBottom_toTopOf="@+id/horGuideline95"
                     app:layout_constraintEnd_toEndOf="@id/verGuideline90"
                     app:layout_constraintStart_toStartOf="@id/verGuideline10"
