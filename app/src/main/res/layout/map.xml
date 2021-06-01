@@ -100,14 +100,32 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/reset"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline80"
+        app:layout_constraintStart_toStartOf="@+id/verGuideline75" />
+
+    <ImageView
+        android:id="@+id/walk"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/walk"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline90"
+        app:layout_constraintStart_toStartOf="@+id/verGuideline30" />
+
+    <ImageView
+        android:id="@+id/car"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/car"
         app:layout_constraintBottom_toTopOf="@+id/horGuideline90"
         app:layout_constraintStart_toStartOf="@+id/verGuideline10" />
+
+
 
     <ImageView
         android:id="@+id/arrow_down"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/arrow_down"
+        android:src="@drawable/down"
         app:layout_constraintBottom_toTopOf="@id/horGuideline20"
         app:layout_constraintStart_toStartOf="@id/verGuideline75" />
 
@@ -115,7 +133,7 @@
         android:id="@+id/arrow_up"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/arrow_up"
+        android:src="@drawable/up"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/horGuideline20"
         app:layout_constraintStart_toStartOf="@id/verGuideline75" />
@@ -205,8 +223,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.1"
-
         />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verGuideline30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25"
+        />
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verGuideline75"

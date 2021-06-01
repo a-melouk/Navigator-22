@@ -96,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageView currentPosition, reset;
     LinearLayout menu_linear;
     ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
+    ImageView walk, car;
 
     Station station = new Station();
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
@@ -130,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int[] ids_bus25 = new int[10];
     int[] ids_bus27 = new int[7];
     int[] couleurs;
-    int[] click = new int[18];
     int bus3_click = 1, bus3bis_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1,
             bus27_click = 1, tramway_click = 1;
     static ArrayList<CustomOverlay> customOverlays = new ArrayList<>();
@@ -191,6 +191,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus25 = findViewById(R.id.bus_25);
         bus27 = findViewById(R.id.bus_27);
         subway = findViewById(R.id.subway);
+        car = findViewById(R.id.car);
+        walk = findViewById(R.id.walk);
+
 //        scroll_menu = findViewById(R.id.stations_menu);
         menu_linear = findViewById(R.id.menu_linear);
         arrow_down = findViewById(R.id.arrow_down);
@@ -415,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         subway.setOnClickListener(v -> {
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             int i = tramway_click;
             if (i == 1) {
                 chemin = database.getAllPointsSub();
@@ -436,7 +439,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus3.setOnClickListener(v -> {
             int i = bus3_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A03");
                 addBus(cheminBus, myMap, 255, 0, 0, "A03");
@@ -452,7 +455,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus3bis.setOnClickListener(v -> {
             int i = bus3bis_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A03 bis");
                 addBus(cheminBus, myMap, 255, 0, 0, "A03 bis");
@@ -468,7 +471,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus11.setOnClickListener(v -> {
             int i = bus11_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A11");
                 addBus(cheminBus, myMap, 0, 0, 0, "A11");
@@ -485,7 +488,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus16.setOnClickListener(v -> {
             int i = bus16_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A16");
                 addBus(cheminBus, myMap, 0, 0, 255, "A16");
@@ -501,7 +504,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus17.setOnClickListener(v -> {
             int i = bus17_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A17");
                 Log.d("A17", chemin.size() + "");
@@ -518,7 +521,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus_22.setOnClickListener(v -> {
             int i = bus22_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A22");
                 addBus(cheminBus, myMap, 105, 105, 105, "A22");
@@ -534,7 +537,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus25.setOnClickListener(v -> {
             int i = bus25_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A25");
                 addBus(cheminBus, myMap, 255, 0, 255, "A25");
@@ -550,7 +553,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         bus27.setOnClickListener(v -> {
             int i = bus27_click;
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A27");
                 addBus(cheminBus, myMap, 0, 255, 255, "A27");
@@ -565,12 +568,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
         reset.setOnClickListener(v -> {
-            Log.d("MapOverlays",myMap.getOverlays().size()+"");
+            Log.d("MapOverlays", myMap.getOverlays().size() + "");
             clearMap();
         });
 
-        ArrayList<RouteBus> test = searchBusRouteByNumber("A03");
-        Log.d("A03ligne",test.size()+"");
+        walk.setOnClickListener(v -> {
+            walk.setImageResource(R.drawable.walk_enabled);
+            car.setImageResource(R.drawable.car);
+
+            walk.setSelected(true);
+            car.setSelected(false);
+        });
+        car.setOnClickListener(v -> {
+            car.setImageResource(R.drawable.car_enabled);
+            walk.setImageResource(R.drawable.walk);
+
+            car.setSelected(true);
+            walk.setSelected(false);
+        });
 
 
     }
@@ -786,6 +801,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return result;
     }
+
     ArrayList<RouteBus> searchBusRouteByNumber(String name) {
         ArrayList<RouteBus> result = new ArrayList<>();
         for (int i = 0; i < routeBus.size(); i++) {
@@ -848,7 +864,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         line.setColor(Color.rgb(red, green, blue));
         line.setDensityMultiplier(0.5f);
         ArrayList<GeoPoint> route = new ArrayList<>();
-        for (int i=0 ; i<chemin.size();i++)
+        for (int i = 0; i < chemin.size(); i++)
             route.add(chemin.get(i).coordinates);
         line.setPoints(route);
         mapView.getOverlayManager().add(line);
@@ -1104,32 +1120,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
-
         OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-        Road road = roadManager.getRoad(roadPoints);
+        if (car.isSelected())
+            roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
+        else roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
 //        Road road = roadManager.getRoad(roadPoints);
 //        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
 //        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(roadPoints);
-
+        Road road = roadManager.getRoad(roadPoints);
+        Polyline route;
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(start, end);
             timeTo = 99999.0;
-            Log.d("FetchRoute", "indisponible");
             return "Route indisponible";
         }
         if (draw == true) {
-            Polyline route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.teal_700), 15.0f);
+            if (car.isSelected())
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 15.0f);
+            else
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.teal_700), 15.0f);
+
             myMap.getOverlays().add(route);
         }
         String duration = format(road.mDuration / 60);
         String dist = format(road.mLength);
         String distanceTo = "km " + dist + " كم";
         String timeTo = "minutes " + duration + " دقيقة";
-        Log.d("FetchRoute", "disponible");
         return distanceTo + "\n" + timeTo;
 
     }
@@ -1142,6 +1161,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    //Menu Navigation
     //Menu Navigation
     private void setNavigationViewListener() {
         NavigationView navigationView = findViewById(R.id.navigation_view);
