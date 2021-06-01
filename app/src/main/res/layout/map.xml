@@ -5,21 +5,15 @@
     android:layout_height="match_parent">
 
 
-<!--    <com.google.android.material.bottomnavigation.BottomNavigationView-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="30dp"-->
-<!--        app:layout_constraintBottom_toTopOf="@id/horGuideline80"-->
-<!--        app:menu="@menu/stations_tramway"-->
-<!--        android:background="@color/blue"-->
-<!--        />-->
-
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline95"
-        app:layout_constraintTop_toTopOf="@id/horGuideline10" />
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline93"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/horGuideline0" />
 
     <LinearLayout
         android:id="@+id/menu_linear"
@@ -33,56 +27,56 @@
 
         <ImageView
             android:id="@+id/subway"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/tramway" />
 
         <ImageView
             android:id="@+id/bus_3"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_3" />
 
         <ImageView
             android:id="@+id/bus_3bis"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_3" />
 
         <ImageView
             android:id="@+id/bus_11"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_11" />
 
         <ImageView
             android:id="@+id/bus_16"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_16" />
 
         <ImageView
             android:id="@+id/bus_17"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_17" />
 
         <ImageView
             android:id="@+id/bus_22"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_22" />
 
         <ImageView
             android:id="@+id/bus_25"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_25" />
 
         <ImageView
             android:id="@+id/bus_27"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:src="@drawable/bus_27" />
 
     </LinearLayout>
@@ -92,7 +86,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/current"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline90"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline88"
         app:layout_constraintStart_toStartOf="@+id/verGuideline75" />
 
     <ImageView
@@ -107,8 +101,8 @@
         android:id="@+id/walk"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/walk"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline90"
+        android:src="@drawable/walk_enabled"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline88"
         app:layout_constraintStart_toStartOf="@+id/verGuideline30" />
 
     <ImageView
@@ -116,9 +110,8 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/car"
-        app:layout_constraintBottom_toTopOf="@+id/horGuideline90"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline88"
         app:layout_constraintStart_toStartOf="@+id/verGuideline10" />
-
 
 
     <ImageView
@@ -137,6 +130,14 @@
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@id/horGuideline20"
         app:layout_constraintStart_toStartOf="@id/verGuideline75" />
+
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.08" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -203,18 +204,25 @@
         app:layout_constraintGuide_percent="0.80" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horGuideline90"
+        android:id="@+id/horGuideline88"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.90" />
+        app:layout_constraintGuide_percent="0.88" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline93"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.93" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline95"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.95" />
+        app:layout_constraintGuide_percent="0.94" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -222,16 +230,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.1"
-        />
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verGuideline30"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.25"
-        />
+        app:layout_constraintGuide_percent="0.25" />
 
 
     <androidx.constraintlayout.widget.Guideline
@@ -254,5 +260,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.95" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline100"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="1" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

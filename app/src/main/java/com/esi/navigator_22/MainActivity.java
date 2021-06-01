@@ -572,6 +572,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             clearMap();
         });
 
+
+
         walk.setOnClickListener(v -> {
             walk.setImageResource(R.drawable.walk_enabled);
             car.setImageResource(R.drawable.car);

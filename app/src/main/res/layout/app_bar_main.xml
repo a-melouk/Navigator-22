@@ -9,23 +9,69 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient"
-        >
-<!--        android:theme="@style/Theme.AppTheme.AppBarOverlay"-->
-
+        android:background="@drawable/gradient">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@drawable/gradient"
+            app:titleTextColor="@color/white">
 
-            app:titleTextColor="@color/white" />
-        <!--            app:popupTheme="@style/Theme.AppTheme.PopupOverlay"-->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+
+                android:orientation="horizontal">
+
+
+                <EditText
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:hint="Search.."
+                    android:maxLength="32"
+                    android:maxLines="1"
+                    android:orientation="horizontal"
+                    android:textColor="@color/black"
+                    app:layout_constraintBottom_toTopOf="@+id/horGuideline95"
+                    app:layout_constraintEnd_toEndOf="@id/verGuideline90"
+                    app:layout_constraintStart_toStartOf="@id/verGuideline10"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horGuideline5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horGuideline95"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="1" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/verGuideline10"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.0"/>
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/verGuideline90"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="1" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.appcompat.widget.Toolbar>
+
+
     </com.google.android.material.appbar.AppBarLayout>
 
-
     <include layout="@layout/content_main" />
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
