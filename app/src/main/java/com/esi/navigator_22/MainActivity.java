@@ -21,8 +21,11 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,12 +39,14 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -53,7 +58,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
@@ -62,12 +66,10 @@ import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.io.IOException;
+import java.sql.Statement;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 import java.util.concurrent.Executors;
 
 import okhttp3.Call;
@@ -75,6 +77,11 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
+import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
+import static org.osmdroid.views.overlay.Marker.ANCHOR_LEFT;
+import static org.osmdroid.views.overlay.Marker.ANCHOR_TOP;
 
 //import androidx.appcompat.app.AlertDialog;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
@@ -92,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     MyLocationNewOverlay mLocationOverlay;
     RotationGestureOverlay mRotationGestureOverlay;
     MapEventsOverlay mapEventsOverlay;
+    Marker draggableMarker;
 
     ImageView currentPosition, reset;
     LinearLayout menu_linear;
@@ -104,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
+    static ArrayList<Station> allStations = new ArrayList<>();
     static ArrayList<Station> stationsSubway = new ArrayList<>();
     static ArrayList<Station> stationsBus = new ArrayList<>();
     static ArrayList<RouteBus> routeBus = new ArrayList<>();
@@ -117,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static ArrayList<Station> stationsBus27 = new ArrayList<>();
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     ArrayList<RouteBus> cheminBus = new ArrayList<>();
+    GeoPoint markerCoordiantes;
     double minZ = 13.0;
     double maxZ = 19.0;
     DrawerLayout drawerLayout;
@@ -134,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int bus3_click = 1, bus3bis_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1,
             bus27_click = 1, tramway_click = 1;
     static ArrayList<CustomOverlay> customOverlays = new ArrayList<>();
+    ArrayAdapter<String> arrayAdapter;
 
     double distanceTo, timeTo;
 
@@ -200,6 +211,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        ArrayList<String> allStationsName = new ArrayList<>();
+        for (int i=0;i<allStations.size();i++)
+            allStationsName.add(allStations.get(i).nomFr);
+        arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+
+
+        markerCoordiantes = new GeoPoint(0.0, 0.0);
 
         OkHttpClient client = new OkHttpClient();
 
@@ -324,100 +342,234 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mRotationGestureOverlay = new RotationGestureOverlay(myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.getOverlays().add(mRotationGestureOverlay);
+        draggableMarker = new Marker(myMap);
+        draggableMarker.setPosition(new GeoPoint(35.1825, -0.6146));
+        draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+        draggableMarker.setDraggable(true);
+//        draggableMarker.setAnchor(ANCHOR_CENTER,ANCHOR_TOP);
+//        draggableMarker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+        draggableMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDrag(Marker marker) {
+
+            }
+
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+                markerCoordiantes = marker.getPosition();
+                getLocation();
+                fetchRoute(currentLocation, marker.getPosition(), true);
+            }
+
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+                marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+            }
+        });
+
+        draggableMarker.setOnMarkerClickListener((marker, mapView) -> {
+
+            Log.d("MarkerDraggable", "Salam");
+//            marker.setTitle(marker.getPosition().geo);
+/*            GeocoderNominatim geocoder = new GeocoderNominatim("Navigator-22");
+            JOpenCageGeocoder jOpenCageGeocoder = new JOpenCageGeocoder("a96db27cef524426a04e9d2268a0d995");
+            JOpenCageReverseRequest request = new JOpenCageReverseRequest(marker.getPosition().getLatitude(), marker.getPosition().getLongitude());
+//            request.setLanguage("es"); // prioritize results in a specific language using an IETF format language code
+            request.setNoDedupe(true); // don't return duplicate results
+            request.setLimit(1); // only return the first 5 results (default is 10)
+            request.setNoAnnotations(true); // exclude additional info such as calling code, timezone, and currency
+//            request.setMinConfidence(3); // restrict to results with a confidence rating of at least 3 (out of 10)
+            JOpenCageResponse response = jOpenCageGeocoder.reverse(request);
+            String formattedAddress = response.getResults().get(0).getFormatted();*/
+
+            OkHttpClient geocoder = new OkHttpClient().newBuilder()
+                    .build();
+            Request request = new Request.Builder()
+                    .url("https://api.geoapify.com/v1/geocode/reverse?lat=" + marker.getPosition().getLatitude() + "&lon=" + marker.getPosition().getLongitude() + "&apiKey=d29f8d73d9b84ba4921d5608fbc4aa47")
+//                    .url("https://api.geoapify.com/v1/geocode/reverse?lat=51.21709661403662&lon=6.7782883744862374&apiKey=d29f8d73d9b84ba4921d5608fbc4aa47")
+                    .method("GET", null)
+                    .build();
+            String address = "";
+            try {
+                Response response = geocoder.newCall(request).execute();
+                myResponse = response.body().string();
+
+//                Log.d("MarkerDraggable11", myResponse);
+//                Log.d("MarkerDraggable12", address);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (NullPointerException g) {
+
+            }
+            marker.setSnippet(fetchRoute(currentLocation, marker.getPosition(), true));
+            marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, mapView) {
+                @Override
+                public void onOpen(Object item) {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                    TextView station = mView.findViewById(R.id.nomStation);
+//                    station.setText(marker1.getTitle() + "\n" + marker1.getSnippet());
+                    station.setText(marker.getSnippet());
+                }
+
+                @Override
+                public void onClose() {
+                    InfoWindow.closeAllInfoWindowsOn(myMap);
+                }
+
+            });
+            marker.showInfoWindow();
+            mapView.getController().setCenter(marker.getPosition());
+            mapView.getController().setZoom(17.0);
+            return true;
+
+        });
+
+        myMap.getOverlays().add(draggableMarker);
 
 
         Request request = new Request.Builder()
                 .url(urlRouteSubway)
                 .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
-            }
+        client.newCall(request).
 
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    fetchRouteSubway(response);
-                }
-            }
-        });
+                enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        e.printStackTrace();
+                    }
 
-        request = new Request.Builder()
-                .url(urlStations)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
-                Log.d("Nouvelle station1", "fail");
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    fetchAllStations(response);
-                    Log.d("Nouvelle station2", "success");
-                }
-            }
-        });
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            fetchRouteSubway(response);
+                        }
+                    }
+                });
 
         request = new Request.Builder()
-                .url(urlRouteBus)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
-            }
+                .
 
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    fetchRouteBus(response);
-                }
-            }
-        });
+                        url(urlStations)
+                .
+
+                        build();
+        client.newCall(request).
+
+                enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        e.printStackTrace();
+                        Log.d("Nouvelle station1", "fail");
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            fetchAllStations(response);
+                            Log.d("Nouvelle station2", "success");
+                        }
+                    }
+                });
 
         request = new Request.Builder()
-                .url(urlCorrespondance)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
-            }
+                .
 
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    fetchRouteCorrespondance(response);
-                }
-            }
-        });
+                        url(urlRouteBus)
+                .
+
+                        build();
+        client.newCall(request).
+
+                enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            fetchRouteBus(response);
+                        }
+                    }
+                });
+
+        request = new Request.Builder()
+                .
+
+                        url(urlCorrespondance)
+                .
+
+                        build();
+        client.newCall(request).
+
+                enqueue(new Callback() {
+                    @Override
+                    public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                        if (response.isSuccessful()) {
+                            fetchRouteCorrespondance(response);
+                        }
+                    }
+                });
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        allStations = database.getAllStations();
         stationsSubway = database.getAllTramwayStations();
         stationsBus = database.getAllBusStations();
         routeBus = database.getAllPointsBus();
-        stationsBus3 = searchBusStationByNumber("A03");
-        stationsBus3bis = searchBusStationByNumber("A03 bis");
-        stationsBus11 = searchBusStationByNumber("A11");
-        stationsBus16 = searchBusStationByNumber("A16");
-        stationsBus17 = searchBusStationByNumber("A17");
-        stationsBus22 = searchBusStationByNumber("A22");
-        stationsBus25 = searchBusStationByNumber("A25");
-        stationsBus27 = searchBusStationByNumber("A27");
 
-        currentPosition.setOnClickListener(v -> {
+        stationsBus3 =
+
+                searchBusStationByNumber("A03");
+
+        stationsBus3bis =
+
+                searchBusStationByNumber("A03 bis");
+
+        stationsBus11 =
+
+                searchBusStationByNumber("A11");
+
+        stationsBus16 =
+
+                searchBusStationByNumber("A16");
+
+        stationsBus17 =
+
+                searchBusStationByNumber("A17");
+
+        stationsBus22 =
+
+                searchBusStationByNumber("A22");
+
+        stationsBus25 =
+
+                searchBusStationByNumber("A25");
+
+        stationsBus27 =
+
+                searchBusStationByNumber("A27");
+
+        currentPosition.setOnClickListener(v ->
+
+        {
             getLocation();
             myMap.getController().setCenter(currentLocation);
             myMap.getController().setZoom(16.0);
         });
 
-        subway.setOnClickListener(v -> {
+        subway.setOnClickListener(v ->
+
+        {
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             int i = tramway_click;
             if (i == 1) {
@@ -437,7 +589,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
-        bus3.setOnClickListener(v -> {
+        bus3.setOnClickListener(v ->
+
+        {
             int i = bus3_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -453,7 +607,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        bus3bis.setOnClickListener(v -> {
+        bus3bis.setOnClickListener(v ->
+
+        {
             int i = bus3bis_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -469,7 +625,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        bus11.setOnClickListener(v -> {
+        bus11.setOnClickListener(v ->
+
+        {
             int i = bus11_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -486,7 +644,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
-        bus16.setOnClickListener(v -> {
+        bus16.setOnClickListener(v ->
+
+        {
             int i = bus16_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -502,7 +662,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        bus17.setOnClickListener(v -> {
+        bus17.setOnClickListener(v ->
+
+        {
             int i = bus17_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -519,7 +681,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        bus_22.setOnClickListener(v -> {
+        bus_22.setOnClickListener(v ->
+
+        {
             int i = bus22_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -535,7 +699,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        bus25.setOnClickListener(v -> {
+        bus25.setOnClickListener(v ->
+
+        {
             int i = bus25_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -551,7 +717,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        bus27.setOnClickListener(v -> {
+        bus27.setOnClickListener(v ->
+
+        {
             int i = bus27_click;
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             if (i == 1) {
@@ -567,21 +735,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        reset.setOnClickListener(v -> {
+        reset.setOnClickListener(v ->
+
+        {
             Log.d("MapOverlays", myMap.getOverlays().size() + "");
             clearMap();
         });
 
 
+        walk.setOnClickListener(v ->
 
-        walk.setOnClickListener(v -> {
+        {
             walk.setImageResource(R.drawable.walk_enabled);
             car.setImageResource(R.drawable.car);
 
             walk.setSelected(true);
             car.setSelected(false);
         });
-        car.setOnClickListener(v -> {
+        car.setOnClickListener(v ->
+
+        {
             car.setImageResource(R.drawable.car_enabled);
             walk.setImageResource(R.drawable.walk);
 
@@ -589,8 +762,75 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             walk.setSelected(false);
         });
 
+        /*MatrixDistance[] matrice = new MatrixDistance[113];
+        for (int i = 0; i < Math.round(allStations.size() / 4); i++)
+            for (int j = i; j < Math.round(allStations.size() / 4); j++)
+                matrice[i] = new MatrixDistance(allStations.get(i), allStations.get(j),
+                        fetchDistance(allStations.get(i).coordonnees, allStations.get(j).coordonnees),
+                        fetchTime(allStations.get(i).coordonnees, allStations.get(j).coordonnees));
+
+        for (int i = 0; i < Math.round(allStations.size() / 4); i++)
+            Log.d("Matrice", matrice[i] + "");
+
+
+        String DB_PATH = "/data/data/" + BuildConfig.APPLICATION_ID + "/databases/";
+        String DB_NAME = "db_pos.db";
+        InputStream myInput = null;
+        try {
+            myInput = getApplicationContext().getAssets().open(DB_NAME);
+
+            // Path to the just created empty db
+            String outFileName = DB_PATH + DB_NAME;
+            //Open the empty db as the output stream
+            OutputStream myOutput = new FileOutputStream(outFileName);
+            //transfer bytes from the inputfile to the outputfile
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = myInput.read(buffer)) > 0) {
+                myOutput.write(buffer, 0, length);
+            }
+            //Close the streams
+            myOutput.flush();
+            myOutput.close();
+            myInput.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+String TAG ="tag";
+        Log.d(TAG, "checkDataBase: Enter");
+        SQLiteDatabase checkDB = null;
+        try {
+            checkDB = SQLiteDatabase.openDatabase(DB_PATH + DB_NAME, null,
+                    SQLiteDatabase.OPEN_READWRITE);
+            checkDB.close();
+            Log.d(TAG, "checkDataBase: loaded");
+        } catch (SQLiteException e) {
+            Log.d(TAG, "checkDataBase: SQLiteException---" + e);
+            e.printStackTrace();
+            Helper.setDefaultDataBase(this);
+            AppSharedPref.setSignedUp(this, true);
+        } catch (Exception e) {
+            Log.d(TAG, "checkDataBase: Exception " + e);
+            e.printStackTrace();
+            Helper.setDefaultDataBase(this);
+            AppSharedPref.setSignedUp(this, true);
+        }
+        return checkDB != null;
+*/
+
+
+        setUpList();
+
+
 
     }
+
+    private void setUpList() {
+        ListView mylist = findViewById(R.id.searchStationList);
+        StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(),0,allStations);
+        mylist.setAdapter(stationNameAdapter);
+    }
+
 
 
 /*    private void bestChoiceOnTramway(GeoPoint currentLocation) {
@@ -617,6 +857,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         graph.Djiskra(22);
 
     }*/
+
+
 
 
     @Override
@@ -786,6 +1028,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+
     //Bus
     void addBusStationByNumber(String name) {
         ArrayList<Station> busStations = searchBusStationByNumber(name);
@@ -824,7 +1067,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     void addStationBus(MapView mapMarker, GeoPoint positionMarker, String nomFr, String numLigne) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
         marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus));
         marker.setTitle(nomFr + " " + numLigne);
@@ -1054,8 +1297,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom, String type) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
+        marker.setDraggable(false);
         if (type.equals("tramway"))
             marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
         else
@@ -1084,7 +1328,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
         marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
         marker.setTitle(nomFrMarker);
@@ -1155,6 +1399,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    double fetchDistance(GeoPoint start, GeoPoint end) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
+//        roadManager.addRequestOption("routeType=pedestrian");
+//        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        roadManager.addRequestOption("vehicle=foot");
+//        Road road = roadManager.getRoad(roadPoints);
+        Road road = roadManager.getRoad(roadPoints);
+        if (road.mLength == 0) {
+            return getDistanceOffline(start, end);
+        }
+        return road.mLength;
+
+    }
+
+    double fetchTime(GeoPoint start, GeoPoint end) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
+//        roadManager.addRequestOption("routeType=pedestrian");
+//        Road road = roadManager.getRoad(roadPoints);
+//        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        roadManager.addRequestOption("vehicle=foot");
+//        Road road = roadManager.getRoad(roadPoints);
+        Road road = roadManager.getRoad(roadPoints);
+        if (road.mLength == 0) {
+            return 99999;
+        }
+        return road.mDuration / 60;
+
+    }
+
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
         float[] distance = new float[2];
         Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
@@ -1198,6 +1484,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(mRotationGestureOverlay);
         myMap.getOverlays().add(echelle);
         myMap.getOverlays().add(mapEventsOverlay);
+        myMap.getOverlays().add(draggableMarker);
         myMap.invalidate();
         bus3bis_click = bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = tramway_click = 1;
     }
