@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout menu_linear;
     ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car;
+    ListView mylist;
 
     Station station = new Station();
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
@@ -820,15 +821,41 @@ String TAG ="tag";
 
 
         setUpList();
+        initSearch();
 
 
 
     }
 
     private void setUpList() {
-        ListView mylist = findViewById(R.id.searchStationList);
-        StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(),0,allStations);
+        mylist = findViewById(R.id.searchStationList);
+        ArrayList<Station> stationsByName = new ArrayList<>();
+        StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(),0,stationsByName);
         mylist.setAdapter(stationNameAdapter);
+    }
+
+    private void initSearch() {
+        SearchView searchView = findViewById(R.id.stationNameText);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                ArrayList<Station> stations = new ArrayList<>();
+                for (int i=0;i<allStations.size();i++)
+                    if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
+                        stations.add(allStations.get(i));
+                StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(),0,stations);
+                mylist.setAdapter(stationNameAdapter);
+
+                return false;
+            }
+        });
+
     }
 
 
@@ -1125,7 +1152,6 @@ String TAG ="tag";
             Toast.makeText(getApplicationContext(),
                     "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     @Override

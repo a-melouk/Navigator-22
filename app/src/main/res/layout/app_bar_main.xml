@@ -14,109 +14,75 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="100dp"
             android:background="@drawable/gradient"
             app:titleTextColor="@color/white">
 
-            <!--<androidx.constraintlayout.widget.ConstraintLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="match_parent">
 
-                android:orientation="horizontal">
+                <SearchView
+                    android:id="@+id/stationNameText"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:minHeight="35dp"
+                    app:layout_constraintBottom_toTopOf="@id/horGuidelin95"
+                    app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
+                    app:layout_constraintStart_toStartOf="@id/verGuidelin0"
+                    app:layout_constraintTop_toTopOf="@id/horGuidelin5" />
 
-
-                <EditText
+                <ListView
+                    android:id="@+id/searchStationList"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:hint="Search.."
-                    android:maxEms="14"
-                    android:maxLength="32"
-                    android:maxLines="2"
-                    android:orientation="horizontal"
-                    android:textColor="@color/bleu"
-                    android:textStyle="bold"
-                    app:layout_constraintBottom_toTopOf="@+id/horGuideline50"
-                    app:layout_constraintEnd_toEndOf="@id/verGuideline90"
-                    app:layout_constraintStart_toStartOf="@id/verGuideline10"
-                    app:layout_constraintTop_toTopOf="@id/horGuideline10" />
-
+                    android:background="@color/red"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
+                    app:layout_constraintStart_toStartOf="@id/verGuidelin0"
+                    app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/horGuideline95"
+                    android:id="@+id/horGuidelin5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="1" />
+                    app:layout_constraintGuide_percent="0.05" />
+
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/horGuideline50"
+                    android:id="@+id/horGuidelin95"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="0.5" />
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/horGuideline10"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="0.1" />
-
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/horGuideline5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="1.0" />
+                    app:layout_constraintGuide_percent="0.95" />
 
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/verGuideline10"
+                    android:id="@+id/verGuidelin0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="0.0" />
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/verGuideline90"
+                    android:id="@+id/verGuidelin90"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.9" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/verGuidelin100"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="1" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>-->
 
-            <!--            <SearchView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/searchStationByName"
-                            android:iconifiedByDefault="false"
-                            android:queryHint="Search"/>-->
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:background="@color/taxi"
-                >
-
-<!--                <EditText-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:id="@+id/stationNameText"-->
-<!--                    android:text="StationSearchText"/>-->
-
-                <SearchView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/stationNameText" />
-
-                <ListView
-                    android:layout_below="@id/stationNameText"
-                    android:id="@+id/searchStationList"
-                    android:layout_width="wrap_content"
-                    android:layout_height="100dp"
-                    android:visibility="visible" />
-            </RelativeLayout>
-
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.appcompat.widget.Toolbar>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
