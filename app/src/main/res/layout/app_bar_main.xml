@@ -14,7 +14,7 @@
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="?attr/actionBarSize"
             android:background="@drawable/gradient"
             app:titleTextColor="@color/white">
 
@@ -26,21 +26,11 @@
                     android:id="@+id/stationNameText"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:minHeight="35dp"
+                    android:queryHint="Search.."
                     app:layout_constraintBottom_toTopOf="@id/horGuidelin95"
                     app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
                     app:layout_constraintStart_toStartOf="@id/verGuidelin0"
                     app:layout_constraintTop_toTopOf="@id/horGuidelin5" />
-
-                <ListView
-                    android:id="@+id/searchStationList"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:background="@color/red"
-                    android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
-                    app:layout_constraintStart_toStartOf="@id/verGuidelin0"
-                    app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/horGuidelin5"

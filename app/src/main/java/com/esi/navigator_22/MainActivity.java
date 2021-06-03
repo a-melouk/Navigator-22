@@ -213,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         ArrayList<String> allStationsName = new ArrayList<>();
-        for (int i=0;i<allStations.size();i++)
+        for (int i = 0; i < allStations.size(); i++)
             allStationsName.add(allStations.get(i).nomFr);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setNavigationViewListener();
 
         setSupportActionBar(toolbar);
-        toolbar.setOverflowIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.search));
+        toolbar.setOverflowIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.station_icon));
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.setDrawerIndicatorEnabled(true);
@@ -824,14 +824,11 @@ String TAG ="tag";
         initSearch();
 
 
-
     }
 
     private void setUpList() {
         mylist = findViewById(R.id.searchStationList);
-        ArrayList<Station> stationsByName = new ArrayList<>();
-        StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(),0,stationsByName);
-        mylist.setAdapter(stationNameAdapter);
+        mylist.setVisibility(View.INVISIBLE);
     }
 
     private void initSearch() {
@@ -846,14 +843,19 @@ String TAG ="tag";
             public boolean onQueryTextChange(String newText) {
 
                 ArrayList<Station> stations = new ArrayList<>();
-                for (int i=0;i<allStations.size();i++)
+                for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
-                StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(),0,stations);
+                StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 mylist.setAdapter(stationNameAdapter);
-
                 return false;
             }
+        });
+        searchView.setOnSearchClickListener(v -> mylist.setVisibility(View.VISIBLE));
+
+        searchView.setOnCloseListener(() -> {
+            mylist.setVisibility(View.INVISIBLE);
+            return false;
         });
 
     }
@@ -884,8 +886,6 @@ String TAG ="tag";
         graph.Djiskra(22);
 
     }*/
-
-
 
 
     @Override
