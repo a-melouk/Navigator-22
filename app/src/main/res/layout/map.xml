@@ -146,12 +146,29 @@
             app:layout_constraintStart_toStartOf="@+id/verGuidelin10"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
 
+        <ImageView
+            android:id="@+id/marker"
+            android:layout_width="50dp"
+            android:layout_height="0dp"
+            android:src="@drawable/pin"
+            app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
+            app:layout_constraintStart_toStartOf="@+id/verGuidelin50"
+            app:layout_constraintEnd_toStartOf="@id/verGuidelin50"
+            app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/verGuidelin10"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verGuidelin50"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/verGuidelin30"

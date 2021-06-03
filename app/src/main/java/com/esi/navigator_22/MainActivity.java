@@ -21,6 +21,7 @@ import android.view.SubMenu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout menu_linear;
     ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car;
+    ImageView marker;
     ListView mylist;
 
     Station station = new Station();
@@ -205,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         subway = findViewById(R.id.subway);
         car = findViewById(R.id.car);
         walk = findViewById(R.id.walk);
+        marker = findViewById(R.id.marker);
 
 //        scroll_menu = findViewById(R.id.stations_menu);
         menu_linear = findViewById(R.id.menu_linear);
@@ -347,6 +350,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         draggableMarker.setPosition(new GeoPoint(35.1825, -0.6146));
         draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
         draggableMarker.setDraggable(true);
+        draggableMarker.setVisible(false);
+        marker.setOnClickListener(v -> {
+            draggableMarker.setVisible(true);
+            myMap.invalidate();
+        });
 //        draggableMarker.setAnchor(ANCHOR_CENTER,ANCHOR_TOP);
 //        draggableMarker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
         draggableMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
@@ -848,6 +856,19 @@ String TAG ="tag";
                         stations.add(allStations.get(i));
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 mylist.setAdapter(stationNameAdapter);
+                mylist.setOnItemClickListener((parent, view, position, id) -> {
+                    Station o = (Station) mylist.getItemAtPosition(position);
+                    if (o.type.equals("bus")) {
+                        clearMap();
+                        cheminBus = searchBusRouteByNumber(o.numero);
+                        tracerCheminBus(cheminBus, myMap, 255, 0, 0, o.numero);
+                        addStationBus(myMap, o.coordonnees, o.nomFr, o.numero);
+                        myMap.getController().setCenter(o.coordonnees);
+                        myMap.invalidate();
+
+                    }
+
+                });
                 return false;
             }
         });
@@ -857,6 +878,7 @@ String TAG ="tag";
             mylist.setVisibility(View.INVISIBLE);
             return false;
         });
+
 
     }
 

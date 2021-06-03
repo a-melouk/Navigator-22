@@ -28,9 +28,10 @@ public class Station {
     @Override
     public String toString() {
         return "Station{" +
-                "nomFr='" + nomFr + '\'' +
+                "type='" + type + '\'' +
+                ", nomFr='" + nomFr + '\'' +
+                ", numero='" + numero + '\'' +
                 ", coordonnees=" + coordonnees +
-                ", numero=" + numero +
                 '}';
     }
 }
