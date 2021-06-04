@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String urlRouteSubway = "http://192.168.1.9:3000/subway";
     String urlRouteBus = "http://192.168.1.9:3000/bus";
     String urlCorrespondance = "http://192.168.1.9:3000/correspondance";
+    String urlMatrice = "http://192.168.1.9:3000/matrice";
     private String myResponse;
 
 
@@ -110,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ListView mylist;
 
     Station station = new Station();
+    MatriceLine ligne = new MatriceLine(new Station("type","nom","numero",new GeoPoint(0.0,0.0)),new Station("type","nom","numero",new GeoPoint(0.0,0.0)),0.0,0.0);
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
@@ -457,22 +459,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-        request = new Request.Builder()
-                .
-
-                        url(urlStations)
-                .
-
-                        build();
-        client.newCall(request).
-
-                enqueue(new Callback() {
+        request = new Request.Builder().url(urlStations).build();
+        client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(@NotNull Call call, @NotNull IOException e) {
                         e.printStackTrace();
                         Log.d("Nouvelle station1", "fail");
                     }
-
                     @Override
                     public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                         if (response.isSuccessful()) {
@@ -527,6 +520,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                 });
+
+        request = new Request.Builder().url(urlMatrice).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+                Log.d("Nouvelle station1", "fail");
+            }
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    fetchAllMatrice(response);
+                    Log.d("Nouvelle station2", "success");
+                }
+            }
+        });
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -1238,6 +1247,90 @@ String TAG ="tag";
             station.coordonnees = point;
             Log.d("Nouvelle station", station.toString());
             database.addStation(station);
+        }
+    }
+
+    private void fetchAllMatrice(Response response) throws IOException {
+        myResponse = Objects.requireNonNull(response.body()).string();
+        JSONArray jsonarray = null;
+        try {
+            jsonarray = new JSONArray(myResponse);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
+            JSONObject jsonobject = null;
+            try {
+                jsonobject = jsonarray.getJSONObject(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                assert jsonobject != null;
+                ligne.stationSource.nomFr = jsonobject.getString("nomFrdepart");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                ligne.stationSource.type = jsonobject.getString("typedepart");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                ligne.stationSource.numero = jsonobject.getString("numerodepart");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                point.setLatitude(jsonobject.getDouble("latitudedepart"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                point.setLongitude(jsonobject.getDouble("longitudedepart"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ligne.stationSource.coordonnees = point;
+
+
+            try {
+                ligne.stationDestination.nomFr = jsonobject.getString("nomFrarrive");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                ligne.stationDestination.type = jsonobject.getString("typearrive");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                ligne.stationDestination.numero = jsonobject.getString("numeroarrive");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                point.setLatitude(jsonobject.getDouble("latitudearrive"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                point.setLongitude(jsonobject.getDouble("longitudearrive"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            ligne.stationDestination.coordonnees = point;
+            try {
+                ligne.distance = jsonobject.getDouble("distance");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                ligne.time = jsonobject.getDouble("duration");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            database.addMatriceLine(ligne);
         }
     }
 

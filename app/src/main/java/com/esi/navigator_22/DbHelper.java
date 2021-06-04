@@ -23,7 +23,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String TABLE_CHEMIN_BUS = "chemin_bus";
     private static final String TABLE_STATIONS = "stations";
     private static final String TABLE_CORRESPONDANCE = "correspondance";
-
+    private static final String TABLE_Matrice = "matrice";
     private static final String TABLE_NEAREST_SUB_STATIONS = "nearest_sub_stations";
 
     public static DbHelper getInstance(Context ctx) {
@@ -44,6 +44,20 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private static final String COLUMN_NUMERO = "numero";
     private static final String COLUMN_NUMLIGNE = "numLigne";
+
+    private static final String COLUMN_LATITUDEDEPART = "latitudedepart";
+    private static final String COLUMN_LONGITUDEDEPART = "longitudedepart";
+    private static final String COLUMN_NOMFRDEPART = "nomfrdepart";
+    private static final String COLUMN_TYPEDEPART = "typedepart";
+    private static final String COLUMN_NUMERODEPART = "numerodepart";
+    private static final String COLUMN_LATITUDEARRIVE = "latitudearrive";
+    private static final String COLUMN_LONGITUDEARRIVE = "longitudearrive";
+    private static final String COLUMN_NOMFRARRIVE = "nomfrarrive";
+    private static final String COLUMN_TYPEARRIVE = "typearrive";
+    private static final String COLUMN_NUMEROARRIVE = "numeroarrive";
+    private static final String COLUMN_DISTANCEMATRICE = "distance";
+    private static final String COLUMN_TIMEMATRICE = "time";
+
 
     private static final String CREATE_TABLE_Station = "CREATE TABLE "
             + TABLE_STATIONS + "("
@@ -86,6 +100,35 @@ public class DbHelper extends SQLiteOpenHelper {
             + COLUMN_TIME + " REAL ,"
             + "PRIMARY KEY (" + COLUMN_NOMFR + " , " + COLUMN_NUMERO + " , " + COLUMN_TYPE + ")"
             + ")";
+    //    private static final String COLUMN_LATITUDEDEPART = "latitudedepart";
+//    private static final String COLUMN_LONGITUDEDEPART = "longitudedepart";
+//    private static final String COLUMN_NOMFRDEPART = "nomfrdepart";
+//    private static final String COLUMN_TYPEDEPART = "typedepart";
+//    private static final String COLUMN_NUMERODEPART = "numerodepart";
+//    private static final String COLUMN_LATITUDEARRIVE = "latitudearrive";
+//    private static final String COLUMN_LONGITUDEARRIVE = "longitudearrive";
+//    private static final String COLUMN_NOMFRARRIVE = "nomfrarrive";
+//    private static final String COLUMN_TYPEARRIVE = "typearrive";
+//    private static final String COLUMN_NUMEROARRIVE = "numeroarrive";
+//    private static final String COLUMN_DISTANCEMATRICE = "distance";
+//    private static final String COLUMN_TIMEMATRICE = "time";
+    private static final String CREATE_TABLE_Matrice = "CREATE TABLE "
+            + TABLE_Matrice + "("
+            + COLUMN_LATITUDEDEPART + " REAL ,"
+            + COLUMN_LONGITUDEDEPART + " REAL ,"
+            + COLUMN_NOMFRDEPART + " TEXT ,"
+            + COLUMN_TYPEDEPART + " TEXT ,"
+            + COLUMN_NUMERODEPART + " TEXT ,"
+            + COLUMN_LATITUDEARRIVE + " REAL ,"
+            + COLUMN_LONGITUDEARRIVE + " REAL ,"
+            + COLUMN_NOMFRARRIVE + " TEXT ,"
+            + COLUMN_TYPEARRIVE + " TEXT ,"
+            + COLUMN_NUMEROARRIVE + " TEXT ,"
+
+            + COLUMN_DISTANCEMATRICE + " REAL ,"
+            + COLUMN_TIMEMATRICE + " REAL ,"
+            + "PRIMARY KEY (" + COLUMN_NOMFRDEPART + " , " + COLUMN_NUMERODEPART + " , " + COLUMN_NOMFRARRIVE + " ," + COLUMN_NUMEROARRIVE + ")"
+            + ")";
 
     private DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -99,6 +142,7 @@ public class DbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_TABLE_Closest_Stations);
         sqLiteDatabase.execSQL(CREATE_TABLE_CheminBus);
         sqLiteDatabase.execSQL(CREATE_TABLE_Correspondance);
+        sqLiteDatabase.execSQL(CREATE_TABLE_Matrice);
 
     }
 
@@ -109,6 +153,7 @@ public class DbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_NEAREST_SUB_STATIONS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CHEMIN_BUS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_CORRESPONDANCE);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_Matrice);
         onCreate(sqLiteDatabase);
     }
 
@@ -130,6 +175,31 @@ public class DbHelper extends SQLiteOpenHelper {
         long word_id = db.insert(TABLE_STATIONS, null, contentValues);
         return word_id;
     }
+
+    long addMatriceLine(MatriceLine line) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COLUMN_LATITUDEDEPART, line.stationSource.coordonnees.getLatitude());
+        contentValues.put(COLUMN_LONGITUDEDEPART, line.stationSource.coordonnees.getLongitude());
+        contentValues.put(COLUMN_NOMFRDEPART, line.stationSource.nomFr);
+        contentValues.put(COLUMN_TYPEDEPART, line.stationSource.type);
+        contentValues.put(COLUMN_NUMERODEPART, line.stationSource.numero);
+
+        contentValues.put(COLUMN_LATITUDEARRIVE, line.stationDestination.coordonnees.getLatitude());
+        contentValues.put(COLUMN_LONGITUDEARRIVE, line.stationDestination.coordonnees.getLongitude());
+        contentValues.put(COLUMN_NOMFRARRIVE, line.stationDestination.nomFr);
+        contentValues.put(COLUMN_TYPEARRIVE, line.stationDestination.type);
+        contentValues.put(COLUMN_NUMEROARRIVE, line.stationDestination.numero);
+
+        contentValues.put(COLUMN_DISTANCEMATRICE, line.distance);
+        contentValues.put(COLUMN_TIMEMATRICE, line.time);
+
+
+        long word_id = db.insert(TABLE_Matrice, null, contentValues);
+        return word_id;
+    }
+
+
 
     long addNearStation(StationDetails stationDetails) {
         SQLiteDatabase db = getWritableDatabase();
@@ -232,8 +302,8 @@ public class DbHelper extends SQLiteOpenHelper {
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDE))));
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
                 name = c.getString(c.getColumnIndex(COLUMN_NUMLIGNE));
-                routeBus.coordinates=g;
-                routeBus.numLigne=name;
+                routeBus.coordinates = g;
+                routeBus.numLigne = name;
                 pointCheminsBus.add(routeBus);
             } while (c.moveToNext());
         }
@@ -342,7 +412,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 station.coordonnees = g;
                 station.numero = c.getString(c.getColumnIndex(COLUMN_NUMERO));
                 stationsBus.add(station);
-                Log.d("SearchBusStationByName",station.toString());
+                Log.d("SearchBusStationByName", station.toString());
             } while (c.moveToNext());
         }
         return stationsBus;
@@ -364,7 +434,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 station.coordonnees = g;
                 station.numero = c.getString(c.getColumnIndex(COLUMN_NUMERO));
                 stationsBus.add(station);
-                Log.d("SearchStationByName",station.toString());
+                Log.d("SearchStationByName", station.toString());
             } while (c.moveToNext());
         }
         return stationsBus;
