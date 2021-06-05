@@ -2,6 +2,8 @@ package com.esi.navigator_22;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.util.Objects;
+
 public class Station {
     String type;
     String nomFr;
@@ -26,12 +28,25 @@ public class Station {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Station station = (Station) o;
+        return Objects.equals(type, station.type) &&
+                Objects.equals(nomFr, station.nomFr) &&
+                Objects.equals(numero, station.numero) &&
+                Objects.equals(coordonnees, station.coordonnees);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, nomFr, numero, coordonnees);
+    }
+
+    @Override
     public String toString() {
         return "Station{" +
-                "type='" + type + '\'' +
-                ", nomFr='" + nomFr + '\'' +
-                ", numero='" + numero + '\'' +
-                ", coordonnees=" + coordonnees +
-                '}';
+                nomFr+" ,"+numero+"}"
+                ;
     }
 }

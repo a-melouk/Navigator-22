@@ -200,7 +200,6 @@ public class DbHelper extends SQLiteOpenHelper {
     }
 
 
-
     long addNearStation(StationDetails stationDetails) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -331,6 +330,44 @@ public class DbHelper extends SQLiteOpenHelper {
         return stations;
     }
 
+    ArrayList<MatriceLine> getAllLines() {
+        ArrayList<MatriceLine> lines = new ArrayList<>();
+        ArrayList<MatriceLine> linesTemp = new ArrayList<>();
+        int compteur = 0;
+
+
+        String selectQuery = "SELECT * FROM " + TABLE_Matrice + " ORDER BY " + COLUMN_NOMFRDEPART + "," + COLUMN_NUMERODEPART + "," + COLUMN_TYPEDEPART;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                Station s1 = new Station();
+                Station s2 = new Station();
+                MatriceLine line = new MatriceLine(s1, s2, 0.0, 0.0);
+                s1.type = c.getString(c.getColumnIndex(COLUMN_TYPEDEPART));
+                s1.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFRDEPART)));
+                s1.numero = c.getString((c.getColumnIndex(COLUMN_NUMERODEPART)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDEDEPART))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDEDEPART))));
+                s1.coordonnees = g;
+                s2.type = c.getString(c.getColumnIndex(COLUMN_TYPEARRIVE));
+                s2.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFRARRIVE)));
+                s2.numero = c.getString((c.getColumnIndex(COLUMN_NUMEROARRIVE)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDEARRIVE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDEARRIVE))));
+                s2.coordonnees = g;
+                line.stationSource = s1;
+                line.stationDestination = s2;
+                line.distance = c.getDouble(c.getColumnIndex(COLUMN_DISTANCEMATRICE));
+                line.time = c.getDouble(c.getColumnIndex(COLUMN_TIMEMATRICE));
+                lines.add(line);
+            } while (c.moveToNext());
+        }
+        return lines;
+    }
+
     ArrayList<Station> getAllTramwayStations() {
         ArrayList<Station> stations = new ArrayList<Station>();
         String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " WHERE " + COLUMN_TYPE + " = 'tramway'" + " ORDER BY CAST(" + COLUMN_NUMERO + " AS INTEGER)";
@@ -347,7 +384,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
                 s.coordonnees = g;
                 stations.add(s);
-                Log.d("TramwayStation", s.toString());
             } while (c.moveToNext());
         }
         return stations;
@@ -390,7 +426,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDE))));
                 s.coordonnees = g;
                 stations.add(s);
-                Log.d("BusStation", s.toString());
             } while (c.moveToNext());
         }
         return stations;
@@ -412,7 +447,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 station.coordonnees = g;
                 station.numero = c.getString(c.getColumnIndex(COLUMN_NUMERO));
                 stationsBus.add(station);
-                Log.d("SearchBusStationByName", station.toString());
+
             } while (c.moveToNext());
         }
         return stationsBus;
@@ -434,7 +469,6 @@ public class DbHelper extends SQLiteOpenHelper {
                 station.coordonnees = g;
                 station.numero = c.getString(c.getColumnIndex(COLUMN_NUMERO));
                 stationsBus.add(station);
-                Log.d("SearchStationByName", station.toString());
             } while (c.moveToNext());
         }
         return stationsBus;
