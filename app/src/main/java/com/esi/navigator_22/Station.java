@@ -27,6 +27,8 @@ public class Station {
         this.coordonnees = coordonnees;
     }
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,8 +47,8 @@ public class Station {
 
     @Override
     public String toString() {
-        return "Station{" +
-                nomFr+" ,"+numero+"}"
+        return
+                "Station("+nomFr+","+numero+")"
                 ;
     }
 }

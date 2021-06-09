@@ -24,6 +24,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String TABLE_STATIONS = "stations";
     private static final String TABLE_CORRESPONDANCE = "correspondance";
     private static final String TABLE_Matrice = "matrice";
+    private static final String TABLE_TRAMWAY_MATRIX = "tramway_matrice";
     private static final String TABLE_NEAREST_SUB_STATIONS = "nearest_sub_stations";
 
     public static DbHelper getInstance(Context ctx) {
@@ -66,7 +67,7 @@ public class DbHelper extends SQLiteOpenHelper {
             + COLUMN_NUMERO + " TEXT ,"
             + COLUMN_LATITUDE + " REAL ,"
             + COLUMN_LONGITUDE + " REAL ,"
-            + "PRIMARY KEY (" + COLUMN_NOMFR + " , " + COLUMN_NUMERO + " , " + COLUMN_TYPE + ")"
+            + "PRIMARY KEY (" + COLUMN_NUMERO + ")"
             + ")";
 
     private static final String CREATE_TABLE_CheminSub = "CREATE TABLE "
@@ -353,6 +354,44 @@ public class DbHelper extends SQLiteOpenHelper {
                 g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDEDEPART))));
                 s1.coordonnees = g;
                 s2.type = c.getString(c.getColumnIndex(COLUMN_TYPEARRIVE));
+                s2.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFRARRIVE)));
+                s2.numero = c.getString((c.getColumnIndex(COLUMN_NUMEROARRIVE)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDEARRIVE))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDEARRIVE))));
+                s2.coordonnees = g;
+                line.stationSource = s1;
+                line.stationDestination = s2;
+                line.distance = c.getDouble(c.getColumnIndex(COLUMN_DISTANCEMATRICE));
+                line.time = c.getDouble(c.getColumnIndex(COLUMN_TIMEMATRICE));
+                lines.add(line);
+            } while (c.moveToNext());
+        }
+        return lines;
+    }
+
+    ArrayList<TramwayMatrixLine> getAllTramwayLines() {
+        ArrayList<TramwayMatrixLine> lines = new ArrayList<>();
+
+        int compteur = 0;
+
+
+        String selectQuery = "SELECT * FROM " + TABLE_Matrice + " WHERE " + COLUMN_TYPEDEPART + "= \"tramway\"" + " " +
+                "AND " + COLUMN_TYPEARRIVE + " =\"tramway\"" +
+                " ORDER BY " + COLUMN_NUMERODEPART + "," + COLUMN_NUMEROARRIVE;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery(selectQuery, null);
+        if (c.moveToFirst()) {
+            do {
+
+                GeoPoint g = new GeoPoint(0.0, 0.0);
+                Station s1 = new Station();
+                Station s2 = new Station();
+                TramwayMatrixLine line = new TramwayMatrixLine(s1, s2, 0.0, 0.0, 0.0);
+                s1.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFRDEPART)));
+                s1.numero = c.getString((c.getColumnIndex(COLUMN_NUMERODEPART)));
+                g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDEDEPART))));
+                g.setLongitude(c.getDouble((c.getColumnIndex(COLUMN_LONGITUDEDEPART))));
+                s1.coordonnees = g;
                 s2.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFRARRIVE)));
                 s2.numero = c.getString((c.getColumnIndex(COLUMN_NUMEROARRIVE)));
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDEARRIVE))));
