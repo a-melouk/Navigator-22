@@ -4,9 +4,9 @@ public class TramwayMatrixLine extends MatriceLine{
 
     double timetramway;
 
-    public TramwayMatrixLine(Station stationSource, Station stationDestination, double distance, double time, double timetramway) {
+    public TramwayMatrixLine(Station stationSource, Station stationDestination, double distance, double time) {
         super(stationSource, stationDestination, distance, time);
-        this.timetramway = timetramway;
+        this.timetramway = 99999;
     }
 
     @Override

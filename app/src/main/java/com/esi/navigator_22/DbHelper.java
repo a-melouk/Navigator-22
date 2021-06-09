@@ -386,7 +386,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 GeoPoint g = new GeoPoint(0.0, 0.0);
                 Station s1 = new Station();
                 Station s2 = new Station();
-                TramwayMatrixLine line = new TramwayMatrixLine(s1, s2, 0.0, 0.0, 0.0);
+                TramwayMatrixLine line = new TramwayMatrixLine(s1, s2, 0.0, 0.0);
                 s1.nomFr = c.getString((c.getColumnIndex(COLUMN_NOMFRDEPART)));
                 s1.numero = c.getString((c.getColumnIndex(COLUMN_NUMERODEPART)));
                 g.setLatitude(c.getDouble((c.getColumnIndex(COLUMN_LATITUDEDEPART))));

@@ -379,17 +379,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         myMap.getOverlays().add(draggableMarker);
 
-        getRouteSubway();
-        getRouteBus();
-        getRouteCorrespondance();
-        getStations();
-        getMatrice();
-        getBestRoute();
-
-//        String urlRouting = "http://192.168.1.9:3000/routing/slatitude=" + currentLocation.getLatitude() + "&slongitude=" + currentLocation.getLongitude()
-//                + "&dlatitude=" + allStations.get(18).coordonnees.getLatitude() + "&dlongitude=" + allStations.get(18).coordonnees.getLongitude();
-//        String urlRouting = "http://192.168.1.9:3000/result/35.21205554963883/-0.616586752697308/35.20599727740149/-0.626524826440471";
-
+//        getRouteSubway();
+//        getRouteBus();
+//        getRouteCorrespondance();
+//        getStations();
+//        getMatrice();
+//        getBestRoute();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -590,29 +585,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
 
         int compteur1, compteur2;
-        for (compteur1 = 0; compteur1 < stationsSubway.size(); compteur1++) {
-            if ((tramwayMatrice.get(compteur1).stationSource.nomFr.equals("Les Cascades"))) {
-                tramwayMatrice.get(compteur1).timetramway = 0;
-                for (compteur2 = 0; compteur2 < stationsSubway.size(); compteur2++) {
-                    if (tramwayMatrice.get(compteur1).stationDestination.nomFr.equals("Gare routière Est, Ghalmi")) {
-                        tramwayMatrice.get(compteur1).timetramway = tramwayTimes[0];
-                    } else {
-                        tramwayMatrice.get(compteur1).timetramway = 9999;
-                    }
+//        for (compteur1 = 0; compteur1 < stationsSubway.size(); compteur1++) {
+//            if ((tramwayMatrice.get(compteur1).stationSource.nomFr.equals("Les Cascades"))) {
+//                tramwayMatrice.get(compteur1).timetramway = 0;
+//                for (compteur2 = 0; compteur2 < stationsSubway.size(); compteur2++) {
+//                    if (tramwayMatrice.get(compteur1).stationDestination.nomFr.equals("Gare routière Est, Ghalmi")) {
+//                        tramwayMatrice.get(compteur1).timetramway = tramwayTimes[0];
+//                    } else {
+//                        tramwayMatrice.get(compteur1).timetramway = 9999;
+//                    }
+//                }
+//            }
+//        }
+        for (compteur1 = 0; compteur1 < tramwayMatrice.size(); compteur1++)
+            for (compteur2 = 1; compteur2 < stationsSubway.size(); compteur2++) {
+                if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(stationsSubway.get(compteur2 - 1).nomFr) && tramwayMatrice.get(compteur1).stationDestination.nomFr.equals(stationsSubway.get(compteur2).nomFr)) {
+                    tramwayMatrice.get(compteur1).timetramway = tramwayTimes[compteur2 - 1];
+                } else if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(tramwayMatrice.get(compteur1).stationDestination.nomFr)) {
+                    tramwayMatrice.get(compteur1).timetramway = 0;
                 }
             }
-        }
+
+
+        for (int i = 0; i < tramwayMatrice.size(); i++)
+            Log.d("TramwayMatrix", tramwayMatrice.get(i).stationSource.nomFr + " | " + tramwayMatrice.get(i).stationDestination.nomFr + " | " + tramwayMatrice.get(i).timetramway);
 
         setUpList();
         initSearch();
-
     }
-//    getRouteSubway();
-//    getRouteBus();
-//    getRouteCorrespondance();
-//    getStations();
-//    getMatrice();
-//    getBestRoute();
 
     private void getRouteSubway() {
         Request request1 = new Request.Builder().url(urlRouteSubway).build();
