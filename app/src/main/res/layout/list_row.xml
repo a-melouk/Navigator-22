@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
-        android:src="@drawable/ic_tramway" />
+        android:src="@drawable/icon_tramway" />
 
 
 

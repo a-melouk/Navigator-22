@@ -13,8 +13,10 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -114,12 +116,12 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         roadPoints.add((currentLocation));
         roadPoints.add(geoPoint);
 
-        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-        Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-//        roadManager1.addRequestOption("vehicle=foot");
-//        Road road = roadManager1.getRoad(roadPoints);
+//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+//        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//        Road road = roadManager.getRoad(roadPoints);
+        RoadManager roadManager1 = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+        roadManager1.addRequestOption("vehicle=foot");
+        Road road = roadManager1.getRoad(roadPoints);
 
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(currentLocation, geoPoint);

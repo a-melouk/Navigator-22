@@ -9,28 +9,34 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gradient">
+        android:background="@drawable/gradient2">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@drawable/gradient"
             app:titleTextColor="@color/white">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                >
+
 
                 <SearchView
                     android:id="@+id/stationNameText"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:queryHint="Search.."
+                    android:searchIcon="@drawable/icon_search"
+                    app:theme="@style/SearchViewStyle"
                     app:layout_constraintBottom_toTopOf="@id/horGuidelin95"
                     app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
                     app:layout_constraintStart_toStartOf="@id/verGuidelin0"
-                    app:layout_constraintTop_toTopOf="@id/horGuidelin5" />
+                    app:layout_constraintTop_toTopOf="@id/horGuidelin5"
+
+
+                    />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/horGuidelin5"
@@ -77,6 +83,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <include layout="@layout/content_main" />
+    <include layout="@layout/map"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

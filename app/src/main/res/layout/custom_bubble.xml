@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="60dp"
-    android:background="@drawable/info"
+    android:background="@drawable/info_window"
     android:orientation="horizontal"
     android:alpha="0.8">
 
@@ -19,18 +19,6 @@
         android:text="Station\naaaaa"
         android:textColor="#FFFFFF"
         android:textSize="13dp" />
-
-<!--    <TextView-->
-<!--        android:id="@+id/route"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:layout_below="@id/nomStation"-->
-<!--        android:padding="3dp"-->
-<!--        android:text="Details\nbbbbb\naaa"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textColor="#FFFFFF"-->
-<!--        android:textSize="13dp" />-->
 
 
 </RelativeLayout>

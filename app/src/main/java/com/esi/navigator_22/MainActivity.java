@@ -1,7 +1,6 @@
 package com.esi.navigator_22;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -40,12 +39,15 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 
+import com.esi.navigator_22.ro.Graph;
+import com.esi.navigator_22.ro.Node;
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -64,9 +66,11 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
+
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -78,6 +82,7 @@ import okhttp3.Response;
 
 import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
+
 
 //import androidx.appcompat.app.AlertDialog;
 //import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
@@ -152,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     double distanceTo, timeTo;
     OkHttpClient client = new OkHttpClient();
+    String graphhopperkey = "c977244b-9c08-401e-a4e3-a57b4ef9148e";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -229,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setNavigationViewListener();
 
         setSupportActionBar(toolbar);
-        toolbar.setOverflowIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.station_icon));
+        toolbar.setOverflowIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_station));
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.setDrawerIndicatorEnabled(true);
@@ -323,6 +329,70 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         marker.setOnClickListener(v -> {
             draggableMarker.setVisible(true);
+            Graph graph = new Graph();
+            ArrayList<Node> nodes = new ArrayList<>();
+            Node a = new Node("Les cascades");
+            Node b = new Node("Gare routière Est, Ghalmi");
+            Node c = new Node("Frères Adnane");
+            Node d = new Node("Benhamouda");
+            Node e = new Node("Environnement");
+            Node f = new Node("Fac de droit");
+            Node g = new Node("Centre Niaâma");
+            Node h = new Node("Campus");
+            Node i = new Node("Gare ferroviaire");
+            Node j = new Node("Gare routière Nord, Sogral");
+            Node k = new Node("AADL Benhamouda");
+            Node l = new Node("Sidi Djilali");
+            Node m = new Node("Wiam");
+            Node n = new Node("Daira");
+            Node o = new Node("Houari Boumediene");
+            Node p = new Node("Houari Boumediene");
+            Node q = new Node("Maternité");
+            Node r = new Node("Salle Adda Boudjelal");
+            Node s = new Node("Amir Abdelkader");
+            Node t = new Node("4 Horloges");
+            Node u = new Node("Jardin Public");
+            Node vv = new Node("Gare routière Sud");
+            Node current = new Node("Current");
+            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+            getLocation();
+            nodes.add(a);
+            nodes.add(b);
+            nodes.add(c);
+            nodes.add(d);
+            nodes.add(e);
+            nodes.add(f);
+            nodes.add(g);
+            nodes.add(h);
+            nodes.add(i);
+            nodes.add(j);
+            nodes.add(k);
+            nodes.add(l);
+            nodes.add(m);
+            nodes.add(n);
+            nodes.add(o);
+            nodes.add(p);
+            nodes.add(q);
+            nodes.add(r);
+            nodes.add(s);
+            nodes.add(t);
+            nodes.add(u);
+            nodes.add(vv);
+            nodes.add(current);
+            for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
+                graph.addEdgeByNodes(nodes.get(compteur), nodes.get(compteur + 1), tramwayTimes[compteur]);
+            }
+
+            graph.addEdgeByNodes(e, l, 60);//correspondance
+
+
+            for (int compteur = 0; compteur < stationsSubway.size(); compteur++) {
+                graph.addEdgeByName(current.getName(), nodes.get(compteur).getName(), (int) Math.round((fetchTime(currentLocation, stationsSubway.get(compteur).coordonnees) * 60)));
+
+            }
+
+            List<String> result = graph.shortestPath(current.getName(), h.getName());
+            Log.d("Dijkstra", "shortest path between " + current.getName() + " and " + h.getName() + ": " + result);
             myMap.invalidate();
         });
         draggableMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
@@ -349,7 +419,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     .url("https://api.geoapify.com/v1/geocode/reverse?lat=" + marker.getPosition().getLatitude() + "&lon=" + marker.getPosition().getLongitude() + "&apiKey=d29f8d73d9b84ba4921d5608fbc4aa47")
                     .method("GET", null)
                     .build();
-            String address = "";
             try {
                 Response response = geocoder.newCall(request).execute();
                 myResponse = response.body().string();
@@ -562,41 +631,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        reset.setOnClickListener(v -> {
-            clearMap();
-        });
+        reset.setOnClickListener(v -> clearMap());
 
         walk.setOnClickListener(v -> {
-            walk.setImageResource(R.drawable.walk_enabled);
-            car.setImageResource(R.drawable.car);
+            walk.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            car.setImageResource(R.drawable.icon_car);
 
             walk.setSelected(true);
             car.setSelected(false);
+            car.setBackground(null);
         });
 
         car.setOnClickListener(v -> {
-            car.setImageResource(R.drawable.car_enabled);
-            walk.setImageResource(R.drawable.walk);
+            car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            walk.setImageResource(R.drawable.icon_walk);
+            walk.setBackground(null);
 
             car.setSelected(true);
             walk.setSelected(false);
         });
 
-        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
 
+        int[] walkingTimes = new int[]{480, 780, 1260, 1620, 2280, 1980, 2580, 3120, 2700, 2700, 2100, 1920, 1560, 870, 1140, 1080, 1500, 1680, 1860, 2520, 3180, 3720};
+        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
         int compteur1, compteur2;
-//        for (compteur1 = 0; compteur1 < stationsSubway.size(); compteur1++) {
-//            if ((tramwayMatrice.get(compteur1).stationSource.nomFr.equals("Les Cascades"))) {
-//                tramwayMatrice.get(compteur1).timetramway = 0;
-//                for (compteur2 = 0; compteur2 < stationsSubway.size(); compteur2++) {
-//                    if (tramwayMatrice.get(compteur1).stationDestination.nomFr.equals("Gare routière Est, Ghalmi")) {
-//                        tramwayMatrice.get(compteur1).timetramway = tramwayTimes[0];
-//                    } else {
-//                        tramwayMatrice.get(compteur1).timetramway = 9999;
-//                    }
-//                }
-//            }
-//        }
         for (compteur1 = 0; compteur1 < tramwayMatrice.size(); compteur1++)
             for (compteur2 = 1; compteur2 < stationsSubway.size(); compteur2++) {
                 if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(stationsSubway.get(compteur2 - 1).nomFr) && tramwayMatrice.get(compteur1).stationDestination.nomFr.equals(stationsSubway.get(compteur2).nomFr)) {
@@ -605,10 +663,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     tramwayMatrice.get(compteur1).timetramway = 0;
                 }
             }
-
-
-        for (int i = 0; i < tramwayMatrice.size(); i++)
-            Log.d("TramwayMatrix", tramwayMatrice.get(i).stationSource.nomFr + " | " + tramwayMatrice.get(i).stationDestination.nomFr + " | " + tramwayMatrice.get(i).timetramway);
 
         setUpList();
         initSearch();
@@ -1034,7 +1088,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void insertRouteSubway(Response response) throws IOException {
-        myResponse = response.body().string();
+        myResponse = Objects.requireNonNull(response.body()).string();
         JSONArray jsonarray = null;
         try {
             jsonarray = new JSONArray(myResponse);
@@ -1325,16 +1379,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
-        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-        if (car.isSelected())
-            roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
-        else roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+//        if (car.isSelected())
+//            roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
+//        else roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+
+
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
-//        Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-//        roadManager.addRequestOption("vehicle=foot");
-//        Road road = roadManager.getRoad(roadPoints);
+
+
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        if (car.isSelected())
+            roadManager.addRequestOption("vehicle=car");
+        else roadManager.addRequestOption("vehicle=foot");
+
+
         Road road = roadManager.getRoad(roadPoints);
         Polyline route;
         if (road.mLength == 0) {
@@ -1342,7 +1402,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             timeTo = 99999.0;
             return "Route indisponible";
         }
-        if (draw == true) {
+        if (draw) {
             if (car.isSelected())
                 route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 15.0f);
             else
@@ -1368,7 +1428,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
 //        Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
+//        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
 //        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(roadPoints);
         Road road = roadManager.getRoad(roadPoints);
@@ -1384,13 +1444,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
-        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
+//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
+//        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
 //        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
 //        roadManager.addRequestOption("routeType=pedestrian");
 //        Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager = new GraphHopperRoadManager("484e2932-b8a9-4bfa-a760-d3f32f84e347", false);
-//        roadManager.addRequestOption("vehicle=foot");
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        roadManager.addRequestOption("vehicle=foot");
 //        Road road = roadManager.getRoad(roadPoints);
         Road road = roadManager.getRoad(roadPoints);
         if (road.mLength == 0) {

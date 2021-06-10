@@ -37,7 +37,7 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
         TextView time = convertView.findViewById(R.id.time);
 
 
-        subway.setImageResource(R.drawable.ic_tramway);
+        subway.setImageResource(R.drawable.icon_tramway);
 //        nomAr.setText(getItem(position).numero);
         nomFr.setText(getItem(position).nomFr);
         distance.setText(String.valueOf(getItem(position).distanceTo));

@@ -41,21 +41,21 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="1dp"
-            android:src="@drawable/tramway" />
+            android:src="@drawable/icon_tramway_linear" />
 
         <ImageView
             android:id="@+id/bus_3"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="1dp"
-            android:src="@drawable/bus_3" />
+            android:src="@drawable/bus_03" />
 
         <ImageView
             android:id="@+id/bus_3bis"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:padding="1dp"
-            android:src="@drawable/bus_3" />
+            android:src="@drawable/bus_03" />
 
         <ImageView
             android:id="@+id/bus_11"
@@ -114,7 +114,7 @@
             android:id="@+id/currentPosition"
             android:layout_width="40dp"
             android:layout_height="0dp"
-            android:src="@drawable/current"
+            android:src="@drawable/icon_current"
             app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
             app:layout_constraintEnd_toStartOf="@+id/verGuidelin75"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
@@ -123,7 +123,7 @@
             android:id="@+id/reset"
             android:layout_width="40dp"
             android:layout_height="0dp"
-            android:src="@drawable/reset"
+            android:src="@drawable/icon_reset"
             app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
             app:layout_constraintEnd_toStartOf="@+id/verGuidelin90"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
@@ -132,7 +132,8 @@
             android:id="@+id/walk"
             android:layout_width="40dp"
             android:layout_height="0dp"
-            android:src="@drawable/walk_enabled"
+            android:src="@drawable/icon_walk"
+            android:background="@drawable/gradient"
             app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
             app:layout_constraintStart_toStartOf="@+id/verGuidelin30"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
@@ -141,7 +142,7 @@
             android:id="@+id/car"
             android:layout_width="40dp"
             android:layout_height="0dp"
-            android:src="@drawable/car"
+            android:src="@drawable/icon_car"
             app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
             app:layout_constraintStart_toStartOf="@+id/verGuidelin10"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
@@ -214,7 +215,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:padding="1dp"
-        android:src="@drawable/down"
+        android:src="@drawable/arrow_down"
         app:layout_constraintBottom_toBottomOf="@id/horGuideline30"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
         app:layout_constraintStart_toStartOf="@id/verGuideline80"
@@ -225,7 +226,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:padding="1dp"
-        android:src="@drawable/up"
+        android:src="@drawable/arrow_up"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@id/horGuideline30"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
