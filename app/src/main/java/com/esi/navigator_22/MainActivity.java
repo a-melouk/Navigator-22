@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     double distanceTo, timeTo;
     OkHttpClient client = new OkHttpClient();
-    String graphhopperkey = "badcbb38-d970-4bf4-94d0-54d542f5b9fd";
+    String graphhopperkey = "60bed308-2f22-4725-80a6-c8876016fd29";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -361,7 +361,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         currentPosition.setOnClickListener(v -> {
             getLocation();
-            myMap.getController().setCenter(currentLocation);
+
             myMap.getController().setZoom(16.0);
         });
 
@@ -630,8 +630,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void getBestRoute() {
-        Request request = new Request.Builder().url(urlRouting).build();
+    private void getBestRoute(String adresse) {
+        Request request = new Request.Builder().url(adresse).build();
         client.newCall(request).enqueue(new Callback() {
 
             @Override
@@ -642,7 +642,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    insertBestRoute(response);
+                    try {
+                        insertBestRoute(response);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                 }
             }
@@ -1032,21 +1036,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void insertBestRoute(Response response) throws IOException {
+    private void insertBestRoute(Response response) throws IOException, JSONException {
         myResponse = Objects.requireNonNull(response.body()).string();
+        Log.d("Routing", myResponse);
         JSONArray jsonarray = null;
+        JSONObject result = null;
+
         try {
-            jsonarray = new JSONArray(myResponse);
+            result = new JSONObject(myResponse);
+            Log.d("Testtesttest", result + "");
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
+        JSONArray datas = result.getJSONArray("datas");
+        Log.d("Testtest1", datas + "");
+        bestRoute.clear();
+        for (int i = 0; i < datas.length(); i++) {
             JSONObject jsonobject;
             GeoPoint a = new GeoPoint(0.0, 0.0);
             try {
-                jsonobject = jsonarray.getJSONObject(i);
+                jsonobject = datas.getJSONObject(i);
                 assert jsonobject != null;
+                Log.d("Routing2", jsonobject + "");
                 a.setLatitude(jsonobject.getDouble("x"));
                 a.setLongitude(jsonobject.getDouble("y"));
                 bestRoute.add(a);
@@ -1054,9 +1065,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
         }
+
+        JSONObject jsonobject;
+        int duration = 5;
+        try {
+//            jsonobject = result.getJSONObject("duration");
+//            duration = jsonobject.getInt("duration");
+            Log.d("duration1",result.getInt("duration")+"");
+//            Log.d("duration2",jsonobject.getInt("duration")+"");
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+//        JSONObject duree = result.getJSONObject("duréé_total");
+        int duree = result.getInt("duration");
+        Log.d("duree", duree + "");
+//        Toast.makeText(getApplicationContext(),String.valueOf(duree),Toast.LENGTH_LONG).show();
         Polyline a = new Polyline();
         a.setWidth(10);
-        a.setColor(Color.rgb(0, 0, 0));
+        a.setColor(Color.rgb(253, 127, 44));
         a.setDensityMultiplier(0.5f);
         a.setPoints(bestRoute);
         myMap.getOverlays().add(a);
@@ -1126,6 +1155,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.showInfoWindow();
     }
 
+    void addPin(GeoPoint coordinates, String nom) {
+        Marker marker = new Marker(myMap);
+        marker.setPosition(coordinates);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+        marker.setAlpha(0.8f);
+        marker.setDraggable(false);
+
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
+
+        marker.setPanToView(true);
+        myMap.invalidate();
+        myMap.getOverlays().add(marker);
+        getLocation();
+        marker.setSnippet(nom);
+        marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+            @Override
+            public void onOpen(Object item) {
+                TextView station = mView.findViewById(R.id.nomStation);
+                station.setText(marker.getSnippet());
+            }
+
+            @Override
+            public void onClose() {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+            }
+        });
+        marker.showInfoWindow();
+    }
+
     public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
@@ -1156,8 +1214,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             });
             marker1.showInfoWindow();
-            mapView.getController().setCenter(marker1.getPosition());
-            mapView.getController().setZoom(16.0);
+            marker1.setPanToView(true);
+//            mapView.getController().setCenter(marker1.getPosition());
+//            mapView.getController().setZoom(16.0);
             return true;
         });
     }
@@ -1279,9 +1338,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if (draw) {
             if (car.isSelected())
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 15.0f);
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
             else
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.teal_700), 15.0f);
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.black), 10.0f);
 
             myMap.getOverlays().add(route);
         }
@@ -1364,10 +1423,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
             intent.putExtras(send);
             MainActivity.this.startActivity(intent);
-        }
-        else if (item.getItemId() == R.id.bestChoice){
+        } else if (item.getItemId() == R.id.bestChoice) {
             draggableMarker = new Marker(myMap);
             draggableMarker.setVisible(true);
+            myMap.invalidate();
             draggableMarker.setPosition(currentLocation);
             draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
             draggableMarker.setDraggable(true);
@@ -1379,6 +1438,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
+                    int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
                     Graph graph = new Graph();
                     marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
                     getLocation();
@@ -1398,16 +1458,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                Log.d("CalcullDestination", destination.getName() + " | " + nodes.get(compteur).getName());
                     }
                     for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
-                        graph.addEdgeByName(stationsSubway.get(compteur).nomFr, stationsSubway.get(compteur+1).nomFr, tramwayTimes[compteur]);
-                        calculs.add(new Calcul(stationsSubway.get(compteur).nomFr, stationsSubway.get(compteur+1).nomFr, tramwayTimes[compteur]));
+                        graph.addEdgeByName(stationsSubway.get(compteur).nomFr, stationsSubway.get(compteur + 1).nomFr, tramwayTimes[compteur]);
+                        calculs.add(new Calcul(stationsSubway.get(compteur).nomFr, stationsSubway.get(compteur + 1).nomFr, tramwayTimes[compteur]));
                     }
-                    time =(int) Math.round(fetchTime(currentLocation, marker.getPosition()) * 60);
+                    time = (int) Math.round(fetchTime(currentLocation, marker.getPosition()) * 60);
                     graph.addEdgeByName(current.getName(), destination.getName(), time);
                     calculs.add(new Calcul(current.getName(), destination.getName(), time));
                     graph.addEdgeByName(stationsSubway.get(4).nomFr, stationsSubway.get(11).nomFr, 60);//correspondance
                     calculs.add(new Calcul(stationsSubway.get(4).nomFr, stationsSubway.get(11).nomFr, 60));
 
+
                     List<String> result = graph.shortestPath(current.getName(), destination.getName());
+                    ArrayList<Station> stations = new ArrayList<>();
+                    for (int k = 1; k < result.size() - 1; k++)
+                        for (int i = 0; i < stationsSubway.size(); i++)
+                            if (result.get(k).equals(stationsSubway.get(i).nomFr))
+                                stations.add(stationsSubway.get(i));
+                    for (int i = 0; i < stations.size(); i++) {
+                        addPin(stations.get(i).coordonnees, stations.get(i).nomFr);
+                    }
+                    if (stations.size() > 0) {
+                        getBestRoute("http://192.168.1.9:3000/result/" + stations.get(0).coordonnees.getLatitude() + "/" + stations.get(0).coordonnees.getLongitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLatitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLongitude());
+                        fetchRoute(currentLocation, stations.get(0).coordonnees, true);
+                        fetchRoute(marker.getPosition(), stations.get(stations.size() - 1).coordonnees, true);
+                    } else fetchRoute(currentLocation, marker.getPosition(), true);
+
                     Log.d("Dijkstra", "shortest path between " + current.getName() + " and " + destination.getName() + ": " + result);
                 }
 
@@ -1451,101 +1526,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
 
             myMap.getOverlays().add(draggableMarker);
-            Graph graph = new Graph();
-            ArrayList<Node> nodes = new ArrayList<>();
-            Node a = new Node("Les cascades");
-            Node b = new Node("Gare routière Est, Ghalmi");
-            Node c = new Node("Frères Adnane");
-            Node d = new Node("Benhamouda");
-            Node e = new Node("Environnement");
-            Node f = new Node("Fac de droit");
-            Node g = new Node("Centre Niaâma");
-            Node h = new Node("Campus");
-            Node ii = new Node("Gare ferroviaire");
-            Node j = new Node("Gare routière Nord, Sogral");
-            Node k = new Node("AADL Benhamouda");
-            Node l = new Node("Sidi Djilali");
-            Node m = new Node("Wiam");
-            Node n = new Node("Daira");
-            Node o = new Node("Houari Boumediene");
-            Node p = new Node("Radio");
-            Node q = new Node("Maternité");
-            Node r = new Node("Salle Adda Boudjelal");
-            Node s = new Node("Amir Abdelkader");
-            Node t = new Node("4 Horloges");
-            Node u = new Node("Jardin Public");
-            Node vv = new Node("Gare routière Sud");
-            Node current = new Node("Current");
-            Node destination = new Node("Destination");
-            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-            getLocation();
-            nodes.add(a);
-            nodes.add(b);
-            nodes.add(c);
-            nodes.add(d);
-            nodes.add(e);
-            nodes.add(f);
-            nodes.add(g);
-            nodes.add(h);
-            nodes.add(ii);
-            nodes.add(j);
-            nodes.add(k);
-            nodes.add(l);
-            nodes.add(m);
-            nodes.add(n);
-            nodes.add(o);
-            nodes.add(p);
-            nodes.add(q);
-            nodes.add(r);
-            nodes.add(s);
-            nodes.add(t);
-            nodes.add(u);
-            nodes.add(vv);
-            nodes.add(current);
-            nodes.add(destination);
 
-//            35.1883, -0.6439 gare sud
-            //35.2168, -0.6145 près adnane
-            GeoPoint test = new GeoPoint(35.20955, -0.62712);
-            ArrayList<Calcul> calculs = new ArrayList<>();
-            int time;
-            for (int compteur = 0; compteur < stationsSubway.size(); compteur++) {
-                time = (int) Math.round((fetchTime(currentLocation, stationsSubway.get(compteur).coordonnees) * 60));
-                graph.addEdgeByName(current.getName(), stationsSubway.get(compteur).nomFr, time);
-                calculs.add(new Calcul(current.getName(), stationsSubway.get(compteur).nomFr, time));
-
-                time = (int) Math.round((fetchTime(test, stationsSubway.get(compteur).coordonnees) * 60));
-                graph.addEdgeByName(destination.getName(), stationsSubway.get(compteur).nomFr, time);
-                calculs.add(new Calcul(destination.getName(), stationsSubway.get(compteur).nomFr, time));
-//                Log.d("CalcullCurrent", current.getName() + " | " + nodes.get(compteur).getName());
-//                Log.d("CalcullDestination", destination.getName() + " | " + nodes.get(compteur).getName());
-            }
-            for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
-                graph.addEdgeByNodes(nodes.get(compteur), nodes.get(compteur + 1), tramwayTimes[compteur]);
-                calculs.add(new Calcul(nodes.get(compteur).getName(), nodes.get(compteur + 1).getName(), tramwayTimes[compteur]));
-            }
-            time =(int) Math.round(fetchTime(currentLocation, test) * 60);
-            graph.addEdgeByName(current.getName(), destination.getName(), time);
-            calculs.add(new Calcul(current.getName(), destination.getName(), time));
-            graph.addEdgeByNodes(e, l, 60);//correspondance
-            calculs.add(new Calcul(e.getName(), l.getName(), 60));
-
-            List<String> result = graph.shortestPath(current.getName(), destination.getName());
-            Log.d("Dijkstra", "shortest path between " + current.getName() + " and " + destination.getName() + ": " + result);
-            Log.d("Dijkstra", result.get(1));
-            Log.d("Dijkstra", result.get(result.size() - 2));
-            for (int kk = 0; kk < stationsSubway.size(); kk++) {
-                if (result.get(1).equals(stationsSubway.get(kk).nomFr)) {
-                    Log.d("CoordiantesToPass1", stationsSubway.get(kk).coordonnees + " | " + stationsSubway.get(kk).nomFr);
-                }
-                if (result.get(result.size() - 2).equals(stationsSubway.get(kk).nomFr)) {
-                    Log.d("CoordiantesToPass2", stationsSubway.get(kk).coordonnees + " | " + stationsSubway.get(kk).nomFr);
-                }
-            }
-
-            for (int kk=0;kk<calculs.size();kk++)
-                Log.d("Calculus",calculs.get(kk).toString()+"");
-            myMap.invalidate();
 
         }
         return true;
@@ -1559,7 +1540,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(mRotationGestureOverlay);
         myMap.getOverlays().add(echelle);
         myMap.getOverlays().add(mapEventsOverlay);
-        myMap.getOverlays().add(draggableMarker);
+//        myMap.getOverlays().add(draggableMarker);
         myMap.invalidate();
         bus3bis_click = bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = tramway_click = 1;
     }
