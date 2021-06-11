@@ -14,6 +14,10 @@
                 android:id="@+id/closestStations"
                 android:icon="@drawable/icon_tramway"
                 android:title="Closest subway stations" />
+            <item
+                android:id="@+id/bestChoice"
+                android:icon="@drawable/icon_tramway"
+                android:title="GOTO" />
         </menu>
     </item>
 </menu>
