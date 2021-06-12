@@ -1,7 +1,6 @@
 package com.esi.navigator_22;
 
 import android.app.ProgressDialog;
-import android.icu.number.NumberFormatter;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -54,7 +53,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         listView = findViewById(R.id.listSubway);
         TextView loading = findViewById(R.id.whileLoading);
 
-        StationAdapter stationAdapter = new StationAdapter(this, R.layout.list_row, myList);
+        StationAdapter stationAdapter = new StationAdapter(this, R.layout.row_list_stations, myList);
 
 
 //        setContentView(R.layout.activity_subway_stations);

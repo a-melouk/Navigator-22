@@ -47,7 +47,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
         listView = findViewById(R.id.listSubway);
         TextView loading = findViewById(R.id.whileLoading);
 
-        StationAdapter stationAdapter = new StationAdapter(this, R.layout.list_row, myList);
+        StationAdapter stationAdapter = new StationAdapter(this, R.layout.row_list_stations, myList);
 
 
 //        setContentView(R.layout.activity_subway_stations);

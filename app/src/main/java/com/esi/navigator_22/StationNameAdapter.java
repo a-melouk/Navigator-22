@@ -10,8 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 
 public class StationNameAdapter extends ArrayAdapter<Station> {
@@ -25,7 +23,7 @@ public class StationNameAdapter extends ArrayAdapter<Station> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         Station station = getItem(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.station_cell, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_cell, parent, false);
         }
 
         TextView tv = convertView.findViewById(R.id.stationName);

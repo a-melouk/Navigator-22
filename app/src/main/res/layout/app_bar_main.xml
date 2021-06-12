@@ -19,8 +19,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                >
+                android:layout_height="match_parent">
 
 
                 <SearchView
@@ -29,11 +28,11 @@
                     android:layout_height="0dp"
                     android:queryHint="Search.."
                     android:searchIcon="@drawable/icon_search"
-                    app:theme="@style/SearchViewStyle"
                     app:layout_constraintBottom_toTopOf="@id/horGuidelin95"
                     app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
                     app:layout_constraintStart_toStartOf="@id/verGuidelin0"
                     app:layout_constraintTop_toTopOf="@id/horGuidelin5"
+                    app:theme="@style/SearchViewStyle"
 
 
                     />
@@ -83,6 +82,6 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <include layout="@layout/map"/>
+    <include layout="@layout/map" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
