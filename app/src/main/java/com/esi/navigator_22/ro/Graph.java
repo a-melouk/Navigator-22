@@ -96,12 +96,18 @@ public class Graph {
 
     private List<String> getPath(Map<String, String> parents, String endNodeName) {
         List<String> path = new ArrayList<>();
+        List<Integer> distance = new ArrayList<>();
         String node = endNodeName;
         while (node != null) {
             path.add(0, node);
+//            distance.add(0,nodes.get(node).getNeighborDistance(nodes.get(parents.get(nodes.get(node)))));
+//            if (Integer.valueOf(nodes.get(node).getNeighborDistance(nodes.get(parents.get(node)))).equals(null)) {
+//            } else
+//                distance.add(0, nodes.get(node).getNeighborDistance(nodes.get(parents.get(node))));
             String parent = parents.get(node);
             node = parent;
         }
+        System.out.println(distance + "");
         return path;
     }
 

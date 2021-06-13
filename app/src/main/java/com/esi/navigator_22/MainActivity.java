@@ -40,9 +40,11 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 
+import com.esi.navigator_22.dijkstra.Vertex;
 import com.esi.navigator_22.ro.Graph;
 import com.esi.navigator_22.ro.Node;
 import com.google.android.material.navigation.NavigationView;
+import com.google.gson.JsonElement;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -1072,7 +1074,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        assert result != null;
         JSONArray datas = result.getJSONArray("datas");
+        Log.d("getting1", result.has("duration") + "");
+        Log.d("getting10", result.has("durationn") + "");
+        Log.d("getting2", result.get("duration") + "");
+        Log.d("getting3", result.getInt("duration") + "");
+
         Log.d("Testtest1", datas + "");
         bestRoute.clear();
         for (int i = 0; i < datas.length(); i++) {
@@ -1465,90 +1473,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
                     int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-                    Graph graph = new Graph();
+                    com.esi.navigator_22.dijkstra.Graph g = new com.esi.navigator_22.dijkstra.Graph();
+                    ArrayList<Vertex> vertices = new ArrayList<>();
+                    Vertex source = new Vertex("Current");
+                    Vertex dest = new Vertex("Destination");
+                    for (int i = 0; i < stationsSubway.size(); i++) {
+                        g.addVertex(stationsSubway.get(i).nomFr);
+                    }
+                    g.addVertex(source);
+                    g.addVertex(dest);
+
                     marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
                     getLocation();
-                    ArrayList<Calcul> calculs = new ArrayList<>();
+
                     int time;
-                    Node current = new Node("Currentlocation");
-                    Node destination = new Node("Destination");
+
                     for (int compteur = 0; compteur < stationsSubway.size(); compteur++) {
                         time = (int) Math.round((fetchTime(currentLocation, stationsSubway.get(compteur).coordonnees) * 60));
-                        graph.addEdgeByName(current.getName(), stationsSubway.get(compteur).nomFr, time);
-                        calculs.add(new Calcul(current.getName(), stationsSubway.get(compteur).nomFr, time));
-
+                        g.addEdge(source, g.getVertices().get(compteur), time);
                         time = (int) Math.round((fetchTime(marker.getPosition(), stationsSubway.get(compteur).coordonnees) * 60));
-                        graph.addEdgeByName(destination.getName(), stationsSubway.get(compteur).nomFr, time);
-                        calculs.add(new Calcul(destination.getName(), stationsSubway.get(compteur).nomFr, time));
-//                Log.d("CalcullCurrent", current.getName() + " | " + nodes.get(compteur).getName());
-//                Log.d("CalcullDestination", destination.getName() + " | " + nodes.get(compteur).getName());
+                        g.addEdge(dest, g.getVertices().get(compteur), time);
                     }
                     for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
-                        graph.addEdgeByName(stationsSubway.get(compteur).nomFr, stationsSubway.get(compteur + 1).nomFr, tramwayTimes[compteur]);
-                        calculs.add(new Calcul(stationsSubway.get(compteur).nomFr, stationsSubway.get(compteur + 1).nomFr, tramwayTimes[compteur]));
+                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
                     }
                     time = (int) Math.round(fetchTime(currentLocation, marker.getPosition()) * 60);
-                    graph.addEdgeByName(current.getName(), destination.getName(), time);
-                    calculs.add(new Calcul(current.getName(), destination.getName(), time));
-                    graph.addEdgeByName(stationsSubway.get(4).nomFr, stationsSubway.get(11).nomFr, 60);//correspondance
-                    calculs.add(new Calcul(stationsSubway.get(4).nomFr, stationsSubway.get(11).nomFr, 60));
+                    g.addEdge(source, dest, time);
+                    g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+                    g.affichage(g, source, dest);
+                    ArrayList<Station> path = new ArrayList<>();
 
 
-                    List<String> result = graph.shortestPath(current.getName(), destination.getName());
-                    ArrayList<Station> stations = new ArrayList<>();
-                    for (int k = 1; k < result.size() - 1; k++)
-                        for (int i = 0; i < stationsSubway.size(); i++)
-                            if (result.get(k).equals(stationsSubway.get(i).nomFr))
-                                stations.add(stationsSubway.get(i));
-                    for (int i = 0; i < stations.size(); i++) {
-                        addPin(stations.get(i).coordonnees, stations.get(i).nomFr);
-                    }
-                    if (stations.size() > 0) {
-                        getBestRoute("http://192.168.1.9:3000/result/" + stations.get(0).coordonnees.getLatitude() + "/" + stations.get(0).coordonnees.getLongitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLatitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLongitude());
-                        fetchRoute(currentLocation, stations.get(0).coordonnees, true);
-                        fetchRoute(marker.getPosition(), stations.get(stations.size() - 1).coordonnees, true);
-                    } else fetchRoute(currentLocation, marker.getPosition(), true);
 
-                    Log.d("Dijkstra", "shortest path between " + current.getName() + " and " + destination.getName() + ": " + result);
+//                    List<String> result = graph.shortestPath(current.getName(), destination.getName());
+//                    ArrayList<Station> stations = new ArrayList<>();
+//                    for (int k = 1; k < result.size() - 1; k++)
+//                        for (int i = 0; i < stationsSubway.size(); i++)
+//                            if (result.get(k).equals(stationsSubway.get(i).nomFr))
+//                                stations.add(stationsSubway.get(i));
+//                    for (int i = 0; i < stations.size(); i++) {
+//                        addPin(stations.get(i).coordonnees, stations.get(i).nomFr);
+//                    }
+//                    if (stations.size() > 0) {
+//                        getBestRoute("http://192.168.1.9:3000/result/" + stations.get(0).coordonnees.getLatitude() + "/" + stations.get(0).coordonnees.getLongitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLatitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLongitude());
+//                        fetchRoute(currentLocation, stations.get(0).coordonnees, true);
+//                        fetchRoute(marker.getPosition(), stations.get(stations.size() - 1).coordonnees, true);
+//                    } else fetchRoute(currentLocation, marker.getPosition(), true);
+//
+//                    Log.d("Dijkstra", "shortest path between " + current.getName() + " and " + destination.getName() + ": " + result);
                 }
 
                 @Override
                 public void onMarkerDragStart(Marker marker) {
 
                 }
-            });
-
-            draggableMarker.setOnMarkerClickListener((marker, mapView) -> {
-//                OkHttpClient geocoder = new OkHttpClient().newBuilder().build();
-//                Request request = new Request.Builder()
-//                        .url("https://api.geoapify.com/v1/geocode/reverse?lat=" + marker.getPosition().getLatitude() + "&lon=" + marker.getPosition().getLongitude() + "&apiKey=d29f8d73d9b84ba4921d5608fbc4aa47")
-//                        .method("GET", null)
-//                        .build();
-//                try {
-//                    Response response = geocoder.newCall(request).execute();
-//                    myResponse = response.body().string();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//                marker.setSnippet(fetchRoute(currentLocation, marker.getPosition(), true));
-//                marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, mapView) {
-//                    @Override
-//                    public void onOpen(Object item) {
-//                        InfoWindow.closeAllInfoWindowsOn(myMap);
-//                        TextView station = mView.findViewById(R.id.nomStation);
-//                        station.setText(marker.getSnippet());
-//                    }
-//
-//                    @Override
-//                    public void onClose() {
-//                        InfoWindow.closeAllInfoWindowsOn(myMap);
-//                    }
-//
-//                });
-//                marker.showInfoWindow();
-//                mapView.getController().setCenter(marker.getPosition());
-//                mapView.getController().setZoom(17.0);
-                return true;
             });
 
             myMap.getOverlays().add(draggableMarker);
