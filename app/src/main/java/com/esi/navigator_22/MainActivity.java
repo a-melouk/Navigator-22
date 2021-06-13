@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     double distanceTo, timeTo;
     OkHttpClient client = new OkHttpClient();
-    String graphhopperkey = "60bed308-2f22-4725-80a6-c8876016fd29";
+    String graphhopperkey = "e1a37263-63f2-48a8-8413-cc9ead957a47";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -1073,7 +1073,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         assert result != null;
         JSONArray datas = result.getJSONArray("datas");
         JSONArray duration = result.getJSONArray("duration");
-        Log.d("duratiooooon",duration+"");
+        Log.d("duratiooooon", duration + "");
 
 //        JSONObject duration = result.getJSONObject("duration");
 //        int duree = duration.getInt("duration");
@@ -1096,8 +1096,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
         }
-        String name = datas.getJSONObject(datas.length()-1).getString("name");
-        Log.d("DDDDD",name);
+        String name = datas.getJSONObject(datas.length() - 1).getString("name");
+        Log.d("DDDDD", name);
         Polyline a = new Polyline();
         a.setWidth(10);
         a.setColor(Color.rgb(253, 127, 44));
@@ -1467,7 +1467,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     g.addVertex(dest);
 
                     marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
-                    getLocation();
+
 
                     int time;
 
@@ -1479,6 +1479,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
                         g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
                     }
                     time = (int) Math.round(fetchTime(currentLocation, marker.getPosition()) * 60);
                     g.addEdge(source, dest, time);
@@ -1501,8 +1503,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         fetchRoute(currentLocation, result.get(0).coordonnees, true);
                         fetchRoute(marker.getPosition(), result.get(result.size() - 1).coordonnees, true);
                     } else fetchRoute(currentLocation, marker.getPosition(), true);
-                    Toast.makeText(getApplicationContext(), String.valueOf(g.cost(g,source,dest)), Toast.LENGTH_LONG).show();
-                    Log.d("TheDuration99",g.cost(g,source,dest)+"");
+                    Toast.makeText(getApplicationContext(), String.valueOf(g.cost(g, source, dest)), Toast.LENGTH_LONG).show();
+                    Log.d("TheDuration99", g.cost(g, source, dest) + "");
 
                 }
 
