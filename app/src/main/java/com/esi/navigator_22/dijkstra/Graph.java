@@ -5,6 +5,8 @@ import java.util.*;
 public class Graph {
     private final ArrayList<Vertex> vertices;
 
+    public ArrayList<Edge> edges = new ArrayList<>();
+
     public Graph() {
         vertices = new ArrayList<>();
     }
@@ -22,8 +24,10 @@ public class Graph {
 
         Edge new_edge = new Edge(src, dest, weight);
         src.neighbours.add(new_edge);
+        edges.add(new_edge);
         new_edge = new Edge(dest, src, weight);
         dest.neighbours.add(new_edge);
+
     }
 
 

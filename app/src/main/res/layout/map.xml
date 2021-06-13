@@ -28,7 +28,8 @@
             android:layout_marginRight="20dp"
             android:queryHint="Source"
             android:searchIcon="@drawable/pin_source"
-            app:theme="@style/SearchViewStyle" />
+            app:theme="@style/SearchViewStyle"
+            android:visibility="invisible"/>
 
         <SearchView
             android:id="@+id/stationDestination"
@@ -39,7 +40,8 @@
             android:layout_marginRight="20dp"
             android:queryHint="Destination"
             android:searchIcon="@drawable/pin_destination"
-            app:theme="@style/SearchViewStyle" />
+            app:theme="@style/SearchViewStyle"
+            android:visibility="invisible"/>
         <ListView
             android:id="@+id/searchStationList"
             android:layout_width="350dp"
