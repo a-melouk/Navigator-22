@@ -408,21 +408,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-//        bus3bis.setOnClickListener(v -> {
-//            int i = bus3bis_click;
-//            if (i == 1) {
-//                cheminBus = searchBusRouteByNumber("A03 bis");
-//                addBus(cheminBus, myMap, 255, 0, 0, "A03bis_");
-//                bus3bis_click++;
-//            } else {
-//                for (int k = 0; k < customOverlays.size(); k++)
-//                    if (customOverlays.get(k).name.contains("A03 bis") || customOverlays.get(k).name.contains("A03bis_"))
-//                        myMap.getOverlays().remove(customOverlays.get(k).overlayItem);
-//                myMap.invalidate();
-//                bus3bis_click--;
-//            }
-//        });
-
         bus11.setOnClickListener(v -> {
             int i = bus11_click;
             if (i == 1) {
@@ -1473,11 +1458,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int time;
         int bis = 0;
 
-//                                     gh  adn bhmd env drt  nima cmps fer  sog aadl dji  wiam dair  hb rad mtrnt adda amr 4   jrdn sud
-
 
         if (mean.toLowerCase().equals("tramway")) {
-
+//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
             int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
             for (int i = 0; i < stationsSubway.size(); i++) {
                 g.addVertex(stationsSubway.get(i).nomFr);
