@@ -23,13 +23,13 @@
             android:layout_width="350dp"
             android:layout_height="40dp"
 
-            android:layout_marginTop="70dp"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="70dp"
             android:layout_marginRight="20dp"
             android:queryHint="Source"
             android:searchIcon="@drawable/pin_source"
-            app:theme="@style/SearchViewStyle"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            app:theme="@style/SearchViewStyle" />
 
         <SearchView
             android:id="@+id/stationDestination"
@@ -40,48 +40,50 @@
             android:layout_marginRight="20dp"
             android:queryHint="Destination"
             android:searchIcon="@drawable/pin_destination"
-            app:theme="@style/SearchViewStyle"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            app:theme="@style/SearchViewStyle" />
+
         <ListView
             android:id="@+id/searchStationList"
             android:layout_width="350dp"
             android:layout_height="60dp"
+            android:layout_below="@id/stationDestination"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_below="@id/stationDestination"/>
+            android:layout_marginRight="20dp" />
 
         <ListView
             android:id="@+id/source"
             android:layout_width="350dp"
             android:layout_height="60dp"
+            android:layout_below="@id/stationDestination"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_below="@id/stationDestination"/>
+            android:layout_marginRight="20dp" />
+
         <ListView
             android:id="@+id/destination"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_below="@id/stationDestination"/>
+            android:layout_below="@id/stationDestination"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp" />
     </RelativeLayout>
 
 
-<!--        app:layout_constraintEnd_toStartOf="@id/verGuideline90"-->
-<!--        app:layout_constraintStart_toStartOf="@id/verGuideline10"-->
-<!--        app:layout_constraintTop_toTopOf="@id/horGuideline8dp" />-->
+    <!--        app:layout_constraintEnd_toStartOf="@id/verGuideline90"-->
+    <!--        app:layout_constraintStart_toStartOf="@id/verGuideline10"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/horGuideline8dp" />-->
 
 
-<!--        app:layout_constraintBottom_toTopOf="@id/horGuideline30dp"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/verGuideline90"-->
-<!--        app:layout_constraintStart_toStartOf="@id/verGuideline10"-->
-<!--        app:layout_constraintTop_toTopOf="@id/horGuideline20dp" />-->
+    <!--        app:layout_constraintBottom_toTopOf="@id/horGuideline30dp"-->
+    <!--        app:layout_constraintEnd_toStartOf="@id/verGuideline90"-->
+    <!--        app:layout_constraintStart_toStartOf="@id/verGuideline10"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/horGuideline20dp" />-->
 
 
-<!--        app:layout_constraintBottom_toTopOf="@id/horGuideline40dp"-->
-<!--        app:layout_constraintEnd_toStartOf="@id/verGuideline90"-->
-<!--        app:layout_constraintStart_toStartOf="@id/verGuideline10"-->
-<!--        app:layout_constraintTop_toTopOf="@id/horGuideline30dp" />-->
+    <!--        app:layout_constraintBottom_toTopOf="@id/horGuideline40dp"-->
+    <!--        app:layout_constraintEnd_toStartOf="@id/verGuideline90"-->
+    <!--        app:layout_constraintStart_toStartOf="@id/verGuideline10"-->
+    <!--        app:layout_constraintTop_toTopOf="@id/horGuideline30dp" />-->
     <!--    app:layout_constraintTop_toTopOf="@id/horGuideline40"-->
     <!--    app:layout_constraintBottom_toBottomOf="@id/horGuideline80"-->
 
@@ -232,7 +234,27 @@
             android:background="@drawable/gradient"
             android:src="@drawable/icon_walk"
             app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
-            app:layout_constraintStart_toStartOf="@+id/verGuidelin30"
+            app:layout_constraintStart_toStartOf="@+id/verGuidelin35"
+            app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
+
+
+
+        <ImageView
+            android:id="@+id/tram"
+            android:layout_width="40dp"
+            android:layout_height="0dp"
+            android:src="@drawable/icon_tram"
+            app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
+            app:layout_constraintStart_toStartOf="@+id/verGuidelin25"
+            app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
+
+        <ImageView
+            android:id="@+id/bus"
+            android:layout_width="40dp"
+            android:layout_height="0dp"
+            android:src="@drawable/icon_bus"
+            app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
+            app:layout_constraintStart_toStartOf="@+id/verGuidelin15"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
 
         <ImageView
@@ -241,18 +263,18 @@
             android:layout_height="0dp"
             android:src="@drawable/icon_car"
             app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
-            app:layout_constraintStart_toStartOf="@+id/verGuidelin10"
+            app:layout_constraintStart_toStartOf="@+id/verGuidelin5"
             app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
 
-        <ImageView
-            android:id="@+id/marker"
-            android:layout_width="50dp"
-            android:layout_height="0dp"
-            android:src="@drawable/pin"
-            app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"
-            app:layout_constraintEnd_toStartOf="@id/verGuidelin50"
-            app:layout_constraintStart_toStartOf="@+id/verGuidelin50"
-            app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />
+<!--        <ImageView-->
+<!--            android:id="@+id/marker"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:src="@drawable/pin"-->
+<!--            app:layout_constraintBottom_toBottomOf="@id/horGuidelin95"-->
+<!--            app:layout_constraintEnd_toStartOf="@id/verGuidelin50"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/verGuidelin50"-->
+<!--            app:layout_constraintTop_toTopOf="@+id/horGuidelin5" />-->
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/verGuidelin10"
@@ -260,6 +282,33 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.1" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verGuidelin15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.15" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verGuidelin5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.05" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verGuidelin25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.25" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/verGuidelin35"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.35" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/verGuidelin50"

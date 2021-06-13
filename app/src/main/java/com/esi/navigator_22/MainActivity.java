@@ -39,7 +39,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-
 import com.esi.navigator_22.dijkstra.Graph;
 import com.esi.navigator_22.dijkstra.Vertex;
 import com.google.android.material.navigation.NavigationView;
@@ -67,7 +66,6 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -83,17 +81,14 @@ import okhttp3.Response;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
-
-//import androidx.appcompat.app.AlertDialog;
-//import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     String urlStations = "http://192.168.1.9:3000/stations_sba";
     String urlRouteSubway = "http://192.168.1.9:3000/subway";
     String urlRouteBus = "http://192.168.1.9:3000/bus";
     String urlCorrespondance = "http://192.168.1.9:3000/correspondance";
     String urlMatrice = "http://192.168.1.9:3000/matrice";
-    String urlRouting = "http://192.168.1.9:3000/result/35.20651762209822/-0.6190001964569092/35.19983303554761/-0.6242465972900391";
+    String graphhopperkey = "e1a37263-63f2-48a8-8413-cc9ead957a47";
+
     private String myResponse;
 
     static MapView myMap;
@@ -105,9 +100,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ImageView currentPosition, reset;
     RelativeLayout menu_linear;
-    ImageView subway, bus3, bus3bis, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
-    ImageView walk, car;
-    ImageView marker;
+    ImageView subway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
+    ImageView walk, car, bus, tram;
     ListView searchStations, navigationSource, navigationDestination;
 
     Station station = new Station();
@@ -117,12 +111,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
-    static ArrayList<Station> allStations = new ArrayList<>();
-    static ArrayList<Station> stationsSubway = new ArrayList<>();
-    static ArrayList<Station> stationsBus = new ArrayList<>();
     static ArrayList<RouteBus> routeBus = new ArrayList<>();
     static ArrayList<GeoPoint> routeTramway = new ArrayList<>();
     static ArrayList<GeoPoint> routeCorrespondance = new ArrayList<>();
+    static ArrayList<Station> allStations = new ArrayList<>();
+    static ArrayList<Station> stationsSubway = new ArrayList<>();
+    static ArrayList<Station> stationsBus = new ArrayList<>();
     static ArrayList<Station> stationsBus3 = new ArrayList<>();
     static ArrayList<Station> stationsBus3bis = new ArrayList<>();
     static ArrayList<Station> stationsBus11 = new ArrayList<>();
@@ -136,8 +130,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayList<GeoPoint> chemin = new ArrayList<>();
     ArrayList<RouteBus> cheminBus = new ArrayList<>();
     ArrayList<GeoPoint> bestRoute = new ArrayList<>();
+    static ArrayList<CustomOverlay> customOverlays = new ArrayList<>();
     double minZ = 13.0;
     double maxZ = 19.0;
+    double distanceTo, timeTo;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     int[] ids_tramway = new int[22];
@@ -150,14 +146,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int[] ids_bus25 = new int[10];
     int[] ids_bus27 = new int[7];
     int[] couleurs;
-    int bus3_click = 1, bus3bis_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1,
+    int bus3_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1,
             bus27_click = 1, tramway_click = 1;
-    static ArrayList<CustomOverlay> customOverlays = new ArrayList<>();
-    ArrayAdapter<String> arrayAdapter;
 
-    double distanceTo, timeTo;
+    ArrayAdapter<String> arrayAdapter;
     OkHttpClient client = new OkHttpClient();
-    String graphhopperkey = "e1a37263-63f2-48a8-8413-cc9ead957a47";
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -205,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         currentPosition = findViewById(R.id.currentPosition);
         reset = findViewById(R.id.reset);
         bus3 = findViewById(R.id.bus_3);
-//        bus3bis = findViewById(R.id.bus_3bis);
         bus11 = findViewById(R.id.bus_11);
         bus16 = findViewById(R.id.bus_16);
         bus17 = findViewById(R.id.bus_17);
@@ -215,7 +207,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         subway = findViewById(R.id.subway);
         car = findViewById(R.id.car);
         walk = findViewById(R.id.walk);
-        marker = findViewById(R.id.marker);
+        bus = findViewById(R.id.bus);
+        tram = findViewById(R.id.tram);
         menu_linear = findViewById(R.id.menu_linear);
         arrow_down = findViewById(R.id.arrow_down);
         arrow_up = findViewById(R.id.arrow_up);
@@ -502,24 +495,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         walk.setOnClickListener(v -> {
             walk.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
-            car.setImageResource(R.drawable.icon_car);
-
             walk.setSelected(true);
+
+
             car.setSelected(false);
             car.setBackground(null);
+            tram.setSelected(false);
+            tram.setBackground(null);
+            bus.setSelected(false);
+            bus.setBackground(null);
+        });
+
+        tram.setOnClickListener(v -> {
+            tram.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            tram.setSelected(true);
+
+
+            car.setSelected(false);
+            car.setBackground(null);
+            walk.setSelected(false);
+            walk.setBackground(null);
+            bus.setSelected(false);
+            bus.setBackground(null);
+        });
+
+        bus.setOnClickListener(v -> {
+            bus.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            bus.setSelected(true);
+
+
+            car.setSelected(false);
+            car.setBackground(null);
+            tram.setSelected(false);
+            tram.setBackground(null);
+            walk.setSelected(false);
+            walk.setBackground(null);
         });
 
         car.setOnClickListener(v -> {
             car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
-            walk.setImageResource(R.drawable.icon_walk);
-            walk.setBackground(null);
-
             car.setSelected(true);
+
             walk.setSelected(false);
+            walk.setBackground(null);
+            tram.setSelected(false);
+            tram.setBackground(null);
+            bus.setSelected(false);
+            bus.setBackground(null);
         });
 
 
-        int[] walkingTimes = new int[]{480, 780, 1260, 1620, 2280, 1980, 2580, 3120, 2700, 2700, 2100, 1920, 1560, 870, 1140, 1080, 1500, 1680, 1860, 2520, 3180, 3720};
         int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
         int compteur1, compteur2;
         for (compteur1 = 0; compteur1 < tramwayMatrice.size(); compteur1++)
@@ -531,8 +556,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
 
-//        for (int k = 0; k < tramwayMatrice.size(); k++)
-//            Log.d("TramwayMatrix", tramwayMatrice.get(k) + "");
 
         setUpList();
         initSearch();
@@ -1430,7 +1453,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
-                    navigation(currentLocation, marker.getPosition(), "A03");
+
+                    if (tram.isSelected())
+                        navigation(currentLocation, marker.getPosition(), "tramway");
+                    else if (bus.isSelected())
+                        navigation(currentLocation, marker.getPosition(), "A11");
+
                 }
 
                 @Override
@@ -1475,8 +1503,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
                 g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
-//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
-//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
             }
             time = (int) Math.round(fetchTime(src, dst) * 60);
             g.addEdge(source, destination, time);
@@ -1507,7 +1533,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addEdge(destination, g.getVertices().get(compteur), time);
             }
 
-            bis = 0;
             for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size(); compteur++) {
                 time = (int) Math.round((fetchTime(src, stationsBus3bis.get(bis).coordonnees) * 60));
                 g.addEdge(source, g.getVertices().get(compteur), time);
@@ -1522,18 +1547,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++) {
                 g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
-                Log.d("corr6", g.getVertices().get(compteur) + " | " + g.getVertices().get(compteur + 1) + "100");
             }
 
 
             g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
-            Log.d("corr1 ", g.getVertices().get(0) + " | " + g.getVertices().get(stationsBus3.size()));
-            Log.d("corr2 ", g.getVertices().get(0) + " | " + g.getVertices().get(stationsBus3.size()));
-            Log.d("corr3 ", g.getVertices().get(0).neighbours + "");
-            Log.d("corr4 ", g.getVertices().get(15).neighbours + "");
-            Log.d("corr5 ", g.edges + "");
-            Log.d("corr6 ", stationsBus3.size() + "");
-            Log.d("corr7 ", stationsBus3bis.size() + "");
+
 
             time = (int) Math.round(fetchTime(src, dst) * 60);
             g.addEdge(source, destination, time);
@@ -1548,10 +1566,167 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path.get(k).name.equals(stationsBus3bis.get(i).nomFr))
                         result.add(stationsBus3bis.get(i));
             }
+        } else if (mean.equals("A11")) {
+            for (int i = 0; i < stationsBus11.size(); i++) {
+                g.addVertex(stationsBus11.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsBus11.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus11.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus11.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsBus11.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
+            }
+            time = (int) Math.round(fetchTime(src, dst) * 60);
+            g.addEdge(source, destination, time);
+            path = g.affichage(g, source, destination);
+            result = new ArrayList<>();
 
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus11.size(); i++)
+                    if (path.get(k).name.equals(stationsBus11.get(i).nomFr))
+                        result.add(stationsBus11.get(i));
+        } else if (mean.equals("A16")) {
+            for (int i = 0; i < stationsBus16.size(); i++) {
+                g.addVertex(stationsBus16.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsBus16.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus16.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus16.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsBus16.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
+            }
+            time = (int) Math.round(fetchTime(src, dst) * 60);
+            g.addEdge(source, destination, time);
+            path = g.affichage(g, source, destination);
+            result = new ArrayList<>();
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus16.size(); i++)
+                    if (path.get(k).name.equals(stationsBus16.get(i).nomFr))
+                        result.add(stationsBus16.get(i));
+        } else if (mean.equals("A17")) {
+            for (int i = 0; i < stationsBus17.size(); i++) {
+                g.addVertex(stationsBus17.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsBus17.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus17.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus17.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsBus17.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
+            }
+            time = (int) Math.round(fetchTime(src, dst) * 60);
+            g.addEdge(source, destination, time);
+            path = g.affichage(g, source, destination);
+            result = new ArrayList<>();
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus17.size(); i++)
+                    if (path.get(k).name.equals(stationsBus17.get(i).nomFr))
+                        result.add(stationsBus17.get(i));
+        } else if (mean.equals("A22")) {
+            for (int i = 0; i < stationsBus22.size(); i++) {
+                g.addVertex(stationsBus22.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsBus22.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus22.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus22.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsBus22.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
+            }
+            time = (int) Math.round(fetchTime(src, dst) * 60);
+            g.addEdge(source, destination, time);
+            path = g.affichage(g, source, destination);
+            result = new ArrayList<>();
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus22.size(); i++)
+                    if (path.get(k).name.equals(stationsBus22.get(i).nomFr))
+                        result.add(stationsBus22.get(i));
+        } else if (mean.equals("A25")) {
+            for (int i = 0; i < stationsBus25.size(); i++) {
+                g.addVertex(stationsBus25.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsBus25.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus25.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus25.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsBus25.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
+            }
+            time = (int) Math.round(fetchTime(src, dst) * 60);
+            g.addEdge(source, destination, time);
+            path = g.affichage(g, source, destination);
+            result = new ArrayList<>();
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus25.size(); i++)
+                    if (path.get(k).name.equals(stationsBus25.get(i).nomFr))
+                        result.add(stationsBus25.get(i));
+        } else if (mean.equals("A27")) {
+            for (int i = 0; i < stationsBus27.size(); i++) {
+                g.addVertex(stationsBus27.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsBus27.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus27.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus27.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsBus27.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+//                        time = (int) Math.round(fetchTime(stationsSubway.get(compteur).coordonnees, stationsSubway.get(compteur + 1).coordonnees) * 60);
+//                        g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), time);
+            }
+            time = (int) Math.round(fetchTime(src, dst) * 60);
+            g.addEdge(source, destination, time);
+            path = g.affichage(g, source, destination);
+            result = new ArrayList<>();
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus27.size(); i++)
+                    if (path.get(k).name.equals(stationsBus27.get(i).nomFr))
+                        result.add(stationsBus27.get(i));
         }
 
 
+        for (int i = 0; i < g.edges.size(); i++)
+            System.out.println("Print : " + g.edges.get(i));
         if (result.size() > 0) {
             for (int i = 0; i < result.size(); i++) {
                 addPin(result.get(i).coordonnees, result.get(i).nomFr);
@@ -1574,7 +1749,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(mapEventsOverlay);
 //        myMap.getOverlays().add(draggableMarker);
         myMap.invalidate();
-        bus3bis_click = bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = tramway_click = 1;
+        bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = tramway_click = 1;
     }
 
     //Formatting the values to #.##

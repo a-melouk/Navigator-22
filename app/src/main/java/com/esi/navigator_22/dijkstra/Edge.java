@@ -19,7 +19,6 @@ public class Edge {
 
     @Override
     public String toString() {
-        return "Edge{" + source + ", "+target + ", "+weight +
-                '}';
+        return "{" + source + ", " + target + ", " + weight + "}";
     }
 }

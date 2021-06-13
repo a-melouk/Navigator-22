@@ -39,7 +39,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subway_stations);
-        String format ="0.00";
+        String format = "0.00";
         df = new DecimalFormat(format);
         Bundle b = getIntent().getExtras();
         double currentLocationLatitude = b.getDouble("currentLocationLatitude");
@@ -131,7 +131,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             Log.d("allStation", "Available " + getDistanceOffline(currentLocation, geoPoint));
             distanceTo = road.mLength;
             Log.d("Formatting", String.valueOf(distanceTo));
-            timeTo = (int) Math.round(road.mDuration/60);
+            timeTo = (int) Math.round(road.mDuration / 60);
         }
 
     }
@@ -150,7 +150,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 //        Road road = roadManager2.getRoad(roadPoints);
 
         distanceTo = road.mLength;
-        timeTo = (int) Math.round(road.mDuration/60);
+        timeTo = (int) Math.round(road.mDuration / 60);
     }
 
 
