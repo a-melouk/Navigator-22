@@ -51,7 +51,7 @@ public class Graph {
         // Repeat the process till all the connected nodes are visited.
 
         source.minDistance = 0;
-        PriorityQueue<Vertex> queue = new PriorityQueue<Vertex>();
+        PriorityQueue<Vertex> queue = new PriorityQueue<>();
         queue.add(source);
 
         while (!queue.isEmpty()) {
@@ -77,16 +77,25 @@ public class Graph {
         }
     }
 
-    public void affichage (Graph g, Vertex source, Vertex dest){
+    public ArrayList<Vertex> affichage(Graph g, Vertex source, Vertex dest) {
+        ArrayList<Vertex> result = new ArrayList<>();
         g.calculate(g.getVertex(source));
         System.out.print(source + " to " + dest + " Distance : " + dest.minDistance + " Path : [");
         for (int i = 0; i < g.getVertices().size(); i++) {
             if (g.getVertices().get(i).equals(dest)) {
                 for (int j = 0; j < dest.path.size(); j++) {
                     System.out.print(dest.path.get(j) + ", ");
+                    result.add(dest.path.get(j));
                 }
             }
         }
+        result.add(dest);
         System.out.println(dest + "]");
+        return result;
+    }
+
+    public double cost(Graph g, Vertex src, Vertex dest) {
+        g.calculate(g.getVertex(src));
+        return dest.minDistance;
     }
 }

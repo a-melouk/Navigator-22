@@ -41,10 +41,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 
 
 import com.esi.navigator_22.dijkstra.Vertex;
-import com.esi.navigator_22.ro.Graph;
-import com.esi.navigator_22.ro.Node;
 import com.google.android.material.navigation.NavigationView;
-import com.google.gson.JsonElement;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -73,7 +70,6 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Executors;
 
@@ -1076,12 +1072,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         assert result != null;
         JSONArray datas = result.getJSONArray("datas");
-        Log.d("getting1", result.has("duration") + "");
-        Log.d("getting10", result.has("durationn") + "");
-        Log.d("getting2", result.get("duration") + "");
-        Log.d("getting3", result.getInt("duration") + "");
+        JSONObject duration = result.getJSONObject("duration");
+        int duree = duration.getInt("duration");
+        Log.d("TheDuration1",duration+"");
+        Log.d("TheDuration2",duree+"");
+        Log.d("TheDuration3",result.getInt("duration")+"");
 
-        Log.d("Testtest1", datas + "");
         bestRoute.clear();
         for (int i = 0; i < datas.length(); i++) {
             JSONObject jsonobject;
@@ -1097,24 +1093,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
         }
-
-        JSONObject jsonobject;
-        int duration = 5;
-        try {
-//            jsonobject = result.getJSONObject("duration");
-//            duration = jsonobject.getInt("duration");
-            Log.d("duration1", result.getInt("duration") + "");
-//            Log.d("duration2",jsonobject.getInt("duration")+"");
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-//        JSONObject duree = result.getJSONObject("duréé_total");
-        int duree = result.getInt("duration");
-        Log.d("duree", duree + "");
-//        Toast.makeText(getApplicationContext(),String.valueOf(duree),Toast.LENGTH_LONG).show();
+        String name = datas.getJSONObject(datas.length()-1).getString("name");
+        Log.d("DDDDD",name);
         Polyline a = new Polyline();
         a.setWidth(10);
         a.setColor(Color.rgb(253, 127, 44));
@@ -1500,10 +1480,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     time = (int) Math.round(fetchTime(currentLocation, marker.getPosition()) * 60);
                     g.addEdge(source, dest, time);
                     g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
-                    g.affichage(g, source, dest);
-                    ArrayList<Station> path = new ArrayList<>();
+//                    g.affichage(g, source, dest);
+                    Log.d("Result", g.affichage(g, source, dest) + "");
+                    ArrayList<Vertex> path = g.affichage(g, source, dest);
+                    ArrayList<Station> result = new ArrayList<>();
 
-
+                    Log.d("Result1", path.size() + " | " + path);
+                    for (int k = 1; k < path.size() - 1; k++)
+                        for (int i = 0; i < stationsSubway.size(); i++)
+                            if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
+                                result.add(stationsSubway.get(i));
+                    if (result.size() > 0) {
+                        for (int i = 0; i < result.size(); i++) {
+                            addPin(result.get(i).coordonnees, result.get(i).nomFr);
+                        }
+                        getBestRoute("http://192.168.1.9:3000/result/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" + result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                        fetchRoute(currentLocation, result.get(0).coordonnees, true);
+                        fetchRoute(marker.getPosition(), result.get(result.size() - 1).coordonnees, true);
+                    } else fetchRoute(currentLocation, marker.getPosition(), true);
+                    Log.d("TheDuration99",g.cost(g,source,dest)+"");
+//                    if (path.size()>2) {
+//                        for (int i=1;i<path.size()-1;i++) {
+//                            addPin();
+//                        }
+//                    }
+//                    if (result.size()>0) {
+//
+//                    }
 
 //                    List<String> result = graph.shortestPath(current.getName(), destination.getName());
 //                    ArrayList<Station> stations = new ArrayList<>();
