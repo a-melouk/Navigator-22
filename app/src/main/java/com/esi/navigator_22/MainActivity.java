@@ -1072,11 +1072,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         assert result != null;
         JSONArray datas = result.getJSONArray("datas");
-        JSONObject duration = result.getJSONObject("duration");
-        int duree = duration.getInt("duration");
-        Log.d("TheDuration1",duration+"");
-        Log.d("TheDuration2",duree+"");
-        Log.d("TheDuration3",result.getInt("duration")+"");
+        JSONArray duration = result.getJSONArray("duration");
+        Log.d("duratiooooon",duration+"");
+
+//        JSONObject duration = result.getJSONObject("duration");
+//        int duree = duration.getInt("duration");
+//        Log.d("TheDuration1",duration+"");
+//        Log.d("TheDuration2",duree+"");
+//        Log.d("TheDuration3",result.getInt("duration")+"");
 
         bestRoute.clear();
         for (int i = 0; i < datas.length(); i++) {
@@ -1498,32 +1501,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         fetchRoute(currentLocation, result.get(0).coordonnees, true);
                         fetchRoute(marker.getPosition(), result.get(result.size() - 1).coordonnees, true);
                     } else fetchRoute(currentLocation, marker.getPosition(), true);
+                    Toast.makeText(getApplicationContext(), String.valueOf(g.cost(g,source,dest)), Toast.LENGTH_LONG).show();
                     Log.d("TheDuration99",g.cost(g,source,dest)+"");
-//                    if (path.size()>2) {
-//                        for (int i=1;i<path.size()-1;i++) {
-//                            addPin();
-//                        }
-//                    }
-//                    if (result.size()>0) {
-//
-//                    }
 
-//                    List<String> result = graph.shortestPath(current.getName(), destination.getName());
-//                    ArrayList<Station> stations = new ArrayList<>();
-//                    for (int k = 1; k < result.size() - 1; k++)
-//                        for (int i = 0; i < stationsSubway.size(); i++)
-//                            if (result.get(k).equals(stationsSubway.get(i).nomFr))
-//                                stations.add(stationsSubway.get(i));
-//                    for (int i = 0; i < stations.size(); i++) {
-//                        addPin(stations.get(i).coordonnees, stations.get(i).nomFr);
-//                    }
-//                    if (stations.size() > 0) {
-//                        getBestRoute("http://192.168.1.9:3000/result/" + stations.get(0).coordonnees.getLatitude() + "/" + stations.get(0).coordonnees.getLongitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLatitude() + "/" + stations.get(stations.size() - 1).coordonnees.getLongitude());
-//                        fetchRoute(currentLocation, stations.get(0).coordonnees, true);
-//                        fetchRoute(marker.getPosition(), stations.get(stations.size() - 1).coordonnees, true);
-//                    } else fetchRoute(currentLocation, marker.getPosition(), true);
-//
-//                    Log.d("Dijkstra", "shortest path between " + current.getName() + " and " + destination.getName() + ": " + result);
                 }
 
                 @Override
