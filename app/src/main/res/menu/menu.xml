@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
     <item android:title="Subway">
@@ -14,10 +14,60 @@
                 android:id="@+id/closestStations"
                 android:icon="@drawable/icon_tramway"
                 android:title="Closest subway stations" />
+
             <item
                 android:id="@+id/bestChoice"
                 android:icon="@drawable/icon_tramway"
-                android:title="GOTO" />
+                android:title="Navigation" />
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/test"
+        android:title="Navigation">
+        <menu>
+
+            <item
+                android:id="@+id/TRAMWAY"
+                android:icon="@drawable/icon_tram"
+                android:title="Tramway"
+                app:actionViewClass="android.widget.CheckBox" />
+
+            <item
+                android:id="@+id/BUSA03"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A03"
+                app:actionViewClass="android.widget.CheckBox" />
+            <item
+                android:id="@+id/BUSA11"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A11"
+                app:actionViewClass="android.widget.CheckBox" />
+            <item
+                android:id="@+id/BUSA16"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A16"
+                app:actionViewClass="android.widget.CheckBox" />
+            <item
+                android:id="@+id/BUSA17"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A17"
+                app:actionViewClass="android.widget.CheckBox" />
+            <item
+                android:id="@+id/BUSA22"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A22"
+                app:actionViewClass="android.widget.CheckBox" />
+            <item
+                android:id="@+id/BUSA25"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A25"
+                app:actionViewClass="android.widget.CheckBox" />
+            <item
+                android:id="@+id/BUSA27"
+                android:icon="@drawable/icon_bus"
+                android:title="Bus A27"
+                app:actionViewClass="android.widget.CheckBox" />
         </menu>
     </item>
 </menu>
