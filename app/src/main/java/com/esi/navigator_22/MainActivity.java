@@ -608,7 +608,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
                         markerRouting.setVisible(false);
-                        navigation(new GeoPoint(35.19348,-0.63466), marker.getPosition(), "tramway");
+                        navigation(currentLocation, marker.getPosition(), "tramway");
 
                     }
 
@@ -878,7 +878,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
                         markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin_final));
-                        navigation(new GeoPoint(35.19348,-0.63466), marker.getPosition(), "A27");
+                        navigation(currentLocation, marker.getPosition(), "A27");
                     }
 
                     @Override
@@ -907,8 +907,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int bis = 0;
 
         if (mean.toLowerCase().equals("tramway")) {
-            Vertex source = new Vertex("Current");
-            Vertex destination = new Vertex("Destination");
+            source = new Vertex("Current");
+            destination = new Vertex("Destination");
             g.edges.clear();
             g.getVertices().clear();
 //                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
@@ -942,8 +942,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             g.getVertices().clear();
             g.edges.clear();
-            Vertex source = new Vertex("Current");
-            Vertex destination = new Vertex("Destination");
+            source = new Vertex("Current");
+            destination = new Vertex("Destination");
             for (int i = 0; i < stationsBus3.size(); i++) {
                 g.addVertex(stationsBus3.get(i).nomFr);
             }
@@ -1022,18 +1022,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (result.size() > 0) {
 
             if (result.get(0).type.equals("tramway")) {
-                Log.d("RouteeeTram", "http://192.168.1.12:3000/result/tram/"
+                Log.d("RouteeeTram", "https://routing22final.herokuapp.com/result/tram/"
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                 getBestRoute(
-                        "http://192.168.1.12:3000/result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                        "https://routing22final.herokuapp.com/result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             } else {
                 getBestRoute(
-                        "http://192.168.1.12:3000/result/" + result.get(0).numero + "/"
+                        "https://routing22final.herokuapp.com/result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                Log.d("RouteeeBus", "http://192.168.1.12:3000/result/" + result.get(0).numero + "/"
+                Log.d("RouteeeBus", "https://routing22final.herokuapp.com/result/" + result.get(0).numero + "/"
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             }
@@ -1057,8 +1057,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public ArrayList<Station> busNavigation(GeoPoint src, GeoPoint dst, ArrayList<Station> list) {
-        Vertex source = new Vertex("Current");
-        Vertex destination = new Vertex("Destination");
+        source = new Vertex("Current");
+        destination = new Vertex("Destination");
         path.clear();
         g.edges.clear();
         g.getVertices().clear();
@@ -1129,7 +1129,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onMarkerDragEnd(Marker marker) {
 
                     if (tram.isSelected())
-                        navigation(new GeoPoint(35.2173, -0.6205), marker.getPosition(), "tramway");
+                        navigation(currentLocation, marker.getPosition() ,"tramway");
                     else if (bus.isSelected())
                         navigation(currentLocation, marker.getPosition(), "A16");
 
