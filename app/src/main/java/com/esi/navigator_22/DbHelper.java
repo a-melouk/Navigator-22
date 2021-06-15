@@ -312,7 +312,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
     ArrayList<Station> getAllStations() {
         ArrayList<Station> stations = new ArrayList<Station>();
-        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " ORDER BY " + COLUMN_NOMFR;
+        String selectQuery = "SELECT * FROM " + TABLE_STATIONS + " ORDER BY " + COLUMN_NUMERO;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
@@ -333,11 +333,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
     ArrayList<MatriceLine> getAllLines() {
         ArrayList<MatriceLine> lines = new ArrayList<>();
-        ArrayList<MatriceLine> linesTemp = new ArrayList<>();
-        int compteur = 0;
 
 
-        String selectQuery = "SELECT * FROM " + TABLE_Matrice + " ORDER BY " + COLUMN_NOMFRDEPART + "," + COLUMN_NUMERODEPART + "," + COLUMN_TYPEDEPART;
+        String selectQuery = "SELECT * FROM " + TABLE_Matrice + " ORDER BY " + COLUMN_NUMERODEPART + "," + COLUMN_NUMEROARRIVE;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {

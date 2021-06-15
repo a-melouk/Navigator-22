@@ -40,10 +40,12 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
+import com.esi.navigator_22.dijkstra.Edge;
 import com.esi.navigator_22.dijkstra.Graph;
 import com.esi.navigator_22.dijkstra.Vertex;
 import com.google.android.material.navigation.NavigationView;
 
+import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -551,24 +553,87 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             bus.setBackground(null);
         });
 
+        source = new Vertex("Current");
+        destination = new Vertex("Destination");
+        g.edges.clear();
+        g.getVertices().clear();
+//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
 
-//        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-//        int compteur1, compteur2;
-//        for (compteur1 = 0; compteur1 < tramwayMatrice.size(); compteur1++)
-//            for (compteur2 = 1; compteur2 < stationsSubway.size(); compteur2++) {
-//                if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(stationsSubway.get(compteur2 - 1).nomFr) && tramwayMatrice.get(compteur1).stationDestination.nomFr.equals(stationsSubway.get(compteur2).nomFr)) {
-//                    tramwayMatrice.get(compteur1).timetramway = tramwayTimes[compteur2 - 1];
-//                } else if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(tramwayMatrice.get(compteur1).stationDestination.nomFr)) {
-//                    tramwayMatrice.get(compteur1).timetramway = 0;
-//                }
-//            }
+        for (int i = 0; i < allStations.size(); i++) {
+            g.addVertex(allStations.get(i).numero);
+        }
+        g.addVertex(source);
+        g.addVertex(destination);
+        int time = 0;
+        for (int compteur = 0; compteur < allStations.size(); compteur++) {
+            for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(time).time);
+                time++;
+                if (time == 6441) time = 0;
+            }
+        }
+        /*ArrayList<Edge> temp = new ArrayList<>();
+        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+
+        for (int i = 0; i < g.edges.size(); i++) {
+            if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
+                int src = Integer.parseInt(g.edges.get(i).source.name);
+                int dst = Integer.parseInt(g.edges.get(i).target.name);
+                int diff = src - dst;
+//                Log.d("MatriceGraph2",src+" | "+dst);
+                for (int j = 0; j < stationsSubway.size() - 1; j++) {
+                    if (src == Integer.parseInt(stationsSubway.get(j).numero) && dst == Integer.parseInt(stationsSubway.get(j + 1).numero) && Math.abs(diff) == 1) {
+                        Log.d("MatriceGraph3", stationsSubway.get(j).numero + " | " + stationsSubway.get(j + 1).numero + " | " + tramwayTimes[j]);
+                        Log.d("MatriceGraph4", g.getVertices().get(j).name + " | " + g.getVertices().get(j + 1).name + " | " + tramwayTimes[j]);
+                        temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
+                    }
+                }
+            }
+        }
+        Log.d("MatriceGraphTemp", temp + "");
+        for (int i = 0; i < temp.size(); i++)
+            g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
+        for (int i = 6439; i < g.edges.size(); i++)
+            Log.d("MatriceGraphFinal", g.edges.get(i)+"");
+        Log.d("MatriceGraphFinal",g.getVertices().get(0).neighbours+"");*/
+
+        for (int i=0;i<g.getVertices().size();i++) {
+            for (int j=0;j<stationsBus3.size();j++) {
+                if (g.getVertices().get(i).name.equals(stationsBus3.get(j).numero)) {
+                    Log.d("LeBusA03",g.getVertices().get(i).name+" | "+stationsBus3.get(j));
+                }
+            }
+
+
+        }
+        Log.d("Parding",removeAfter("A03_16")+"");
+
+
 
 
         setUpList();
         initSearch();
-//        stationSource();
-//        stationDestination();
     }
+
+    public int removeAfter(String a) {
+        int res;
+        String b = a.substring(a.indexOf("_")+1);
+        res = Integer.parseInt(b);
+        return res;
+    }
+
+    public boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
+
 
     //Menu Navigation
     private void setNavigationViewListener() {
@@ -900,6 +965,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     }
+
     public void navigation(GeoPoint src, GeoPoint dst, String mean) {
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
@@ -936,9 +1002,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
                         result.add(stationsSubway.get(i));
 
-        }
-
-        else if (mean.equals("A03")) {
+        } else if (mean.equals("A03")) {
 
             g.getVertices().clear();
             g.edges.clear();
@@ -1016,7 +1080,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (mean.equals("All")) {
+            source = new Vertex("Current");
+            destination = new Vertex("Destination");
+            g.edges.clear();
+            g.getVertices().clear();
+//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
+
+            for (int i = 0; i < allStations.size(); i++) {
+                g.addVertex(allStations.get(i).numero);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < matrice.size(); compteur++) {
+                for (int compteur2 = 0; compteur2 < allStations.size() - 1; compteur2++) {
+                    g.addEdge(g.getVertex(compteur2), g.getVertex(compteur2 + 1), (int) matrice.get(compteur).time);
+                }
+
+            }
+            for (int i = 0; i < g.edges.size(); i++)
+                Log.d("MatriceGraph", g.edges.get(i) + "");
+            path = g.affichage(g, source, destination);
+
+
+//            for (int k = 1; k < path.size() - 1; k++)
+//                for (int i = 0; i < stationsSubway.size(); i++)
+//                    if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
+//                        result.add(stationsSubway.get(i));
         }
+//        https://routing22final.herokuapp.com
         for (int i = 0; i < g.edges.size(); i++)
             System.out.println("Print : " + g.edges.get(i));
         if (result.size() > 0) {
@@ -1026,11 +1117,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                 getBestRoute(
-                        "https://routing22final.herokuapp.com/result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                        "http://192.168.43.119:3000/result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             } else {
                 getBestRoute(
-                        "https://routing22final.herokuapp.com/result/" + result.get(0).numero + "/"
+                        "http://192.168.43.119:3000/result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                 Log.d("RouteeeBus", "https://routing22final.herokuapp.com/result/" + result.get(0).numero + "/"
@@ -1051,7 +1142,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1)));
         }
         //
-        else {fetchRoute(src, dst, true);}
+        else {
+            fetchRoute(src, dst, true);
+        }
 
 
     }
@@ -1129,7 +1222,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onMarkerDragEnd(Marker marker) {
 
                     if (tram.isSelected())
-                        navigation(currentLocation, marker.getPosition() ,"tramway");
+                        navigation(currentLocation, marker.getPosition(), "tramway");
                     else if (bus.isSelected())
                         navigation(currentLocation, marker.getPosition(), "A16");
 
