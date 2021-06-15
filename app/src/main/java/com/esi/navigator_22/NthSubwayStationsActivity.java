@@ -55,7 +55,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
 
         barProgressDialog.setTitle("Recupérations des 5 stations les plus proches ...");
         barProgressDialog.setMessage("Download in progress ...");
-        barProgressDialog.setProgressStyle(barProgressDialog.STYLE_HORIZONTAL);
+        barProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(5);
         barProgressDialog.show();

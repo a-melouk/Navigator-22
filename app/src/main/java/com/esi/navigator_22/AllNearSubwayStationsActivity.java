@@ -61,7 +61,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
         barProgressDialog.setTitle("Recupérations des stations les plus proches ...");
         barProgressDialog.setMessage("Download in progress ...");
-        barProgressDialog.setProgressStyle(barProgressDialog.STYLE_HORIZONTAL);
+        barProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(MainActivity.stationsSubway.size());
         barProgressDialog.show();
