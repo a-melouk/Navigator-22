@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Graph g = new Graph();
     Vertex source = new Vertex("Current");
     Vertex destination = new Vertex("Destination");
+    ArrayList<Vertex> path;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -551,22 +552,602 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
 
 
-        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-        int compteur1, compteur2;
-        for (compteur1 = 0; compteur1 < tramwayMatrice.size(); compteur1++)
-            for (compteur2 = 1; compteur2 < stationsSubway.size(); compteur2++) {
-                if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(stationsSubway.get(compteur2 - 1).nomFr) && tramwayMatrice.get(compteur1).stationDestination.nomFr.equals(stationsSubway.get(compteur2).nomFr)) {
-                    tramwayMatrice.get(compteur1).timetramway = tramwayTimes[compteur2 - 1];
-                } else if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(tramwayMatrice.get(compteur1).stationDestination.nomFr)) {
-                    tramwayMatrice.get(compteur1).timetramway = 0;
-                }
-            }
+//        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+//        int compteur1, compteur2;
+//        for (compteur1 = 0; compteur1 < tramwayMatrice.size(); compteur1++)
+//            for (compteur2 = 1; compteur2 < stationsSubway.size(); compteur2++) {
+//                if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(stationsSubway.get(compteur2 - 1).nomFr) && tramwayMatrice.get(compteur1).stationDestination.nomFr.equals(stationsSubway.get(compteur2).nomFr)) {
+//                    tramwayMatrice.get(compteur1).timetramway = tramwayTimes[compteur2 - 1];
+//                } else if (tramwayMatrice.get(compteur1).stationSource.nomFr.equals(tramwayMatrice.get(compteur1).stationDestination.nomFr)) {
+//                    tramwayMatrice.get(compteur1).timetramway = 0;
+//                }
+//            }
 
 
         setUpList();
         initSearch();
 //        stationSource();
 //        stationDestination();
+    }
+
+    //Menu Navigation
+    private void setNavigationViewListener() {
+        navigationView = findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        MenuItem menuItem = navigationView.getMenu().findItem(R.id.TRAMWAY);
+        CompoundButton tramway = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA03);
+        CompoundButton bus3 = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA11);
+        CompoundButton bus11 = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA16);
+        CompoundButton bus16 = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA17);
+        CompoundButton bus17 = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA22);
+        CompoundButton bus22 = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA25);
+        CompoundButton bus25 = (CompoundButton) menuItem.getActionView();
+        menuItem = navigationView.getMenu().findItem(R.id.BUSA27);
+        CompoundButton bus27 = (CompoundButton) menuItem.getActionView();
+        tramway.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (tramway.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+                        markerRouting.setVisible(false);
+                        navigation(new GeoPoint(35.19348,-0.63466), marker.getPosition(), "tramway");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "Tramway enabled");
+                bus3.setChecked(false);
+                bus11.setChecked(false);
+                bus16.setChecked(false);
+                bus17.setChecked(false);
+                bus22.setChecked(false);
+                bus25.setChecked(false);
+                bus27.setChecked(false);
+
+
+            } else {
+            }
+        });
+        bus3.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus3.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+
+                        navigation(currentLocation, marker.getPosition(), "A03");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS3 enabled");
+                tramway.setChecked(false);
+                bus11.setChecked(false);
+                bus16.setChecked(false);
+                bus17.setChecked(false);
+                bus22.setChecked(false);
+                bus25.setChecked(false);
+                bus27.setChecked(false);
+
+
+            } else {
+            }
+        });
+        bus11.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus11.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+
+                        navigation(currentLocation, marker.getPosition(), "A11");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS11 enabled");
+                tramway.setChecked(false);
+                bus3.setChecked(false);
+                bus16.setChecked(false);
+                bus17.setChecked(false);
+                bus22.setChecked(false);
+                bus25.setChecked(false);
+                bus27.setChecked(false);
+            } else {
+            }
+        });
+        bus16.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus16.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+
+                        navigation(currentLocation, marker.getPosition(), "A16");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS16 enabled");
+                tramway.setChecked(false);
+                bus11.setChecked(false);
+                bus3.setChecked(false);
+                bus17.setChecked(false);
+                bus22.setChecked(false);
+                bus25.setChecked(false);
+                bus27.setChecked(false);
+            } else {
+            }
+        });
+        bus17.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus17.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+
+                        navigation(currentLocation, marker.getPosition(), "A17");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS17 enabled");
+                tramway.setChecked(false);
+                bus11.setChecked(false);
+                bus16.setChecked(false);
+                bus3.setChecked(false);
+                bus22.setChecked(false);
+                bus25.setChecked(false);
+                bus27.setChecked(false);
+            } else {
+            }
+        });
+        bus22.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus22.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+
+                        navigation(currentLocation, marker.getPosition(), "A22");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS22 enabled");
+                tramway.setChecked(false);
+                bus11.setChecked(false);
+                bus16.setChecked(false);
+                bus17.setChecked(false);
+                bus3.setChecked(false);
+                bus25.setChecked(false);
+                bus27.setChecked(false);
+            } else {
+            }
+        });
+        bus25.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus25.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+                        markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin_final));
+                        navigation(currentLocation, marker.getPosition(), "A25");
+
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS25 enabled");
+                tramway.setChecked(false);
+                bus11.setChecked(false);
+                bus16.setChecked(false);
+                bus17.setChecked(false);
+                bus22.setChecked(false);
+                bus3.setChecked(false);
+                bus27.setChecked(false);
+            } else {
+            }
+        });
+        bus27.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (bus27.isChecked()) {
+                markerRouting = new Marker(myMap);
+                markerRouting.setVisible(true);
+                getLocation();
+                markerRouting.setPosition(currentLocation);
+                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+                markerRouting.setDraggable(true);
+                myMap.getOverlays().add(markerRouting);
+                myMap.invalidate();
+                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                    @Override
+                    public void onMarkerDrag(Marker marker) {
+                    }
+
+                    @Override
+                    public void onMarkerDragEnd(Marker marker) {
+                        markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin_final));
+                        navigation(new GeoPoint(35.19348,-0.63466), marker.getPosition(), "A27");
+                    }
+
+                    @Override
+                    public void onMarkerDragStart(Marker marker) {
+
+                    }
+                });
+                Log.d("EnablingC", "BUS27 enabled");
+                tramway.setChecked(false);
+                bus11.setChecked(false);
+                bus16.setChecked(false);
+                bus17.setChecked(false);
+                bus22.setChecked(false);
+                bus25.setChecked(false);
+                bus3.setChecked(false);
+            } else {
+            }
+        });
+
+
+    }
+    public void navigation(GeoPoint src, GeoPoint dst, String mean) {
+        path = new ArrayList<>();
+        ArrayList<Station> result = new ArrayList<>();
+        int time;
+        int bis = 0;
+
+        if (mean.toLowerCase().equals("tramway")) {
+            Vertex source = new Vertex("Current");
+            Vertex destination = new Vertex("Destination");
+            g.edges.clear();
+            g.getVertices().clear();
+//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
+            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+            for (int i = 0; i < stationsSubway.size(); i++) {
+                g.addVertex(stationsSubway.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+            for (int compteur = 0; compteur < stationsSubway.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsSubway.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsSubway.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+            for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
+            }
+            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+            path = g.affichage(g, source, destination);
+
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsSubway.size(); i++)
+                    if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
+                        result.add(stationsSubway.get(i));
+
+        }
+
+        else if (mean.equals("A03")) {
+
+            g.getVertices().clear();
+            g.edges.clear();
+            Vertex source = new Vertex("Current");
+            Vertex destination = new Vertex("Destination");
+            for (int i = 0; i < stationsBus3.size(); i++) {
+                g.addVertex(stationsBus3.get(i).nomFr);
+            }
+            for (int i = 0; i < stationsBus3bis.size(); i++) {
+                g.addVertex(stationsBus3bis.get(i).nomFr);
+            }
+            g.addVertex(source);
+            g.addVertex(destination);
+
+            for (int compteur = 0; compteur < stationsBus3.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus3.get(compteur).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus3.get(compteur).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+            }
+
+            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsBus3bis.get(bis).coordonnees) * 60));
+                g.addEdge(source, g.getVertices().get(compteur), time);
+                time = (int) Math.round((fetchTime(dst, stationsBus3bis.get(bis).coordonnees) * 60));
+                g.addEdge(destination, g.getVertices().get(compteur), time);
+                bis++;
+            }
+
+            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
+
+            }
+            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++) {
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
+            }
+
+
+            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
+            path = g.affichage(g, source, destination);
+            for (int k = 1; k < path.size() - 1; k++) {
+                for (int i = 0; i < stationsBus3.size(); i++)
+                    if (path.get(k).name.equals(stationsBus3.get(i).nomFr))
+                        result.add(stationsBus3.get(i));
+                for (int i = 0; i < stationsBus3bis.size(); i++)
+                    if (path.get(k).name.equals(stationsBus3bis.get(i).nomFr))
+                        result.add(stationsBus3bis.get(i));
+            }
+        }
+        //
+        else if (mean.equals("A11")) {
+            result = busNavigation(src, dst, stationsBus11);
+        }
+        //
+        else if (mean.equals("A16")) {
+            result = busNavigation(src, dst, stationsBus16);
+        }
+        //
+        else if (mean.equals("A17")) {
+            result = busNavigation(src, dst, stationsBus17);
+        }
+        //
+        else if (mean.equals("A22")) {
+            result = busNavigation(src, dst, stationsBus22);
+        }
+        //
+        else if (mean.equals("A25")) {
+            result = busNavigation(src, dst, stationsBus25);
+        }
+        //
+        else if (mean.equals("A27")) {
+
+            result = busNavigation(src, dst, stationsBus27);
+
+        }
+        //
+        else if (mean.equals("All")) {
+        }
+        for (int i = 0; i < g.edges.size(); i++)
+            System.out.println("Print : " + g.edges.get(i));
+        if (result.size() > 0) {
+
+            if (result.get(0).type.equals("tramway")) {
+                Log.d("RouteeeTram", "http://192.168.1.12:3000/result/tram/"
+                        + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                        result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                getBestRoute(
+                        "http://192.168.1.12:3000/result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+            } else {
+                getBestRoute(
+                        "http://192.168.1.12:3000/result/" + result.get(0).numero + "/"
+                                + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                Log.d("RouteeeBus", "http://192.168.1.12:3000/result/" + result.get(0).numero + "/"
+                        + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                        result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+            }
+            fetchRoute(src, result.get(0).coordonnees, true);
+            fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
+            addDestination(dst, "From current to destination: " + "\n" + g.cost(g, source, destination) + "minutes");
+
+            addSource(src, "From current location to " + result.get(0).nomFr + ":\n" + g.cost(g, source, path.get(1)));
+
+            for (int i = 0; i < result.size() - 1; i++) {
+                addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + g.cost(g, path.get(i + 1), path.get(i + 2)));
+            }
+
+            addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
+                    g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1)));
+        }
+        //
+        else {fetchRoute(src, dst, true);}
+
+
+    }
+
+    public ArrayList<Station> busNavigation(GeoPoint src, GeoPoint dst, ArrayList<Station> list) {
+        Vertex source = new Vertex("Current");
+        Vertex destination = new Vertex("Destination");
+        path.clear();
+        g.edges.clear();
+        g.getVertices().clear();
+        ArrayList<Station> result;
+
+        int time;
+        int bis = 0;
+        for (int i = 0; i < list.size(); i++) {
+            g.addVertex(list.get(i).nomFr);
+        }
+        g.addVertex(source);
+        g.addVertex(destination);
+        for (int compteur = 0; compteur < list.size(); compteur++) {
+            time = (int) Math.round((fetchTime(src, list.get(compteur).coordonnees) * 60));
+            g.addEdge(source, g.getVertices().get(compteur), time);
+            time = (int) Math.round((fetchTime(dst, list.get(compteur).coordonnees) * 60));
+            g.addEdge(destination, g.getVertices().get(compteur), time);
+        }
+        for (int compteur = 0; compteur < list.size() - 1; compteur++) {
+            g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
+        }
+        path = g.affichage(g, source, destination);
+
+        result = new ArrayList<>();
+
+        for (int k = 1; k < path.size() - 1; k++)
+            for (int i = 0; i < list.size(); i++)
+                if (path.get(k).name.equals(list.get(i).nomFr))
+                    result.add(list.get(i));
+        return result;
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
+        getLocation();
+        Bundle send = new Bundle();
+
+
+        if (item.getItemId() == R.id.allSubwayStations) {
+            Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
+        } else if (item.getItemId() == R.id.closestStations) {
+            Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
+        } else if (item.getItemId() == R.id.bestChoice) {
+
+//            stationSource();
+//            stationDestination();
+            draggableMarker = new Marker(myMap);
+            draggableMarker.setVisible(true);
+            myMap.invalidate();
+            draggableMarker.setPosition(currentLocation);
+            draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
+            draggableMarker.setDraggable(true);
+
+            draggableMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
+                @Override
+                public void onMarkerDrag(Marker marker) {
+                }
+
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+
+                    if (tram.isSelected())
+                        navigation(new GeoPoint(35.2173, -0.6205), marker.getPosition(), "tramway");
+                    else if (bus.isSelected())
+                        navigation(currentLocation, marker.getPosition(), "A16");
+
+                }
+
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+
+                }
+            });
+
+            myMap.getOverlays().add(draggableMarker);
+
+
+        } else {
+            Log.d("EnablingC", "bestroute");
+        }
+        return true;
     }
 
     private void setUpList() {
@@ -1203,6 +1784,64 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.showInfoWindow();
     }
 
+    void addSource(GeoPoint coordinates, String nom) {
+        Marker marker = new Marker(myMap);
+        marker.setPosition(coordinates);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+        marker.setAlpha(0.8f);
+        marker.setDraggable(false);
+
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_source));
+
+        marker.setPanToView(true);
+        myMap.invalidate();
+        myMap.getOverlays().add(marker);
+        getLocation();
+        marker.setSnippet(nom);
+        marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+            @Override
+            public void onOpen(Object item) {
+                TextView station = mView.findViewById(R.id.nomStation);
+                station.setText(marker.getSnippet());
+            }
+
+            @Override
+            public void onClose() {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+            }
+        });
+        marker.showInfoWindow();
+    }
+
+    void addDestination(GeoPoint coordinates, String nom) {
+        Marker marker = new Marker(myMap);
+        marker.setPosition(coordinates);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+        marker.setAlpha(0.8f);
+        marker.setDraggable(false);
+
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_destination));
+
+        marker.setPanToView(true);
+        myMap.invalidate();
+        myMap.getOverlays().add(marker);
+        getLocation();
+        marker.setSnippet(nom);
+        marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+            @Override
+            public void onOpen(Object item) {
+                TextView station = mView.findViewById(R.id.nomStation);
+                station.setText(marker.getSnippet());
+            }
+
+            @Override
+            public void onClose() {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+            }
+        });
+        marker.showInfoWindow();
+    }
+
     public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
@@ -1332,16 +1971,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
-//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-//        if (car.isSelected())
-//            roadManager.setMean(OSRMRoadManager.MEAN_BY_CAR);
-//        else roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-
-
-//        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
-//        roadManager.addRequestOption("routeType=pedestrian");
-
-
         RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
         if (car.isSelected())
             roadManager.addRequestOption("vehicle=car");
@@ -1376,14 +2005,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
-        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-//        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
-//        roadManager.addRequestOption("routeType=pedestrian");
-//        Road road = roadManager.getRoad(roadPoints);
-//        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
-//        roadManager.addRequestOption("vehicle=foot");
-//        Road road = roadManager.getRoad(roadPoints);
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        roadManager.addRequestOption("vehicle=foot");
+
         Road road = roadManager.getRoad(roadPoints);
         if (road.mLength == 0) {
             return getDistanceOffline(start, end);
@@ -1397,14 +2021,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
-//        OSRMRoadManager roadManager = new OSRMRoadManager(getApplicationContext(), "22-Transport");
-//        roadManager.setMean(OSRMRoadManager.MEAN_BY_FOOT);
-//        RoadManager roadManager = new MapQuestRoadManager("jmQfNVRjCrl8jiDLW1QNO5hTkWuyv5mm");
-//        roadManager.addRequestOption("routeType=pedestrian");
-//        Road road = roadManager.getRoad(roadPoints);
         RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
         roadManager.addRequestOption("vehicle=foot");
-//        Road road = roadManager.getRoad(roadPoints);
         Road road = roadManager.getRoad(roadPoints);
         if (road.mLength == 0) {
             return 99999;
@@ -1419,539 +2037,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
         return distance[0];
     }
-
-    //Menu Navigation
-    private void setNavigationViewListener() {
-        navigationView = findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        MenuItem menuItem = navigationView.getMenu().findItem(R.id.TRAMWAY);
-        CompoundButton tramway = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA03);
-        CompoundButton bus3 = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA11);
-        CompoundButton bus11 = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA16);
-        CompoundButton bus16 = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA17);
-        CompoundButton bus17 = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA22);
-        CompoundButton bus22 = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA25);
-        CompoundButton bus25 = (CompoundButton) menuItem.getActionView();
-        menuItem = navigationView.getMenu().findItem(R.id.BUSA27);
-        CompoundButton bus27 = (CompoundButton) menuItem.getActionView();
-        tramway.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (tramway.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "tramway");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "Tramway enabled");
-                bus3.setChecked(false);
-                bus11.setChecked(false);
-                bus16.setChecked(false);
-                bus17.setChecked(false);
-                bus22.setChecked(false);
-                bus25.setChecked(false);
-                bus27.setChecked(false);
-
-
-            } else {
-            }
-        });
-        bus3.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus3.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A03");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS3 enabled");
-                tramway.setChecked(false);
-                bus11.setChecked(false);
-                bus16.setChecked(false);
-                bus17.setChecked(false);
-                bus22.setChecked(false);
-                bus25.setChecked(false);
-                bus27.setChecked(false);
-
-
-            } else {
-            }
-        });
-        bus11.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus11.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A11");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS11 enabled");
-                tramway.setChecked(false);
-                bus3.setChecked(false);
-                bus16.setChecked(false);
-                bus17.setChecked(false);
-                bus22.setChecked(false);
-                bus25.setChecked(false);
-                bus27.setChecked(false);
-            } else {
-            }
-        });
-        bus16.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus16.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A16");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS16 enabled");
-                tramway.setChecked(false);
-                bus11.setChecked(false);
-                bus3.setChecked(false);
-                bus17.setChecked(false);
-                bus22.setChecked(false);
-                bus25.setChecked(false);
-                bus27.setChecked(false);
-            } else {
-            }
-        });
-        bus17.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus17.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A17");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS17 enabled");
-                tramway.setChecked(false);
-                bus11.setChecked(false);
-                bus16.setChecked(false);
-                bus3.setChecked(false);
-                bus22.setChecked(false);
-                bus25.setChecked(false);
-                bus27.setChecked(false);
-            } else {
-            }
-        });
-        bus22.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus22.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A22");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS22 enabled");
-                tramway.setChecked(false);
-                bus11.setChecked(false);
-                bus16.setChecked(false);
-                bus17.setChecked(false);
-                bus3.setChecked(false);
-                bus25.setChecked(false);
-                bus27.setChecked(false);
-            } else {
-            }
-        });
-        bus25.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus25.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A25");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS25 enabled");
-                tramway.setChecked(false);
-                bus11.setChecked(false);
-                bus16.setChecked(false);
-                bus17.setChecked(false);
-                bus22.setChecked(false);
-                bus3.setChecked(false);
-                bus27.setChecked(false);
-            } else {
-            }
-        });
-        bus27.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (bus27.isChecked()) {
-                markerRouting = new Marker(myMap);
-                markerRouting.setVisible(true);
-                getLocation();
-                markerRouting.setPosition(currentLocation);
-                markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-                markerRouting.setDraggable(true);
-                myMap.getOverlays().add(markerRouting);
-                myMap.invalidate();
-                markerRouting.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                    @Override
-                    public void onMarkerDrag(Marker marker) {
-                    }
-
-                    @Override
-                    public void onMarkerDragEnd(Marker marker) {
-
-                        navigation(currentLocation, marker.getPosition(), "A27");
-
-                    }
-
-                    @Override
-                    public void onMarkerDragStart(Marker marker) {
-
-                    }
-                });
-                Log.d("EnablingC", "BUS27 enabled");
-                tramway.setChecked(false);
-                bus11.setChecked(false);
-                bus16.setChecked(false);
-                bus17.setChecked(false);
-                bus22.setChecked(false);
-                bus25.setChecked(false);
-                bus3.setChecked(false);
-            } else {
-            }
-        });
-
-
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NotNull MenuItem item) {
-        getLocation();
-        Bundle send = new Bundle();
-
-
-        if (item.getItemId() == R.id.allSubwayStations) {
-            Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
-            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
-            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
-            intent.putExtras(send);
-            MainActivity.this.startActivity(intent);
-        } else if (item.getItemId() == R.id.closestStations) {
-            Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
-            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
-            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
-            intent.putExtras(send);
-            MainActivity.this.startActivity(intent);
-        } else if (item.getItemId() == R.id.bestChoice) {
-
-//            stationSource();
-//            stationDestination();
-            draggableMarker = new Marker(myMap);
-            draggableMarker.setVisible(true);
-            myMap.invalidate();
-            draggableMarker.setPosition(currentLocation);
-            draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-            draggableMarker.setDraggable(true);
-
-            draggableMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                @Override
-                public void onMarkerDrag(Marker marker) {
-                }
-
-                @Override
-                public void onMarkerDragEnd(Marker marker) {
-
-                    if (tram.isSelected())
-                        navigation(new GeoPoint(35.2173, -0.6205), marker.getPosition(), "tramway");
-                    else if (bus.isSelected())
-                        navigation(currentLocation, marker.getPosition(), "A16");
-
-                }
-
-                @Override
-                public void onMarkerDragStart(Marker marker) {
-
-                }
-            });
-
-            myMap.getOverlays().add(draggableMarker);
-
-
-        } else {
-            Log.d("EnablingC", "Khrat");
-        }
-        return true;
-    }
-
-    public void navigation(GeoPoint src, GeoPoint dst, String mean) {
-        ArrayList<Vertex> path;
-        ArrayList<Station> result = new ArrayList<>();
-        int time;
-        int bis = 0;
-
-        if (mean.toLowerCase().equals("tramway")) {
-//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-            for (int i = 0; i < stationsSubway.size(); i++) {
-                g.addVertex(stationsSubway.get(i).nomFr);
-            }
-            g.addVertex(source);
-            g.addVertex(destination);
-            for (int compteur = 0; compteur < stationsSubway.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsSubway.get(compteur).coordonnees) * 60));
-                g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsSubway.get(compteur).coordonnees) * 60));
-                g.addEdge(destination, g.getVertices().get(compteur), time);
-            }
-            for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
-            }
-//            time = (int) Math.round(fetchTime(src, dst) * 60);
-//            g.addEdge(source, destination, time);
-            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
-            path = g.affichage(g, source, destination);
-            result = new ArrayList<>();
-
-            for (int k = 1; k < path.size() - 1; k++)
-                for (int i = 0; i < stationsSubway.size(); i++)
-                    if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
-                        result.add(stationsSubway.get(i));
-        } else if (mean.equals("A03")) {
-            for (int i = 0; i < stationsBus3.size(); i++) {
-                g.addVertex(stationsBus3.get(i).nomFr);
-            }
-            for (int i = 0; i < stationsBus3bis.size(); i++) {
-                g.addVertex(stationsBus3bis.get(i).nomFr);
-            }
-            g.addVertex(source);
-            g.addVertex(destination);
-            Log.d("Vertices", g.getVertices() + "");
-
-
-            for (int compteur = 0; compteur < stationsBus3.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsBus3.get(compteur).coordonnees) * 60));
-                g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsBus3.get(compteur).coordonnees) * 60));
-                g.addEdge(destination, g.getVertices().get(compteur), time);
-            }
-
-            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsBus3bis.get(bis).coordonnees) * 60));
-                g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsBus3bis.get(bis).coordonnees) * 60));
-                g.addEdge(destination, g.getVertices().get(compteur), time);
-                bis++;
-            }
-
-            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++) {
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
-
-            }
-            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++) {
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
-            }
-
-
-            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
-            path = g.affichage(g, source, destination);
-
-
-            for (int k = 1; k < path.size() - 1; k++) {
-                for (int i = 0; i < stationsBus3.size(); i++)
-                    if (path.get(k).name.equals(stationsBus3.get(i).nomFr))
-                        result.add(stationsBus3.get(i));
-                for (int i = 0; i < stationsBus3bis.size(); i++)
-                    if (path.get(k).name.equals(stationsBus3bis.get(i).nomFr))
-                        result.add(stationsBus3bis.get(i));
-            }
-        } else if (mean.equals("A11")) {
-            result = busNavigation(src, dst, stationsBus11);
-        } else if (mean.equals("A16")) {
-            result = busNavigation(src, dst, stationsBus16);
-        } else if (mean.equals("A17")) {
-            result = busNavigation(src, dst, stationsBus17);
-        } else if (mean.equals("A22")) {
-            result = busNavigation(src, dst, stationsBus22);
-        } else if (mean.equals("A25")) {
-            result = busNavigation(src, dst, stationsBus25);
-        } else if (mean.equals("A27")) {
-            result = busNavigation(src, dst, stationsBus27);
-        } else if (mean.equals("All")) {
-        }
-
-
-        for (int i = 0; i < g.edges.size(); i++)
-            System.out.println("Print : " + g.edges.get(i));
-        if (result.size() > 0) {
-            for (int i = 0; i < result.size(); i++) {
-                addPin(result.get(i).coordonnees, result.get(i).nomFr);
-            }
-            getBestRoute("http://192.168.1.12:3000/result/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" + result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-            fetchRoute(src, result.get(0).coordonnees, true);
-            fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
-        } else fetchRoute(src, dst, true);
-        Toast.makeText(getApplicationContext(), String.valueOf(g.cost(g, source, destination)), Toast.LENGTH_LONG).show();
-
-    }
-
-    public ArrayList<Station> busNavigation(GeoPoint src, GeoPoint dst, ArrayList<Station> list) {
-        ArrayList<Station> result;
-        ArrayList<Vertex> path;
-
-        int time;
-        int bis = 0;
-        for (int i = 0; i < list.size(); i++) {
-            g.addVertex(list.get(i).nomFr);
-        }
-        g.addVertex(source);
-        g.addVertex(destination);
-        for (int compteur = 0; compteur < list.size(); compteur++) {
-            time = (int) Math.round((fetchTime(src, list.get(compteur).coordonnees) * 60));
-            g.addEdge(source, g.getVertices().get(compteur), time);
-            time = (int) Math.round((fetchTime(dst, list.get(compteur).coordonnees) * 60));
-            g.addEdge(destination, g.getVertices().get(compteur), time);
-        }
-        for (int compteur = 0; compteur < list.size() - 1; compteur++) {
-            g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
-        }
-        path = g.affichage(g, source, destination);
-        result = new ArrayList<>();
-
-        for (int k = 1; k < path.size() - 1; k++)
-            for (int i = 0; i < list.size(); i++)
-                if (path.get(k).name.equals(list.get(i).nomFr))
-                    result.add(list.get(i));
-        return result;
-    }
-
 
     //Clean Map from all markers and polylines
     private void clearMap() {

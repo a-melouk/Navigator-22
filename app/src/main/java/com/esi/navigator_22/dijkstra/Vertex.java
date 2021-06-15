@@ -6,11 +6,11 @@ public class Vertex implements Comparable<Vertex> {
     public String name;
     public ArrayList<Edge> neighbours;
     public LinkedList<Vertex> path;
-    public double minDistance = Double.POSITIVE_INFINITY;
+    public double cost = Double.POSITIVE_INFINITY;
     public Vertex previous;
 
     public int compareTo(Vertex other) {
-        return Double.compare(minDistance, other.minDistance);
+        return Double.compare(cost, other.cost);
     }
 
     public Vertex(String name) {

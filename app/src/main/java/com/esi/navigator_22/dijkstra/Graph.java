@@ -6,6 +6,7 @@ public class Graph {
     private final ArrayList<Vertex> vertices;
 
     public ArrayList<Edge> edges = new ArrayList<>();
+    ArrayList<Vertex> points = new ArrayList<>();
 
     public Graph() {
         vertices = new ArrayList<>();
@@ -54,7 +55,7 @@ public class Graph {
         // 3. Update the distances for all the neighbours (In the Priority Queue).
         // Repeat the process till all the connected nodes are visited.
 
-        source.minDistance = 0;
+        source.cost = 0;
         PriorityQueue<Vertex> queue = new PriorityQueue<>();
         queue.add(source);
 
@@ -63,15 +64,15 @@ public class Graph {
             Vertex u = queue.poll();
 
             for (Edge neighbour : u.neighbours) {
-                double newDist = u.minDistance + neighbour.weight;
+                double newDist = u.cost + neighbour.weight;
 
-                if (neighbour.target.minDistance > newDist) {
+                if (neighbour.target.cost > newDist) {
                     // Remove the node from the queue to update the distance value.
                     queue.remove(neighbour.target);
-                    neighbour.target.minDistance = newDist;
+                    neighbour.target.cost = newDist;
 
                     // Take the path visited till now and add the new node.s
-                    neighbour.target.path = new LinkedList<Vertex>(u.path);
+                    neighbour.target.path = new LinkedList<>(u.path);
                     neighbour.target.path.add(u);
 
                     //Reenter the node with new distance.
@@ -81,10 +82,21 @@ public class Graph {
         }
     }
 
+    public ArrayList<Vertex> getNodes(Graph g,Vertex source,Vertex dest) {
+        g.calculate(source);
+        for (int i = 0; i < g.getVertices().size(); i++) {
+            if (g.getVertices().get(i).equals(dest)) {
+                points.addAll(dest.path);
+            }
+        }
+        points.add(dest);
+        return points;
+    }
+
     public ArrayList<Vertex> affichage(Graph g, Vertex source, Vertex dest) {
         ArrayList<Vertex> result = new ArrayList<>();
-        g.calculate(g.getVertex(source));
-        System.out.print(source + " to " + dest + " Distance : " + dest.minDistance + " Path : [");
+        g.calculate(source);
+        System.out.print(source + " to " + dest + " Distance : " + dest.cost + " Path : [");
         for (int i = 0; i < g.getVertices().size(); i++) {
             if (g.getVertices().get(i).equals(dest)) {
                 for (int j = 0; j < dest.path.size(); j++) {
@@ -100,6 +112,6 @@ public class Graph {
 
     public double cost(Graph g, Vertex src, Vertex dest) {
         g.calculate(g.getVertex(src));
-        return dest.minDistance;
+        return dest.cost;
     }
 }
