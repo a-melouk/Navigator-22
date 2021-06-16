@@ -1075,11 +1075,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus27);
             for (int i = 6439; i < g.edges.size(); i++)
                 Log.d("MatriceGraphFinal", g.edges.get(i)+"");
+            path = g.affichage(g, g.getVertex(21), g.getVertex(35));
+
+
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < allStations.size(); i++)
+                    if (path.get(k).name.equals(allStations.get(i).nomFr))
+                        result.add(allStations.get(i));
 
         }
         for (int i = 0; i < g.edges.size(); i++)
             System.out.println("Print : " + g.edges.get(i));
-        if (result.size() > 0) {
+/*        if (result.size() > 0) {
 
             if (result.get(0).type.equals("tramway")) {
                 Log.d("RouteeeTram", "https://routing22final.herokuapp.com/result/tram/"
@@ -1113,7 +1120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
         else {
             fetchRoute(src, dst, true);
-        }
+        }*/
 
 
     }
