@@ -558,6 +558,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUpList();
         initSearch();
+        navigation(currentLocation,currentLocation,"All");
     }
 
     public int removeAfter(String a) {
@@ -1073,9 +1074,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus22);
             addBusNavigation(stationsBus25);
             addBusNavigation(stationsBus27);
-            for (int i = 6439; i < g.edges.size(); i++)
-                Log.d("MatriceGraphFinal", g.edges.get(i)+"");
-            path = g.affichage(g, g.getVertex(21), g.getVertex(35));
+            path = g.affichage(g, g.getVertex(0), g.getVertex(112));
 
 
             for (int k = 1; k < path.size() - 1; k++)
@@ -1084,8 +1083,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         result.add(allStations.get(i));
 
         }
-        for (int i = 0; i < g.edges.size(); i++)
-            System.out.println("Print : " + g.edges.get(i));
 /*        if (result.size() > 0) {
 
             if (result.get(0).type.equals("tramway")) {
@@ -1211,7 +1208,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (tram.isSelected())
                         navigation(currentLocation, marker.getPosition(), "tramway");
                     else if (bus.isSelected())
-                        navigation(stationsBus3.get(14).coordonnees, stationsSubway.get(21).coordonnees, "All");
+                        navigation(allStations.get(91).coordonnees, allStations.get(21).coordonnees, "All");
                 }
 
                 @Override
