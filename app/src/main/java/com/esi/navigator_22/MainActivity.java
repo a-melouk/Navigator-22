@@ -109,7 +109,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
 
     Station station = new Station();
-    MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), 0.0, 0.0);
+    MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero",
+            new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero",
+            new GeoPoint(0.0, 0.0)), 0.0, 0.0);
     public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
@@ -553,63 +555,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             bus.setBackground(null);
         });
 
-        source = new Vertex("Current");
-        destination = new Vertex("Destination");
-        g.edges.clear();
-        g.getVertices().clear();
-//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-
-        for (int i = 0; i < allStations.size(); i++) {
-            g.addVertex(allStations.get(i).numero);
-        }
-        g.addVertex(source);
-        g.addVertex(destination);
-        int time = 0;
-        for (int compteur = 0; compteur < allStations.size(); compteur++) {
-            for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(time).time);
-                time++;
-                if (time == 6441) time = 0;
-            }
-        }
-        /*ArrayList<Edge> temp = new ArrayList<>();
-        int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-
-        for (int i = 0; i < g.edges.size(); i++) {
-            if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                int src = Integer.parseInt(g.edges.get(i).source.name);
-                int dst = Integer.parseInt(g.edges.get(i).target.name);
-                int diff = src - dst;
-//                Log.d("MatriceGraph2",src+" | "+dst);
-                for (int j = 0; j < stationsSubway.size() - 1; j++) {
-                    if (src == Integer.parseInt(stationsSubway.get(j).numero) && dst == Integer.parseInt(stationsSubway.get(j + 1).numero) && Math.abs(diff) == 1) {
-                        Log.d("MatriceGraph3", stationsSubway.get(j).numero + " | " + stationsSubway.get(j + 1).numero + " | " + tramwayTimes[j]);
-                        Log.d("MatriceGraph4", g.getVertices().get(j).name + " | " + g.getVertices().get(j + 1).name + " | " + tramwayTimes[j]);
-                        temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
-                    }
-                }
-            }
-        }
-        Log.d("MatriceGraphTemp", temp + "");
-        for (int i = 0; i < temp.size(); i++)
-            g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-        for (int i = 6439; i < g.edges.size(); i++)
-            Log.d("MatriceGraphFinal", g.edges.get(i)+"");
-        Log.d("MatriceGraphFinal",g.getVertices().get(0).neighbours+"");*/
-
-        for (int i=0;i<g.getVertices().size();i++) {
-            for (int j=0;j<stationsBus3.size();j++) {
-                if (g.getVertices().get(i).name.equals(stationsBus3.get(j).numero)) {
-                    Log.d("LeBusA03",g.getVertices().get(i).name+" | "+stationsBus3.get(j));
-                }
-            }
-
-
-        }
-        Log.d("Parding",removeAfter("A03_16")+"");
-
-
-
 
         setUpList();
         initSearch();
@@ -617,7 +562,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public int removeAfter(String a) {
         int res;
-        String b = a.substring(a.indexOf("_")+1);
+        String b = a.substring(a.indexOf("_") + 1);
         res = Integer.parseInt(b);
         return res;
     }
@@ -1091,23 +1036,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             g.addVertex(source);
             g.addVertex(destination);
-            for (int compteur = 0; compteur < matrice.size(); compteur++) {
-                for (int compteur2 = 0; compteur2 < allStations.size() - 1; compteur2++) {
-                    g.addEdge(g.getVertex(compteur2), g.getVertex(compteur2 + 1), (int) matrice.get(compteur).time);
+            int walk = 0;
+            for (int compteur = 0; compteur < allStations.size(); compteur++) {
+                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                    g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
+                    walk++;
+                    if (walk == 6441) walk = 0;
                 }
-
             }
-            for (int i = 0; i < g.edges.size(); i++)
-                Log.d("MatriceGraph", g.edges.get(i) + "");
-            path = g.affichage(g, source, destination);
+            ArrayList<Edge> temp = new ArrayList<>();
+            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
 
+            for (int i = 0; i < g.edges.size(); i++) {
+                if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
+                    int sourceName = Integer.parseInt(g.edges.get(i).source.name);
+                    int targetName = Integer.parseInt(g.edges.get(i).target.name);
+                    int diff = sourceName - targetName;
+//                Log.d("MatriceGraph2",src+" | "+dst);
+                    for (int j = 0; j < stationsSubway.size() - 1; j++) {
+                        if (sourceName == Integer.parseInt(stationsSubway.get(j).numero) && targetName == Integer.parseInt(stationsSubway.get(j + 1).numero) && Math.abs(diff) == 1) {
+                            Log.d("MatriceGraph3", stationsSubway.get(j).numero + " | " + stationsSubway.get(j + 1).numero + " | " + tramwayTimes[j]);
+                            Log.d("MatriceGraph4", g.getVertices().get(j).name + " | " + g.getVertices().get(j + 1).name + " | " + tramwayTimes[j]);
+                            temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
+                        }
+                    }
+                }
+            }
+            for (int i = 0; i < temp.size(); i++)
+                g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
 
-//            for (int k = 1; k < path.size() - 1; k++)
-//                for (int i = 0; i < stationsSubway.size(); i++)
-//                    if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
-//                        result.add(stationsSubway.get(i));
+            addBusNavigation(stationsBus3);
+            addBusNavigation(stationsBus3bis);
+            addBusNavigation(stationsBus11);
+            addBusNavigation(stationsBus16);
+            addBusNavigation(stationsBus17);
+            addBusNavigation(stationsBus22);
+            addBusNavigation(stationsBus25);
+            addBusNavigation(stationsBus27);
+            for (int i = 6439; i < g.edges.size(); i++)
+                Log.d("MatriceGraphFinal", g.edges.get(i)+"");
+
         }
-//        https://routing22final.herokuapp.com
         for (int i = 0; i < g.edges.size(); i++)
             System.out.println("Print : " + g.edges.get(i));
         if (result.size() > 0) {
@@ -1147,6 +1116,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
+    }
+
+    void addBusNavigation(ArrayList<Station> list) {
+        for (int i = 0; i < g.getVertices().size(); i++) {
+            for (int j = 0; j < list.size() - 1; j++) {
+                if (g.getVertices().get(i).name.equals(list.get(j).numero)) {
+                    if (Math.abs(removeAfter(g.getVertices().get(i).name) - removeAfter(list.get(j + 1).numero)) == 1)
+                        g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), 150);
+                }
+            }
+        }
     }
 
     public ArrayList<Station> busNavigation(GeoPoint src, GeoPoint dst, ArrayList<Station> list) {
@@ -1224,8 +1204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (tram.isSelected())
                         navigation(currentLocation, marker.getPosition(), "tramway");
                     else if (bus.isSelected())
-                        navigation(currentLocation, marker.getPosition(), "A16");
-
+                        navigation(stationsBus3.get(14).coordonnees, stationsSubway.get(21).coordonnees, "All");
                 }
 
                 @Override
