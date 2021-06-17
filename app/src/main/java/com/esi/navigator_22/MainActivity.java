@@ -38,6 +38,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.esi.navigator_22.dijkstra.Edge;
@@ -45,13 +46,11 @@ import com.esi.navigator_22.dijkstra.Graph;
 import com.esi.navigator_22.dijkstra.Vertex;
 import com.google.android.material.navigation.NavigationView;
 
-import org.intellij.lang.annotations.Pattern;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.events.MapEventsReceiver;
@@ -85,11 +84,12 @@ import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String urlStations = "http://192.168.1.9:3000/stations_sba";
-    String urlRouteSubway = "http://192.168.1.9:3000/subway";
-    String urlRouteBus = "http://192.168.1.9:3000/bus";
-    String urlCorrespondance = "http://192.168.1.9:3000/correspondance";
-    String urlMatrice = "http://192.168.1.9:3000/matrice";
+    String adresse = "http://192.168.1.12:3000/";
+    String urlStations = adresse+"stations_sba";
+    String urlRouteTramway = adresse+"subway";
+    String urlRouteBus = adresse+"bus";
+    String urlCorrespondance = adresse+"correspondance";
+    String urlMatrice = adresse+"matrice";
     String graphhopperkey = "e1a37263-63f2-48a8-8413-cc9ead957a47";
 
     private String myResponse;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ImageView currentPosition, reset;
     RelativeLayout menu_linear;
-    ImageView subway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
+    ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car, bus, tram;
     ListView searchStations, navigationSource, navigationDestination;
     NavigationView navigationView;
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static ArrayList<GeoPoint> routeTramway = new ArrayList<>();
     static ArrayList<GeoPoint> routeCorrespondance = new ArrayList<>();
     static ArrayList<Station> allStations = new ArrayList<>();
-    static ArrayList<Station> stationsSubway = new ArrayList<>();
+    static ArrayList<Station> stationsTramway = new ArrayList<>();
     static ArrayList<Station> stationsBus = new ArrayList<>();
     static ArrayList<Station> stationsBus3 = new ArrayList<>();
     static ArrayList<Station> stationsBus3bis = new ArrayList<>();
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus_22 = findViewById(R.id.bus_22);
         bus25 = findViewById(R.id.bus_25);
         bus27 = findViewById(R.id.bus_27);
-        subway = findViewById(R.id.subway);
+        tramway = findViewById(R.id.tramway);
         car = findViewById(R.id.car);
         walk = findViewById(R.id.walk);
         bus = findViewById(R.id.bus);
@@ -241,8 +241,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toolbar.setOverflowIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_station));
         toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_draw_open, R.string.navigation_draw_close);
         drawerLayout.addDrawerListener(toggle);
-        toggle.setDrawerIndicatorEnabled(true);
         toggle.syncState();
+        toggle.setDrawerIndicatorEnabled(false);
+        toggle.setToolbarNavigationClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
+        toggle.setHomeAsUpIndicator(R.drawable.icon_hamburger);
 
         myMap.getController().setCenter(new GeoPoint(35.2023025901554, -0.6302970012564838));
         myMap.setMinZoomLevel(minZ);
@@ -324,7 +326,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mRotationGestureOverlay.setEnabled(true);
         myMap.getOverlays().add(mRotationGestureOverlay);
 
-//        getRouteSubway();
+//        getRouteTramway();
 //        getRouteBus();
 //        getRouteCorrespondance();
 //        getStations();
@@ -335,7 +337,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         StrictMode.setThreadPolicy(policy);
 
         allStations = database.getAllStations();
-        stationsSubway = database.getAllTramwayStations();
+        stationsTramway = database.getAllTramwayStations();
         stationsBus = database.getAllBusStations();
         routeBus = database.getAllPointsBus();
         routeTramway = database.getAllPointsSub();
@@ -374,14 +376,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             myMap.getController().setZoom(16.0);
         });
 
-        subway.setOnClickListener(v -> {
+        tramway.setOnClickListener(v -> {
             int i = tramway_click;
             if (i == 1) {
                 chemin = routeTramway;
-                tracerCheminSubway(chemin, myMap);
+                tracerCheminTramway(chemin, myMap);
                 chemin = routeCorrespondance;
                 tracerCorrespondance(chemin, myMap);
-                addStationsSubway();
+                addStationsTramway();
                 tramway_click++;
             } else {
                 for (int k = 0; k < customOverlays.size(); k++)
@@ -558,7 +560,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUpList();
         initSearch();
-        navigation(currentLocation,currentLocation,"All");
+//        navigation(currentLocation,currentLocation,"All");
     }
 
     public int removeAfter(String a) {
@@ -925,18 +927,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             g.getVertices().clear();
 //                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
             int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-            for (int i = 0; i < stationsSubway.size(); i++) {
-                g.addVertex(stationsSubway.get(i).nomFr);
+            for (int i = 0; i < stationsTramway.size(); i++) {
+                g.addVertex(stationsTramway.get(i).nomFr);
             }
             g.addVertex(source);
             g.addVertex(destination);
-            for (int compteur = 0; compteur < stationsSubway.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsSubway.get(compteur).coordonnees) * 60));
+            for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
                 g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsSubway.get(compteur).coordonnees) * 60));
+                time = (int) Math.round((fetchTime(dst, stationsTramway.get(compteur).coordonnees) * 60));
                 g.addEdge(destination, g.getVertices().get(compteur), time);
             }
-            for (int compteur = 0; compteur < stationsSubway.size() - 1; compteur++) {
+            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++) {
                 g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
             }
             g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
@@ -944,9 +946,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
             for (int k = 1; k < path.size() - 1; k++)
-                for (int i = 0; i < stationsSubway.size(); i++)
-                    if (path.get(k).name.equals(stationsSubway.get(i).nomFr))
-                        result.add(stationsSubway.get(i));
+                for (int i = 0; i < stationsTramway.size(); i++)
+                    if (path.get(k).name.equals(stationsTramway.get(i).nomFr))
+                        result.add(stationsTramway.get(i));
 
         } else if (mean.equals("A03")) {
 
@@ -1054,9 +1056,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     int targetName = Integer.parseInt(g.edges.get(i).target.name);
                     int diff = sourceName - targetName;
 //                Log.d("MatriceGraph2",src+" | "+dst);
-                    for (int j = 0; j < stationsSubway.size() - 1; j++) {
-                        if (sourceName == Integer.parseInt(stationsSubway.get(j).numero) && targetName == Integer.parseInt(stationsSubway.get(j + 1).numero) && Math.abs(diff) == 1) {
-                            Log.d("MatriceGraph3", stationsSubway.get(j).numero + " | " + stationsSubway.get(j + 1).numero + " | " + tramwayTimes[j]);
+                    for (int j = 0; j < stationsTramway.size() - 1; j++) {
+                        if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1) {
+                            Log.d("MatriceGraph3", stationsTramway.get(j).numero + " | " + stationsTramway.get(j + 1).numero + " | " + tramwayTimes[j]);
                             Log.d("MatriceGraph4", g.getVertices().get(j).name + " | " + g.getVertices().get(j + 1).name + " | " + tramwayTimes[j]);
                             temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
                         }
@@ -1074,7 +1076,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus22);
             addBusNavigation(stationsBus25);
             addBusNavigation(stationsBus27);
-            path = g.affichage(g, g.getVertex(0), g.getVertex(112));
+            path = g.affichage(g, g.getVertex(7), g.getVertex(86));
 
 
             for (int k = 1; k < path.size() - 1; k++)
@@ -1083,21 +1085,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         result.add(allStations.get(i));
 
         }
-/*        if (result.size() > 0) {
+        if (result.size() > 0) {
 
             if (result.get(0).type.equals("tramway")) {
-                Log.d("RouteeeTram", "https://routing22final.herokuapp.com/result/tram/"
-                        + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                Log.d("RouteeeTram", adresse+"result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                 getBestRoute(
-                        "http://192.168.43.119:3000/result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                        adresse+"result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             } else {
                 getBestRoute(
-                        "http://192.168.43.119:3000/result/" + result.get(0).numero + "/"
+                        adresse+"result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                Log.d("RouteeeBus", "https://routing22final.herokuapp.com/result/" + result.get(0).numero + "/"
+                Log.d("RouteeeBus", adresse+"result/" + result.get(0).numero + "/"
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             }
@@ -1117,7 +1118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
         else {
             fetchRoute(src, dst, true);
-        }*/
+        }
 
 
     }
@@ -1174,14 +1175,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Bundle send = new Bundle();
 
 
-        if (item.getItemId() == R.id.allSubwayStations) {
-            Intent intent = new Intent(MainActivity.this, AllNearSubwayStationsActivity.class);
+        if (item.getItemId() == R.id.allTramwayStations) {
+            Intent intent = new Intent(MainActivity.this, AllNearTramwayStationsActivity.class);
             send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
             intent.putExtras(send);
             MainActivity.this.startActivity(intent);
         } else if (item.getItemId() == R.id.closestStations) {
-            Intent intent = new Intent(MainActivity.this, NthSubwayStationsActivity.class);
+            Intent intent = new Intent(MainActivity.this, NthTramwayStationsActivity.class);
             send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
             send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
             intent.putExtras(send);
@@ -1264,8 +1265,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         myMap.invalidate();
                     } else {
                         chemin = routeTramway;
-                        tracerCheminSubway(chemin, myMap);
-                        addStationSubway(myMap, o.coordonnees, o.nomFr);
+                        tracerCheminTramway(chemin, myMap);
+                        addStationTramway(myMap, o.coordonnees, o.nomFr);
                         myMap.getController().setCenter(o.coordonnees);
                         myMap.invalidate();
 
@@ -1317,8 +1318,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         myMap.invalidate();
                     } else {
                         chemin = routeTramway;
-                        tracerCheminSubway(chemin, myMap);
-                        addStationSubway(myMap, o.coordonnees, o.nomFr);
+                        tracerCheminTramway(chemin, myMap);
+                        addStationTramway(myMap, o.coordonnees, o.nomFr);
                         myMap.getController().setCenter(o.coordonnees);
                         myMap.invalidate();
 
@@ -1371,8 +1372,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         myMap.invalidate();
                     } else {
                         chemin = routeTramway;
-                        tracerCheminSubway(chemin, myMap);
-                        addStationSubway(myMap, o.coordonnees, o.nomFr);
+                        tracerCheminTramway(chemin, myMap);
+                        addStationTramway(myMap, o.coordonnees, o.nomFr);
                         myMap.getController().setCenter(o.coordonnees);
                         myMap.invalidate();
 
@@ -1399,7 +1400,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         ArrayList<Station> ligne;
-        SubMenu tramwaySubMenu = menu.addSubMenu(R.id.subway_stations, R.id.subway_stations, 1, "Stations de Tramway");
+        SubMenu tramwaySubMenu = menu.addSubMenu(R.id.tramway_stations, R.id.tramway_stations, 1, "Stations de Tramway");
         SubMenu busSubMenu = menu.addSubMenu(R.id.bus_16, R.id.bus_16, 1, "Stations de bus");
         SubMenu ligne3 = busSubMenu.addSubMenu(R.id.bus_stations_3, R.id.bus_stations_3, 1, "Ligne 3");
         SubMenu ligne3bis = busSubMenu.addSubMenu(R.id.bus_stations_3_bis, R.id.bus_stations_3_bis, 1, "Ligne 3 bis");
@@ -1410,8 +1411,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SubMenu ligne25 = busSubMenu.addSubMenu(R.id.bus_stations_25, R.id.bus_stations_25, 1, "Ligne 25");
         SubMenu ligne27 = busSubMenu.addSubMenu(R.id.bus_stations_27, R.id.bus_stations_27, 1, "Ligne 27");
 
-        for (int i = 0; i < stationsSubway.size(); i++) {
-            tramwaySubMenu.add(R.id.subway_stations, ids_tramway[i], 1, stationsSubway.get(i).nomFr);
+        for (int i = 0; i < stationsTramway.size(); i++) {
+            tramwaySubMenu.add(R.id.tramway_stations, ids_tramway[i], 1, stationsTramway.get(i).nomFr);
         }
         ligne = searchBusStationByNumber("A03_");
         for (int i = 0; i < ligne.size(); i++) {
@@ -1455,13 +1456,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         getLocation();
         int i, verify, parcours;
-        if (item.getGroupId() == R.id.subway_stations) {
+        if (item.getGroupId() == R.id.tramway_stations) {
             i = item.getItemId();
             verify = 1;
             parcours = 0;
-            while (verify != 0 && parcours < stationsSubway.size()) {
+            while (verify != 0 && parcours < stationsTramway.size()) {
                 if (i == ids_tramway[parcours]) {
-                    addMarker(myMap, stationsSubway.get(parcours).coordonnees, stationsSubway.get(parcours).nomFr, "tramway");
+                    addMarker(myMap, stationsTramway.get(parcours).coordonnees, stationsTramway.get(parcours).nomFr, "tramway");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1661,7 +1662,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void insertRouteSubway(Response response) throws IOException {
+    private void insertRouteTramway(Response response) throws IOException {
         myResponse = Objects.requireNonNull(response.body()).string();
         JSONArray jsonarray = null;
         try {
@@ -1771,13 +1772,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     //Adding Overlays
-    private void addStationsSubway() {
-        for (int i = 0; i < stationsSubway.size(); i++) {
-            addStationSubway(myMap, stationsSubway.get(i).coordonnees, stationsSubway.get(i).nomFr);
+    private void addStationsTramway() {
+        for (int i = 0; i < stationsTramway.size(); i++) {
+            addStationTramway(myMap, stationsTramway.get(i).coordonnees, stationsTramway.get(i).nomFr);
         }
     }
 
-    private void tracerCheminSubway(ArrayList<GeoPoint> chemin, MapView mapView) {
+    private void tracerCheminTramway(ArrayList<GeoPoint> chemin, MapView mapView) {
         Polyline line = new Polyline();
         line.setWidth(8);
 //        line.getOutlinePaint();
@@ -1918,7 +1919,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.showInfoWindow();
     }
 
-    public void addStationSubway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
+    public void addStationTramway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
@@ -2162,8 +2163,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .show();
     }
 
-    private void getRouteSubway() {
-        Request request1 = new Request.Builder().url(urlRouteSubway).build();
+    private void getRouteTramway() {
+        Request request1 = new Request.Builder().url(urlRouteTramway).build();
         client.newCall(request1).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
@@ -2173,7 +2174,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    insertRouteSubway(response);
+                    insertRouteTramway(response);
                 }
             }
         });

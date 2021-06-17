@@ -6,18 +6,18 @@
     <item android:title="Subway">
         <menu>
             <item
-                android:id="@+id/allSubwayStations"
-                android:icon="@drawable/icon_tramway"
+                android:id="@+id/allTramwayStations"
+                android:icon="@drawable/icon_tram"
                 android:title="All Subway stations" />
 
             <item
                 android:id="@+id/closestStations"
-                android:icon="@drawable/icon_tramway"
+                android:icon="@drawable/icon_tram"
                 android:title="Closest subway stations" />
 
             <item
                 android:id="@+id/bestChoice"
-                android:icon="@drawable/icon_tramway"
+                android:icon="@drawable/icon_navigation"
                 android:title="Navigation" />
         </menu>
     </item>

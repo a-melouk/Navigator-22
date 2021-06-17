@@ -18,8 +18,9 @@
     <color name="dark_blue">#000080</color>
     <color name="taxi">#fdb813</color>
     <color name="bleu">#0C0563</color>
+    <color name="searchViewTextColor">#FFFACD</color>
 
 
 
-    <color name="primary">#72A1F1</color>
+    <color name="primary">#075F55</color>
 </resources>

@@ -24,7 +24,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 
-public class AllNearSubwayStationsActivity extends AppCompatActivity {
+public class AllNearTramwayStationsActivity extends AppCompatActivity {
     GeoPoint currentLocation;
     ListView listView;
     MyLocationNewOverlay myLocationNewOverlay;
@@ -38,7 +38,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subway_stations);
+        setContentView(R.layout.activity_tramway_stations);
         String format = "0.00";
         df = new DecimalFormat(format);
         Bundle b = getIntent().getExtras();
@@ -50,7 +50,7 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
 
         ArrayList<StationDetails> myList = new ArrayList<>();
 
-        listView = findViewById(R.id.listSubway);
+        listView = findViewById(R.id.listTramway);
         TextView loading = findViewById(R.id.whileLoading);
 
         StationAdapter stationAdapter = new StationAdapter(this, R.layout.row_list_stations, myList);
@@ -63,29 +63,29 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
         barProgressDialog.setMessage("Download in progress ...");
         barProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         barProgressDialog.setProgress(0);
-        barProgressDialog.setMax(MainActivity.stationsSubway.size());
+        barProgressDialog.setMax(MainActivity.stationsTramway.size());
         barProgressDialog.show();
         barProgressDialog.setCancelable(true);
         t1 = new Thread(() -> {
 //            Log.d("databaseDelete13", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
-            database.deleteAllNearestSubwayStation();
+            database.deleteAllNearestTramwayStation();
 //            Log.d("databaseDelete14", String.valueOf(database.getAllNearestSubStationsSortedByDistance().size()));
 
 //            Log.d("databaseDelete5", String.valueOf(getDistanceOffline(new GeoPoint(35.2065503, -0.6191647), new GeoPoint(0.0, 0.0))));
 
 //            MainActivity.stations.size()
-            for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
+            for (int i = 0; i < MainActivity.stationsTramway.size(); i++) {
                 Log.d("TestAllNearest", i + "");
                 barProgressDialog.incrementProgressBy(1);
                 StationDetails availableStation = new StationDetails();
-                availableStation.type = MainActivity.stationsSubway.get(i).type;
-                availableStation.nomFr = MainActivity.stationsSubway.get(i).nomFr;
-                availableStation.numero = MainActivity.stationsSubway.get(i).numero;
-                getRouteOnlineOnFoot(MainActivity.stationsSubway.get(i).coordonnees);
+                availableStation.type = MainActivity.stationsTramway.get(i).type;
+                availableStation.nomFr = MainActivity.stationsTramway.get(i).nomFr;
+                availableStation.numero = MainActivity.stationsTramway.get(i).numero;
+                getRouteOnlineOnFoot(MainActivity.stationsTramway.get(i).coordonnees);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
-                Log.d("allstation13", MainActivity.stationsSubway.get(i).nomFr + " | " + getDistanceOffline(currentLocation, MainActivity.stationsSubway.get(i).coordonnees));
-                Log.d("allstation14", MainActivity.stationsSubway.get(i).nomFr + " | " + availableStation.distanceTo);
+                Log.d("allstation13", MainActivity.stationsTramway.get(i).nomFr + " | " + getDistanceOffline(currentLocation, MainActivity.stationsTramway.get(i).coordonnees));
+                Log.d("allstation14", MainActivity.stationsTramway.get(i).nomFr + " | " + availableStation.distanceTo);
                 database.addNearStation(availableStation);
 
                 Log.d("progressBar11", String.valueOf(barProgressDialog.getProgress()));
@@ -94,10 +94,10 @@ public class AllNearSubwayStationsActivity extends AppCompatActivity {
             }
 
             runOnUiThread(() -> {
-                for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
+                for (int i = 0; i < MainActivity.stationsTramway.size(); i++) {
                     myList.add(database.getAllNearestSubStationsSortedByTime().get(i));
                     Log.d("Distance online", myList.get(i).nomFr + " | " + myList.get(i).distanceTo + " | " + myList.get(i).timeTo);
-                    if (barProgressDialog.getProgress() == MainActivity.stationsSubway.size())
+                    if (barProgressDialog.getProgress() == MainActivity.stationsTramway.size())
                         barProgressDialog.dismiss();
 
                 }

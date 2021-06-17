@@ -30,14 +30,14 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
 
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
         convertView = layoutInflater.inflate(mResource, parent, false);
-        ImageView subway = convertView.findViewById(R.id.imageSubway);
+        ImageView tramway = convertView.findViewById(R.id.imageTramway);
 //        TextView nomAr = convertView.findViewById(R.id.nomAr);
         TextView nomFr = convertView.findViewById(R.id.nomFr);
         TextView distance = convertView.findViewById(R.id.distance);
         TextView time = convertView.findViewById(R.id.time);
 
 
-        subway.setImageResource(R.drawable.icon_tramway);
+        tramway.setImageResource(R.drawable.icon_tram);
 //        nomAr.setText(getItem(position).numero);
         nomFr.setText(getItem(position).nomFr);
         distance.setText(String.valueOf(getItem(position).distanceTo));

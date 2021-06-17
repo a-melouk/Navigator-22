@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <group
-        android:id="@+id/subway_stations"
+        android:id="@+id/tramway_stations"
         android:icon="@drawable/icon_tramway"
         android:title="@string/stations_de_tramway"
         app:showAsAction="ifRoom">
@@ -100,7 +100,7 @@
 
     <group
         android:id="@+id/bus_stations_3"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A03"
         app:showAsAction="ifRoom">
 
@@ -168,7 +168,7 @@
 
     <group
         android:id="@+id/bus_stations_3_bis"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A03 bis"
         app:showAsAction="ifRoom">
 
@@ -212,7 +212,7 @@
 
     <group
         android:id="@+id/bus_stations_11"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A11"
         app:showAsAction="ifRoom">
 
@@ -276,7 +276,7 @@
 
     <group
         android:id="@+id/bus_stations_16"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A16"
         app:showAsAction="ifRoom">
 
@@ -348,7 +348,7 @@
 
     <group
         android:id="@+id/bus_stations_17"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A17"
         app:showAsAction="ifRoom">
 
@@ -404,7 +404,7 @@
 
     <group
         android:id="@+id/bus_stations_22"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A22"
         app:showAsAction="ifRoom">
 
@@ -444,7 +444,7 @@
 
     <group
         android:id="@+id/bus_stations_25"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A25"
         app:showAsAction="ifRoom">
 
@@ -492,7 +492,7 @@
 
     <group
         android:id="@+id/bus_stations_27"
-        android:icon="@drawable/ic_bus"
+
         android:title="Stations Bus A27"
         app:showAsAction="ifRoom">
 

@@ -20,7 +20,7 @@ import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.ArrayList;
 
-public class NthSubwayStationsActivity extends AppCompatActivity {
+public class NthTramwayStationsActivity extends AppCompatActivity {
     GeoPoint currentLocation;
     ListView listView;
     MyLocationNewOverlay myLocationNewOverlay;
@@ -34,7 +34,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subway_stations);
+        setContentView(R.layout.activity_tramway_stations);
         Bundle b = getIntent().getExtras();
         double currentLocationLatitude = b.getDouble("currentLocationLatitude");
         double currentLocationLongitude = b.getDouble("currentLocationLongitude");
@@ -44,7 +44,7 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
 
         ArrayList<StationDetails> myList = new ArrayList<>();
 
-        listView = findViewById(R.id.listSubway);
+        listView = findViewById(R.id.listTramway);
         TextView loading = findViewById(R.id.whileLoading);
 
         StationAdapter stationAdapter = new StationAdapter(this, R.layout.row_list_stations, myList);
@@ -61,16 +61,16 @@ public class NthSubwayStationsActivity extends AppCompatActivity {
         barProgressDialog.show();
         barProgressDialog.setCancelable(false);
         t1 = new Thread(() -> {
-            database.deleteAllNearestSubwayStation();
+            database.deleteAllNearestTramwayStation();
 //            MainActivity.stations.size()
             ArrayList<StationDetails> plusProches = new ArrayList<>();
-            for (int i = 0; i < MainActivity.stationsSubway.size(); i++) {
+            for (int i = 0; i < MainActivity.stationsTramway.size(); i++) {
                 double distanceOffline = 0.0;
                 StationDetails stationDetails = new StationDetails();
-                stationDetails.type = MainActivity.stationsSubway.get(i).type;
-                stationDetails.nomFr = MainActivity.stationsSubway.get(i).nomFr;
-                stationDetails.numero = MainActivity.stationsSubway.get(i).numero;
-                stationDetails.coordonnees = MainActivity.stationsSubway.get(i).coordonnees;
+                stationDetails.type = MainActivity.stationsTramway.get(i).type;
+                stationDetails.nomFr = MainActivity.stationsTramway.get(i).nomFr;
+                stationDetails.numero = MainActivity.stationsTramway.get(i).numero;
+                stationDetails.coordonnees = MainActivity.stationsTramway.get(i).coordonnees;
                 distanceOffline = getDistanceOffline(stationDetails.coordonnees, currentLocation);
                 stationDetails.distanceTo = distanceOffline;
                 plusProches.add(stationDetails);

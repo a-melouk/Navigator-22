@@ -158,7 +158,7 @@ public class DbHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
-    long deleteAllNearestSubwayStation() {
+    long deleteAllNearestTramwayStation() {
         SQLiteDatabase sqLiteDatabase = getWritableDatabase();
         long word_id = sqLiteDatabase.delete(TABLE_NEAREST_SUB_STATIONS, null, null);
         return word_id;
