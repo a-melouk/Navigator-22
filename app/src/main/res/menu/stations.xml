@@ -4,7 +4,7 @@
 
     <group
         android:id="@+id/tramway_stations"
-        android:icon="@drawable/icon_tramway"
+        android:icon="@drawable/icon_tram"
         android:title="@string/stations_de_tramway"
         app:showAsAction="ifRoom">
 
