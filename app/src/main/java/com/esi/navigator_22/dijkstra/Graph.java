@@ -82,7 +82,7 @@ public class Graph {
         }
     }
 
-    public ArrayList<Vertex> getNodes(Graph g,Vertex source,Vertex dest) {
+    public ArrayList<Vertex> getNodes(Graph g, Vertex source, Vertex dest) {
         g.calculate(source);
         for (int i = 0; i < g.getVertices().size(); i++) {
             if (g.getVertices().get(i).equals(dest)) {
@@ -112,6 +112,7 @@ public class Graph {
 
     public double cost(Graph g, Vertex src, Vertex dest) {
         g.calculate(g.getVertex(src));
+
         return dest.cost;
     }
 }

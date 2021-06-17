@@ -84,7 +84,8 @@ import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String adresse = "http://192.168.1.12:3000/";
+    //    String adresse = "http://192.168.1.12:3000/";
+    String adresse = "https://routing22.herokuapp.com/";
     String urlStations = adresse + "stations_sba";
     String urlRouteTramway = adresse + "subway";
     String urlRouteBus = adresse + "bus";
@@ -661,7 +662,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A03");
 
                     }
@@ -701,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A11");
 
                     }
@@ -739,7 +740,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A16");
 
                     }
@@ -777,7 +778,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A17");
 
                     }
@@ -815,7 +816,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A22");
 
                     }
@@ -853,7 +854,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-                        markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin_final));
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A25");
 
                     }
@@ -891,7 +892,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     @Override
                     public void onMarkerDragEnd(Marker marker) {
-                        markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.pin_final));
+                        markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "A27");
                     }
 
@@ -1105,16 +1106,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             fetchRoute(src, result.get(0).coordonnees, true);
             fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
-            addDestination(dst, "From current to destination: " + "\n" + g.cost(g, source, destination) + "minutes");
+            addDestination(dst, "From current to destination: " + "\n" + (int)Math.round(g.cost(g, source, destination)/60) + "minutes");
 
-            addSource(src, "From current location to " + result.get(0).nomFr + ":\n" + g.cost(g, source, path.get(1)));
+            addSource(src, "From current location to " + result.get(0).nomFr + ":\n" + (int)Math.round(g.cost(g, source, path.get(1))));
 
             for (int i = 0; i < result.size() - 1; i++) {
-                addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + g.cost(g, path.get(i + 1), path.get(i + 2)));
+                if (result.get(i).type.equals("tramway"))
+                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int)Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
+                else
+                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int)Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
             }
-
-            addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
-                    g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1)));
+            if (result.get(result.size() - 1).type.equals("tramway"))
+                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
+                        (int)Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "tramway");
+            else addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
+                    (int)Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "bus");
         }
         //
         else {
@@ -1190,10 +1196,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MainActivity.this.startActivity(intent);
         } else if (item.getItemId() == R.id.bestChoice) {
 
-//            stationSource();
-//            stationDestination();
+            stationSource();
+            stationDestination();
             draggableMarker = new Marker(myMap);
-            draggableMarker.setVisible(true);
+            draggableMarker.setVisible(false);
             myMap.invalidate();
             draggableMarker.setPosition(currentLocation);
             draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
@@ -1289,12 +1295,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void stationSource() {
+        Marker source = new Marker(myMap);
+        source.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_source));
         SearchView pointSource = findViewById(R.id.stationSource);
         pointSource.setBackgroundResource(R.drawable.rounded);
         pointSource.setVisibility(View.VISIBLE);
         pointSource.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+
                 return false;
             }
 
@@ -1308,23 +1318,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationSource.setAdapter(stationNameAdapter);
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
+                    myMap.getOverlays().remove(source);
                     Station o = (Station) navigationSource.getItemAtPosition(position);
-                    if (o.type.equals("bus")) {
-                        clearMap();
-                        String num = removeLastChars(o.numero, 3);
-                        cheminBus = searchBusRouteByNumber(num);
-                        tracerCheminBus(cheminBus, myMap, 255, 0, 0, o.numero);
-                        addStationBus(myMap, o.coordonnees, o.nomFr, o.numero);
-                        myMap.getController().setCenter(o.coordonnees);
-                        myMap.invalidate();
-                    } else {
-                        chemin = routeTramway;
-                        tracerCheminTramway(chemin, myMap);
-                        addStationTramway(myMap, o.coordonnees, o.nomFr);
-                        myMap.getController().setCenter(o.coordonnees);
-                        myMap.invalidate();
-
-                    }
+                    source.setPosition(o.coordonnees);
+                    source.setTitle(o.nomFr);
+                    myMap.getOverlays().add(source);
+                    myMap.invalidate();
+                    customOverlays.add(new CustomOverlay("searchSource", source));
+                    pointSource.setQuery(o.nomFr, true);
 
                 });
                 return true;
@@ -1337,11 +1338,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointSource.setOnCloseListener(() -> {
             navigationSource.setVisibility(View.INVISIBLE);
+            myMap.getOverlays().remove(source);
             return false;
         });
     }
 
     private void stationDestination() {
+        Marker destination = new Marker(myMap);
+        destination.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_destination));
         SearchView pointDestination = findViewById(R.id.stationDestination);
 
         pointDestination.setBackgroundResource(R.drawable.rounded);
@@ -1362,23 +1366,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationDestination.setAdapter(stationNameAdapter);
                 navigationDestination.setOnItemClickListener((parent, view, position, id) -> {
+                    myMap.getOverlays().remove(destination);
                     Station o = (Station) navigationDestination.getItemAtPosition(position);
-                    if (o.type.equals("bus")) {
-                        clearMap();
-                        String num = removeLastChars(o.numero, 3);
-                        cheminBus = searchBusRouteByNumber(num);
-                        tracerCheminBus(cheminBus, myMap, 255, 0, 0, o.numero);
-                        addStationBus(myMap, o.coordonnees, o.nomFr, o.numero);
-                        myMap.getController().setCenter(o.coordonnees);
-                        myMap.invalidate();
-                    } else {
-                        chemin = routeTramway;
-                        tracerCheminTramway(chemin, myMap);
-                        addStationTramway(myMap, o.coordonnees, o.nomFr);
-                        myMap.getController().setCenter(o.coordonnees);
-                        myMap.invalidate();
+//                    addDestination(o.coordonnees, o.nomFr);
 
-                    }
+                    destination.setPosition(o.coordonnees);
+                    destination.setTitle(o.nomFr);
+                    myMap.getOverlays().add(destination);
+                    myMap.invalidate();
+                    customOverlays.add(new CustomOverlay("searchDestination", destination));
+                    pointDestination.setQuery(o.nomFr, true);
                 });
                 return false;
             }
@@ -1390,6 +1387,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointDestination.setOnCloseListener(() -> {
             navigationDestination.setVisibility(View.INVISIBLE);
+            myMap.getOverlays().remove(destination);
             return false;
         });
     }
@@ -1833,14 +1831,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.showInfoWindow();
     }
 
-    void addPin(GeoPoint coordinates, String nom) {
+    void addPin(GeoPoint coordinates, String nom, String mean) {
+        Marker marker = new Marker(myMap);
+        marker.setPosition(coordinates);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+        marker.setAlpha(0.8f);
+        marker.setDraggable(false);
+        if (mean.equals("tramway"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
+        else marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus));
+
+        marker.setPanToView(true);
+        myMap.invalidate();
+        myMap.getOverlays().add(marker);
+        getLocation();
+        marker.setSnippet(nom);
+        marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
+            @Override
+            public void onOpen(Object item) {
+                TextView station = mView.findViewById(R.id.nomStation);
+                station.setText(marker.getSnippet());
+            }
+
+            @Override
+            public void onClose() {
+                InfoWindow.closeAllInfoWindowsOn(myMap);
+            }
+        });
+//        marker.showInfoWindow();
+    }
+
+    void addSource(GeoPoint coordinates, String nom) {
         Marker marker = new Marker(myMap);
         marker.setPosition(coordinates);
         marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
         marker.setDraggable(false);
 
-        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.icon_source));
 
         marker.setPanToView(true);
         myMap.invalidate();
@@ -1862,14 +1890,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.showInfoWindow();
     }
 
-    void addSource(GeoPoint coordinates, String nom) {
+    void addPin(GeoPoint coordinates, String nom, Drawable d) {
         Marker marker = new Marker(myMap);
         marker.setPosition(coordinates);
         marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
         marker.setAlpha(0.8f);
         marker.setDraggable(false);
 
-        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_source));
+        marker.setIcon(d);
 
         marker.setPanToView(true);
         myMap.invalidate();
@@ -1898,7 +1926,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setAlpha(0.8f);
         marker.setDraggable(false);
 
-        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_destination));
+        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.icon_destination));
 
         marker.setPanToView(true);
         myMap.invalidate();
