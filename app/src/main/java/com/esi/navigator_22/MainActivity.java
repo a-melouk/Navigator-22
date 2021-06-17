@@ -374,6 +374,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getLocation();
 
             myMap.getController().setZoom(16.0);
+            myMap.getController().setCenter(currentLocation);
         });
 
         tramway.setOnClickListener(v -> {
