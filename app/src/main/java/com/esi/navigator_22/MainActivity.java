@@ -85,11 +85,11 @@ import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     String adresse = "http://192.168.1.12:3000/";
-    String urlStations = adresse+"stations_sba";
-    String urlRouteTramway = adresse+"subway";
-    String urlRouteBus = adresse+"bus";
-    String urlCorrespondance = adresse+"correspondance";
-    String urlMatrice = adresse+"matrice";
+    String urlStations = adresse + "stations_sba";
+    String urlRouteTramway = adresse + "subway";
+    String urlRouteBus = adresse + "bus";
+    String urlCorrespondance = adresse + "correspondance";
+    String urlMatrice = adresse + "matrice";
     String graphhopperkey = "e1a37263-63f2-48a8-8413-cc9ead957a47";
 
     private String myResponse;
@@ -1089,17 +1089,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (result.size() > 0) {
 
             if (result.get(0).type.equals("tramway")) {
-                Log.d("RouteeeTram", adresse+"result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                Log.d("RouteeeTram", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                 getBestRoute(
-                        adresse+"result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                        adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
             } else {
                 getBestRoute(
-                        adresse+"result/" + result.get(0).numero + "/"
+                        adresse + "result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                Log.d("RouteeeBus", adresse+"result/" + result.get(0).numero + "/"
+                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
+                Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             }
@@ -1733,7 +1733,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void insertBestRoute(Response response) throws IOException, JSONException {
+    private void insertBestRoute(Response response, int r, int g, int b) throws IOException, JSONException {
         myResponse = Objects.requireNonNull(response.body()).string();
         JSONArray jsonarray = null;
         JSONObject result = null;
@@ -1763,7 +1763,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         Polyline a = new Polyline();
         a.setWidth(10);
-        a.setColor(Color.rgb(253, 127, 44));
+        a.setColor(Color.rgb(r, g, b));
         a.setDensityMultiplier(0.5f);
         a.setPoints(bestRoute);
         myMap.getOverlays().add(a);
@@ -2251,7 +2251,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void getBestRoute(String adresse) {
+    private void getBestRoute(String adresse, int r, int g, int b) {
         Request request = new Request.Builder().url(adresse).build();
         client.newCall(request).enqueue(new Callback() {
 
@@ -2264,7 +2264,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     try {
-                        insertBestRoute(response);
+                        insertBestRoute(response, r, g, b);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
