@@ -226,11 +226,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
 
-
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
         Animation anim = new AlphaAnimation(0.8f, 1.0f);
-        anim.setDuration(1000); //You can manage the blinking time with this parameter
+        anim.setDuration(1000);
         anim.setStartOffset(0);
         anim.setRepeatMode(Animation.REVERSE);
         anim.setRepeatCount(Animation.INFINITE);
