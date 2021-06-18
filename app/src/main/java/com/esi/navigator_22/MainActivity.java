@@ -510,8 +510,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         walk.setOnClickListener(v -> {
             walk.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
             walk.setSelected(true);
-
-
             car.setSelected(false);
             car.setBackground(null);
             tram.setSelected(false);
@@ -523,8 +521,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tram.setOnClickListener(v -> {
             tram.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
             tram.setSelected(true);
-
-
             car.setSelected(false);
             car.setBackground(null);
             walk.setSelected(false);
@@ -536,8 +532,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus.setOnClickListener(v -> {
             bus.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
             bus.setSelected(true);
-
-
             car.setSelected(false);
             car.setBackground(null);
             tram.setSelected(false);
@@ -549,7 +543,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         car.setOnClickListener(v -> {
             car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
             car.setSelected(true);
-
             walk.setSelected(false);
             walk.setBackground(null);
             tram.setSelected(false);
@@ -623,7 +616,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onMarkerDragEnd(Marker marker) {
                         markerRouting.setVisible(false);
                         navigation(currentLocation, marker.getPosition(), "tramway");
-
                     }
 
                     @Override
@@ -911,8 +903,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
             }
         });
-
-
     }
 
     public void navigation(GeoPoint src, GeoPoint dst, String mean) {
@@ -951,7 +941,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path.get(k).name.equals(stationsTramway.get(i).nomFr))
                         result.add(stationsTramway.get(i));
 
-        } else if (mean.equals("A03")) {
+        }
+        //
+        else if (mean.equals("A03")) {
 
             g.getVertices().clear();
             g.edges.clear();
@@ -1023,9 +1015,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (mean.equals("A27")) {
-
             result = busNavigation(src, dst, stationsBus27);
-
         }
         //
         else if (mean.equals("All")) {
@@ -1033,7 +1023,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             destination = new Vertex("Destination");
             g.edges.clear();
             g.getVertices().clear();
-//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
 
             for (int i = 0; i < allStations.size(); i++) {
                 g.addVertex(allStations.get(i).numero);
@@ -1049,6 +1038,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
             ArrayList<Edge> temp = new ArrayList<>();
+            //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
             int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
 
             for (int i = 0; i < g.edges.size(); i++) {
@@ -1056,7 +1046,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     int sourceName = Integer.parseInt(g.edges.get(i).source.name);
                     int targetName = Integer.parseInt(g.edges.get(i).target.name);
                     int diff = sourceName - targetName;
-//                Log.d("MatriceGraph2",src+" | "+dst);
                     for (int j = 0; j < stationsTramway.size() - 1; j++) {
                         if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1) {
                             Log.d("MatriceGraph3", stationsTramway.get(j).numero + " | " + stationsTramway.get(j + 1).numero + " | " + tramwayTimes[j]);
@@ -1077,14 +1066,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus22);
             addBusNavigation(stationsBus25);
             addBusNavigation(stationsBus27);
+
             path = g.affichage(g, g.getVertex(7), g.getVertex(86));
-
-
             for (int k = 1; k < path.size() - 1; k++)
                 for (int i = 0; i < allStations.size(); i++)
                     if (path.get(k).name.equals(allStations.get(i).nomFr))
                         result.add(allStations.get(i));
-
         }
         if (result.size() > 0) {
 
@@ -1105,21 +1092,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             fetchRoute(src, result.get(0).coordonnees, true);
             fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
-            addDestination(dst, "From current to destination: " + "\n" + (int)Math.round(g.cost(g, source, destination)/60) + "minutes");
+            addSource(src, "From current location to " + result.get(0).nomFr + ":\n" + (int) Math.round(g.cost(g, source, path.get(1))));
 
-            addSource(src, "From current location to " + result.get(0).nomFr + ":\n" + (int)Math.round(g.cost(g, source, path.get(1))));
-
+            //1ère station to Size()-1
             for (int i = 0; i < result.size() - 1; i++) {
                 if (result.get(i).type.equals("tramway"))
-                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int)Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
+                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
                 else
-                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int)Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
+                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
             }
+
+            //Dernière station to Destination
             if (result.get(result.size() - 1).type.equals("tramway"))
                 addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
-                        (int)Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "tramway");
-            else addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
-                    (int)Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "bus");
+                        (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "tramway");
+            else
+                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
+                        (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "bus");
+
+            addDestination(dst, "From current to destination: " + "\n" + (int) Math.round(g.cost(g, source, destination) / 60) + "minutes");
         }
         //
         else {
@@ -1247,6 +1238,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchStations.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+
                 return false;
             }
 
@@ -1302,7 +1295,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pointSource.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
+                navigationSource.setVisibility(View.INVISIBLE);
+                searchStations.setVisibility(View.INVISIBLE);
+                navigationDestination.setVisibility(View.INVISIBLE);
 
                 return false;
             }
@@ -1352,6 +1347,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         pointDestination.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+
+                navigationSource.setVisibility(View.INVISIBLE);
+                searchStations.setVisibility(View.INVISIBLE);
+                navigationDestination.setVisibility(View.INVISIBLE);
                 return false;
             }
 

@@ -96,7 +96,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_lignes"
         android:orientation="horizontal"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
         app:layout_constraintTop_toTopOf="@id/horGuideline40">
 
