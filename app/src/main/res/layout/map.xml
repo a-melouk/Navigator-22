@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -15,48 +16,111 @@
         app:layout_constraintTop_toTopOf="@id/horGuideline8" />
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horGuideline10">
 
-        <SearchView
-            android:id="@+id/stationSource"
-            android:layout_width="350dp"
-            android:layout_height="40dp"
-
+        <RelativeLayout
+            android:id="@+id/searchViews"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="70dp"
-            android:layout_marginRight="20dp"
-            android:queryHint="Source"
-            android:searchIcon="@drawable/pin_source"
-            android:visibility="invisible"
-            app:theme="@style/SearchViewStyle" />
+            android:background="@drawable/rounded_lignes"
+            android:visibility="visible">
 
-        <SearchView
-            android:id="@+id/stationDestination"
-            android:layout_width="350dp"
-            android:layout_height="40dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="113dp"
-            android:layout_marginRight="20dp"
-            android:queryHint="Destination"
-            android:searchIcon="@drawable/pin_destination"
-            android:visibility="invisible"
-            app:theme="@style/SearchViewStyle" />
+            <SearchView
+                android:id="@+id/stationSource"
+                android:layout_width="350dp"
+                android:layout_height="40dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:queryHint="Source"
+                android:searchIcon="@drawable/pin_source"
+                android:visibility="invisible"
+                app:theme="@style/SearchViewStyle" />
+
+            <SearchView
+                android:id="@+id/stationDestination"
+                android:layout_width="350dp"
+                android:layout_height="40dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="55dp"
+                android:layout_marginRight="10dp"
+
+                android:queryHint="Destination"
+                android:searchIcon="@drawable/pin_destination"
+                android:visibility="invisible"
+                app:theme="@style/SearchViewStyle" />
+
+            <ImageView
+                android:id="@+id/mean_walk"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:src="@drawable/mean_walk" />
+
+            <ImageView
+                android:id="@+id/mean_tramway"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_walk"
+                android:src="@drawable/mean_tram" />
+
+            <ImageView
+                android:id="@+id/mean_bus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_tramway"
+                android:src="@drawable/mean_bus" />
+
+            <ImageView
+                android:id="@+id/mean_car"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_bus"
+                android:src="@drawable/mean_car" />
+
+            <Button
+                android:id="@+id/start"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignTop="@+id/mean_car"
+                android:layout_alignBottom="@+id/mean_car"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="-4dp"
+                android:text="Start" />
+        </RelativeLayout>
 
         <ListView
             android:id="@+id/searchStationList"
             android:layout_width="280dp"
             android:layout_height="70dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="56dp" />
+            android:layout_centerHorizontal="true" />
 
         <ListView
             android:id="@+id/source"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_below="@id/stationDestination"
+            android:layout_below="@id/searchViews"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp" />
 
@@ -64,9 +128,10 @@
             android:id="@+id/destination"
             android:layout_width="350dp"
             android:layout_height="60dp"
-            android:layout_below="@id/stationDestination"
+            android:layout_below="@id/searchViews"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp" />
+
     </RelativeLayout>
 
     <ImageView
@@ -254,6 +319,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.08" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline40"

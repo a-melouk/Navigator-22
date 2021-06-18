@@ -22,6 +22,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -103,9 +104,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     Marker draggableMarker, markerRouting;
 
     ImageView currentPosition, reset;
-    RelativeLayout menu_linear;
+    RelativeLayout menu_linear, navigationSearchViews;
     ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car, bus, tram;
+    ImageView mean_walk, mean_car, mean_bus, mean_tram;
+    Button start;
     ListView searchStations, navigationSource, navigationDestination;
     NavigationView navigationView;
 
@@ -113,8 +116,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero",
             new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero",
             new GeoPoint(0.0, 0.0)), 0.0, 0.0);
-    public GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
+    GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
+    GeoPoint navigationSrc = new GeoPoint(0.0, 0.0);
+    GeoPoint navigationDst = new GeoPoint(0.0, 0.0);
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
@@ -220,7 +225,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         walk = findViewById(R.id.walk);
         bus = findViewById(R.id.bus);
         tram = findViewById(R.id.tram);
+
+        mean_walk = findViewById(R.id.mean_walk);
+        mean_tram = findViewById(R.id.mean_tramway);
+        mean_bus = findViewById(R.id.mean_bus);
+        mean_car = findViewById(R.id.mean_car);
+        start = findViewById(R.id.start);
         menu_linear = findViewById(R.id.menu_linear);
+        navigationSearchViews = findViewById(R.id.searchViews);
         arrow_down = findViewById(R.id.arrow_down);
         arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
@@ -554,6 +566,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUpList();
         initSearch();
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocation();
+                navigation(navigationSrc, navigationDst, "walk");
+            }
+        });
 //        navigation(currentLocation,currentLocation,"All");
     }
 
@@ -910,8 +929,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ArrayList<Station> result = new ArrayList<>();
         int time;
         int bis = 0;
-
-        if (mean.toLowerCase().equals("tramway")) {
+        if (mean.toLowerCase().equals("walk")) {
+            fetchRoute(src, dst, true);
+        }
+        //
+        else if (mean.toLowerCase().equals("tramway")) {
             source = new Vertex("Current");
             destination = new Vertex("Destination");
             g.edges.clear();
@@ -1185,7 +1207,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             intent.putExtras(send);
             MainActivity.this.startActivity(intent);
         } else if (item.getItemId() == R.id.bestChoice) {
-
+            navigationSearchViews.setVisibility(View.VISIBLE);
             stationSource();
             stationDestination();
             draggableMarker = new Marker(myMap);
@@ -1304,7 +1326,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
+                navigationSource.setVisibility(View.VISIBLE);
+                searchStations.setVisibility(View.INVISIBLE);
+                navigationDestination.setVisibility(View.INVISIBLE);
                 ArrayList<Station> stations = new ArrayList<>();
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
@@ -1320,6 +1344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     myMap.invalidate();
                     customOverlays.add(new CustomOverlay("searchSource", source));
                     pointSource.setQuery(o.nomFr, true);
+                    navigationSrc = o.coordonnees;
 
                 });
                 return true;
@@ -1356,7 +1381,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public boolean onQueryTextChange(String newText) {
-
+                navigationDestination.setVisibility(View.VISIBLE);
+                searchStations.setVisibility(View.INVISIBLE);
+                navigationSource.setVisibility(View.INVISIBLE);
                 ArrayList<Station> stations = new ArrayList<>();
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
@@ -1374,6 +1401,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     myMap.invalidate();
                     customOverlays.add(new CustomOverlay("searchDestination", destination));
                     pointDestination.setQuery(o.nomFr, true);
+                    navigationDst = o.coordonnees;
                 });
                 return false;
             }
