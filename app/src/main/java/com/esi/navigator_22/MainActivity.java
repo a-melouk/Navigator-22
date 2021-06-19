@@ -24,6 +24,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car, bus, tram;
     ImageView mean_walk, mean_car, mean_bus, mean_tram,the_best_time;
+    ImageButton close;
     Button start;
     ListView searchStations, navigationSource, navigationDestination;
     NavigationView navigationView;
@@ -233,6 +235,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mean_car = findViewById(R.id.mean_car);
         the_best_time = findViewById(R.id.the_best_time);
         start = findViewById(R.id.start);
+        close = findViewById(R.id.close);
         menu_linear = findViewById(R.id.menu_linear);
         navigationSearchViews = findViewById(R.id.searchViews);
         arrow_down = findViewById(R.id.arrow_down);
@@ -644,11 +647,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setUpList();
         initSearch();
 
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigationSearchViews.setVisibility(View.INVISIBLE);
+            }
+        });
+
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getLocation();
-
+                myMap.setVisibility(0);
                 if (mean_walk.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "walk", true);
                 else if (mean_tram.isSelected())
@@ -658,7 +668,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
-                    navigation(srcCoord,dstCoord,"All");
+                    navigation(srcCoord,dstCoord,"buses");
             }
         });
     }
@@ -1219,15 +1229,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (path.get(k).name.equals(allStations.get(i).numero))
                         result.add(allStations.get(i));
         }
+        //
         if (result.size() > 0) {
 
-            if (result.get(0).type.equals("tramway")) {
+            if (mean.equals("tramway")) {
                 Log.d("RouteeeTram", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                Log.d("Khrat","Khrat1");
                 getBestRoute(
                         adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
-            } else {
+            } else if (mean.equals("bus")) {
                 getBestRoute(
                         adresse + "result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
@@ -1236,27 +1248,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
             }
+            else if (mean.equals("buses")) {
+
+            }
             fetchRoute(src, result.get(0).coordonnees, true);
             fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
-            addSource(src, "From current location to " + result.get(0).nomFr + ":\n" + (int) Math.round(g.cost(g, source, path.get(1))));
+            Log.d("Khrat","Khrat2");
+            addSource(src, "From current location to \n" + result.get(0).nomFr + ":\n" + (int) Math.round(g.cost(g, source, path.get(1))));
 
             //1ère station to Size()-1
             for (int i = 0; i < result.size() - 1; i++) {
                 if (result.get(i).type.equals("tramway"))
-                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
+                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to \n" + path.get(i + 2).name + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
                 else
-                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to " + path.get(i + 2).name + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
+                    addPin(result.get(i).coordonnees, path.get(i + 1).name + " to \n" + path.get(i + 2).name + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
             }
 
             //Dernière station to Destination
             if (result.get(result.size() - 1).type.equals("tramway"))
-                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
+                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to \n" + path.get(path.size() - 1).name + ":\n" +
                         (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "tramway");
             else
-                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to " + path.get(path.size() - 1).name + ":\n" +
+                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to \n" + path.get(path.size() - 1).name + ":\n" +
                         (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "bus");
-
+            Log.d("Khrat","Khrat3");
             addDestination(dst, "From current to destination: " + "\n" + (int) Math.round(g.cost(g, source, destination) / 60) + "minutes");
+            Log.d("Khrat","Khrat4");
         }
         //
         else {

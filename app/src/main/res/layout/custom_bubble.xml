@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="60dp"
+    android:layout_width="100dp"
+    android:layout_height="45dp"
     android:background="@drawable/info_window"
     android:orientation="horizontal"
     android:alpha="0.8">
@@ -12,13 +12,12 @@
         android:layout_height="wrap_content"
         android:maxHeight="45dp"
         android:layout_gravity="center"
-        android:layout_weight="1"
         android:gravity="center"
         android:maxLines="3"
         android:padding="3dp"
         android:text="Station\naaaaa"
         android:textColor="#FFFFFF"
-        android:textSize="13dp" />
+        android:textSize="13sp" />
 
 
 </RelativeLayout>
