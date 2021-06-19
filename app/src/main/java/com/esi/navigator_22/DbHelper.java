@@ -333,14 +333,11 @@ public class DbHelper extends SQLiteOpenHelper {
 
     ArrayList<MatriceLine> getAllLines() {
         ArrayList<MatriceLine> lines = new ArrayList<>();
-
-
         String selectQuery = "SELECT * FROM " + TABLE_Matrice + " ORDER BY " + COLUMN_NUMERODEPART + "," + COLUMN_NUMEROARRIVE;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery(selectQuery, null);
         if (c.moveToFirst()) {
             do {
-
                 GeoPoint g = new GeoPoint(0.0, 0.0);
                 Station s1 = new Station();
                 Station s2 = new Station();
@@ -369,10 +366,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
     ArrayList<TramwayMatrixLine> getAllTramwayLines() {
         ArrayList<TramwayMatrixLine> lines = new ArrayList<>();
-
-        int compteur = 0;
-
-
         String selectQuery = "SELECT * FROM " + TABLE_Matrice + " WHERE " + COLUMN_TYPEDEPART + "= \"tramway\"" + " " +
                 "AND " + COLUMN_TYPEARRIVE + " =\"tramway\"" +
                 " ORDER BY " + COLUMN_NUMERODEPART + "," + COLUMN_NUMEROARRIVE;

@@ -48,6 +48,14 @@ public class Graph {
         return b;
     }
 
+    public Vertex getVertex(String numero) {
+        Vertex b = new Vertex();
+        for (Vertex vertex : vertices) {
+            if (vertex.name.equals(numero)) b = vertex;
+        }
+        return b;
+    }
+
     public void calculate(Vertex source) {
         // Algo:
         // 1. Take the unvisited node with minimum weight.

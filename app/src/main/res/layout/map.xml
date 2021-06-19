@@ -64,17 +64,21 @@
                 android:layout_below="@id/stationDestination"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
+
                 android:layout_marginBottom="10dp"
+                android:padding="4dp"
                 android:src="@drawable/mean_walk" />
 
             <ImageView
                 android:id="@+id/mean_tramway"
                 android:layout_width="30dp"
+
                 android:layout_height="30dp"
                 android:layout_below="@id/stationDestination"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_toEndOf="@id/mean_walk"
+                android:padding="4dp"
                 android:src="@drawable/mean_tram" />
 
             <ImageView
@@ -85,6 +89,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_toEndOf="@id/mean_tramway"
+                android:padding="4dp"
                 android:src="@drawable/mean_bus" />
 
             <ImageView
@@ -95,7 +100,20 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:layout_toEndOf="@id/mean_bus"
+                android:padding="4dp"
                 android:src="@drawable/mean_car" />
+
+            <ImageView
+                android:id="@+id/the_best_time"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_car"
+                android:padding="4dp"
+                android:src="@drawable/icon_time" />
 
             <Button
                 android:id="@+id/start"

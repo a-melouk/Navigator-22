@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     RelativeLayout menu_linear, navigationSearchViews;
     ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car, bus, tram;
-    ImageView mean_walk, mean_car, mean_bus, mean_tram;
+    ImageView mean_walk, mean_car, mean_bus, mean_tram,the_best_time;
     Button start;
     ListView searchStations, navigationSource, navigationDestination;
     NavigationView navigationView;
@@ -118,8 +118,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             new GeoPoint(0.0, 0.0)), 0.0, 0.0);
     GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
-    GeoPoint navigationSrc = new GeoPoint(0.0, 0.0);
-    GeoPoint navigationDst = new GeoPoint(0.0, 0.0);
+    GeoPoint srcCoord = new GeoPoint(0.0, 0.0);
+    GeoPoint dstCoord = new GeoPoint(0.0, 0.0);
+    String srcNumber, dstNumber;
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
@@ -230,6 +231,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mean_tram = findViewById(R.id.mean_tramway);
         mean_bus = findViewById(R.id.mean_bus);
         mean_car = findViewById(R.id.mean_car);
+        the_best_time = findViewById(R.id.the_best_time);
         start = findViewById(R.id.start);
         menu_linear = findViewById(R.id.menu_linear);
         navigationSearchViews = findViewById(R.id.searchViews);
@@ -563,17 +565,102 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             bus.setBackground(null);
         });
 
+        mean_walk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mean_walk.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_walk.setSelected(true);
+                mean_tram.setBackground(null);
+                mean_bus.setBackground(null);
+                mean_car.setBackground(null);
 
+                mean_tram.setSelected(false);
+                mean_bus.setSelected(false);
+                mean_car.setSelected(false);
+                the_best_time.setSelected(false);
+                the_best_time.setBackground(null);
+            }
+        });
+        mean_tram.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mean_tram.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_tram.setSelected(true);
+                mean_walk.setBackground(null);
+                mean_bus.setBackground(null);
+                mean_car.setBackground(null);
+                mean_walk.setSelected(false);
+                mean_bus.setSelected(false);
+                mean_car.setSelected(false);
+                the_best_time.setSelected(false);
+                the_best_time.setBackground(null);
+            }
+        });
+        mean_bus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mean_bus.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_bus.setSelected(true);
+                mean_tram.setBackground(null);
+                mean_walk.setBackground(null);
+                mean_car.setBackground(null);
+                mean_walk.setSelected(false);
+                mean_tram.setSelected(false);
+                mean_car.setSelected(false);
+                the_best_time.setSelected(false);
+                the_best_time.setBackground(null);
+            }
+        });
+        mean_car.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mean_car.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_car.setSelected(true);
+                mean_tram.setBackground(null);
+                mean_bus.setBackground(null);
+                mean_walk.setBackground(null);
+                mean_walk.setSelected(false);
+                mean_bus.setSelected(false);
+                mean_tram.setSelected(false);
+                the_best_time.setSelected(false);
+                the_best_time.setBackground(null);
+            }
+        });
+        the_best_time.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                the_best_time.setBackgroundResource(R.drawable.rounded_lignes);
+                the_best_time.setSelected(true);
+                mean_tram.setBackground(null);
+                mean_bus.setBackground(null);
+                mean_walk.setBackground(null);
+                mean_walk.setSelected(false);
+                mean_bus.setSelected(false);
+                mean_tram.setSelected(false);
+                mean_car.setSelected(false);
+                mean_car.setBackground(null);
+            }
+        });
         setUpList();
         initSearch();
+
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getLocation();
-                navigation(navigationSrc, navigationDst, "walk");
+
+                if (mean_walk.isSelected())
+                    fetchRouteByMean(srcCoord, dstCoord, "walk", true);
+                else if (mean_tram.isSelected())
+                    navigation(srcCoord, dstCoord, "tramway");
+                else if (mean_bus.isSelected())
+                    navigation(srcCoord, dstCoord, "bus");
+                else if (mean_car.isSelected())
+                    fetchRouteByMean(srcCoord, dstCoord, "car", true);
+                else if (the_best_time.isSelected())
+                    navigation(srcCoord,dstCoord,"All");
             }
         });
-//        navigation(currentLocation,currentLocation,"All");
     }
 
     public int removeAfter(String a) {
@@ -1040,6 +1127,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             result = busNavigation(src, dst, stationsBus27);
         }
         //
+        else if (mean.equals("bus")) {
+            source = new Vertex("Current");
+            destination = new Vertex("Destination");
+            g.edges.clear();
+            g.getVertices().clear();
+
+            for (int i = 0; i < stationsBus.size(); i++) {
+                g.addVertex(stationsBus.get(i).numero);
+            }
+
+            g.addVertex(source);
+            g.addVertex(destination);
+            int walk = 0;
+            for (int compteur = 0; compteur < allStations.size(); compteur++) {
+                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                    if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
+                        g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
+                    }
+                    walk++;
+                    if (walk == 6441) walk = 0;
+                }
+            }
+            addBusNavigation(stationsBus3);
+            addBusNavigation(stationsBus3bis);
+            addBusNavigation(stationsBus11);
+            addBusNavigation(stationsBus16);
+            addBusNavigation(stationsBus17);
+            addBusNavigation(stationsBus22);
+            addBusNavigation(stationsBus25);
+            addBusNavigation(stationsBus27);
+            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+            for (int k = 1; k < path.size() - 1; k++)
+                for (int i = 0; i < stationsBus.size(); i++)
+                    if (path.get(k).name.equals(stationsBus.get(i).numero))
+                        result.add(stationsBus.get(i));
+        }
+        //
         else if (mean.equals("All")) {
             source = new Vertex("Current");
             destination = new Vertex("Destination");
@@ -1089,10 +1213,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus25);
             addBusNavigation(stationsBus27);
 
-            path = g.affichage(g, g.getVertex(7), g.getVertex(86));
+            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
             for (int k = 1; k < path.size() - 1; k++)
                 for (int i = 0; i < allStations.size(); i++)
-                    if (path.get(k).name.equals(allStations.get(i).nomFr))
+                    if (path.get(k).name.equals(allStations.get(i).numero))
                         result.add(allStations.get(i));
         }
         if (result.size() > 0) {
@@ -1137,6 +1261,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
         else {
             fetchRoute(src, dst, true);
+            Log.d("Mefihech","mefihech");
         }
 
 
@@ -1344,7 +1469,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     myMap.invalidate();
                     customOverlays.add(new CustomOverlay("searchSource", source));
                     pointSource.setQuery(o.nomFr, true);
-                    navigationSrc = o.coordonnees;
+                    srcCoord = o.coordonnees;
+                    srcNumber = o.numero;
 
                 });
                 return true;
@@ -1401,7 +1527,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     myMap.invalidate();
                     customOverlays.add(new CustomOverlay("searchDestination", destination));
                     pointDestination.setQuery(o.nomFr, true);
-                    navigationDst = o.coordonnees;
+                    dstCoord = o.coordonnees;
+                    dstNumber = o.numero;
                 });
                 return false;
             }
@@ -2129,6 +2256,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String distanceTo = "km " + dist + " كم";
         String timeTo = "minutes " + duration + " دقيقة";
         return distanceTo + "\n" + timeTo;
+    }
+
+    void fetchRouteByMean(GeoPoint start, GeoPoint end, String mean, boolean draw) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        if (mean.equals("car"))
+            roadManager.addRequestOption("vehicle=car");
+        else if (mean.equals("walk"))
+            roadManager.addRequestOption("vehicle=foot");
+        Road road = roadManager.getRoad(roadPoints);
+        Polyline route;
+        if (road.mLength == 0) {
+            distanceTo = getDistanceOffline(start, end);
+            timeTo = 99999.0;
+            Toast.makeText(getApplicationContext(), "Route indisponible", Toast.LENGTH_LONG).show();
+        }
+        if (draw)
+            if (mean.equals("car")) {
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
+                myMap.getOverlays().add(route);
+            } else if (mean.equals("walk")) {
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.green), 10.0f);
+                myMap.getOverlays().add(route);
+            }
+
 
     }
 

@@ -18,11 +18,6 @@ public class MatriceLine {
 
     @Override
     public String toString() {
-        return "MatriceLine{" +
-                "stationSource=" + stationSource +
-                ", stationDestination=" + stationDestination +
-                ", distance=" + distance +
-                ", time=" + time +
-                '}';
+        return "MatriceLine{" + stationSource.numero + ", " + stationDestination.numero + ", " + distance + ", " + time + '}';
     }
 }
