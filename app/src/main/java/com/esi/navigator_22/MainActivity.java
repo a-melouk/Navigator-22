@@ -653,7 +653,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 else if (mean_tram.isSelected())
                     navigation(srcCoord, dstCoord, "tramway");
                 else if (mean_bus.isSelected())
-                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
+//                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
+                    navigation(srcCoord, dstCoord, "buses");
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
@@ -728,15 +729,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
             }
             g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
-            Log.d("TramwayError", g.getVertex(srcNumber) + " | " + g.getVertex(dstNumber));
-            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
 
 
-            for (int k = 1; k < path.size(); k++)
-                for (int i = 0; i < stationsTramway.size(); i++)
-                    if (path.get(k).name.equals(stationsTramway.get(i).numero))
-                        result.add(stationsTramway.get(i));
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < stationsTramway.size(); i++)
+                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
+                            result.add(stationsTramway.get(i));
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+
 
         }
         //
@@ -778,18 +782,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++) {
                 g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
             }
-
             g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
-            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-            for (int k = 1; k < path.size(); k++) {
-                for (int i = 0; i < stationsBus3.size(); i++)
-                    if (path.get(k).name.equals(stationsBus3.get(i).numero))
-                        result.add(stationsBus3.get(i));
-                for (int i = 0; i < stationsBus3bis.size(); i++)
-                    if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
-                        result.add(stationsBus3bis.get(i));
-            }
+
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                for (int k = 1; k < path.size(); k++) {
+                    for (int i = 0; i < stationsBus3.size(); i++)
+                        if (path.get(k).name.equals(stationsBus3.get(i).numero))
+                            result.add(stationsBus3.get(i));
+                    for (int i = 0; i < stationsBus3bis.size(); i++)
+                        if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
+                            result.add(stationsBus3bis.get(i));
+                }
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+
         }
         //
         else if (mean.equals("A11")) {
@@ -817,8 +826,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (mean.equals("buses")) {
-            source = new Vertex("Current");
-            destination = new Vertex("Destination");
+
             g.edges.clear();
             g.getVertices().clear();
 
@@ -826,8 +834,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addVertex(stationsBus.get(i).numero);
             }
 
-            g.addVertex(source);
+            /*g.addVertex(source);
             g.addVertex(destination);
+            source = new Vertex("Current");
+            destination = new Vertex("Destination");*/
             int walk = 0;
             for (int compteur = 0; compteur < allStations.size(); compteur++) {
                 for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
@@ -846,11 +856,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus22);
             addBusNavigation(stationsBus25);
             addBusNavigation(stationsBus27);
-            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            for (int k = 1; k < path.size() - 1; k++)
-                for (int i = 0; i < stationsBus.size(); i++)
-                    if (path.get(k).name.equals(stationsBus.get(i).numero))
-                        result.add(stationsBus.get(i));
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < stationsBus.size(); i++)
+                        if (path.get(k).name.equals(stationsBus.get(i).numero))
+                            result.add(stationsBus.get(i));
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
         }
         //
         else if (mean.equals("All")) {
@@ -917,7 +932,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
             }//
-            else if (result.get(0).numero.length() > 2)
+            else if (result.get(0).type.equals("bus"))
                 if (mean.equals(removeFromStart(result.get(0).numero))) {
                     getBestRoute(
                             adresse + "result/" + result.get(0).numero + "/"
@@ -994,15 +1009,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (int compteur = 0; compteur < list.size() - 1; compteur++) {
             g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
         }
-        path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-        cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
 
         result = new ArrayList<>();
-
-        for (int k = 1; k < path.size(); k++)
-            for (int i = 0; i < list.size(); i++)
-                if (path.get(k).name.equals(list.get(i).numero))
-                    result.add(list.get(i));
+        if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+            for (int k = 1; k < path.size(); k++)
+                for (int i = 0; i < list.size(); i++)
+                    if (path.get(k).name.equals(list.get(i).numero))
+                        result.add(list.get(i));
+        } else
+            Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
         return result;
     }
 
