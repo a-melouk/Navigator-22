@@ -638,6 +638,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 navigationSearchViews.setVisibility(View.INVISIBLE);
+                navigationDestination.setVisibility(View.INVISIBLE);
+                navigationSource.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -728,7 +730,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
             Log.d("TramwayError", g.getVertex(srcNumber) + " | " + g.getVertex(dstNumber));
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
 
 
             for (int k = 1; k < path.size(); k++)
@@ -779,7 +781,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
             for (int k = 1; k < path.size(); k++) {
                 for (int i = 0; i < stationsBus3.size(); i++)
                     if (path.get(k).name.equals(stationsBus3.get(i).numero))
@@ -899,7 +901,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus27);
 
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
             for (int k = 1; k < path.size(); k++)
                 for (int i = 0; i < allStations.size(); i++)
                     if (path.get(k).name.equals(allStations.get(i).numero))
@@ -915,21 +917,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
             }//
+            else if (result.get(0).numero.length() > 2)
+                if (mean.equals(removeFromStart(result.get(0).numero))) {
+                    getBestRoute(
+                            adresse + "result/" + result.get(0).numero + "/"
+                                    + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                    result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
+                    Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
+                            + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                            result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                } else if (mean.equals("buses")) {
 
-            else if (mean.equals(removeFromStart(result.get(0).numero))) {
-                getBestRoute(
-                        adresse + "result/" + result.get(0).numero + "/"
-                                + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
-                Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
-                        + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                        result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-            }
-            else if (mean.equals("buses")) {
+                } else if (mean.equals("All")) {
 
-            } else if (mean.equals("All")) {
-
-            }
+                }
 //            fetchRoute(src, result.get(0).coordonnees, true);
 //            fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
 //            addSource(src, "From current location to \n" + result.get(0).nomFr + ":\n" + (int) Math.round(g.cost(g, source, path.get(1))));
@@ -944,9 +945,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
             if (result.get(result.size() - 1).type.equals("tramway"))
-                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost+" minutes", "tramway");
+                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "tramway");
             else {
-                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost+" minutes", "bus");
+                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "bus");
                 Log.d("TracerBus", "Ouaiiiis");
             }
 
@@ -994,7 +995,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
         }
         path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-        cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
+        cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
 
         result = new ArrayList<>();
 
@@ -2189,13 +2190,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (mean.equals("car")) {
                 route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
                 myMap.getOverlays().add(route);
-                addSource(start,Math.round(road.mDuration/60)+" minutes");
-                addDestination(end,Math.round(road.mDuration/60)+" minutes");
+                addSource(start, Math.round(road.mDuration / 60) + " minutes");
+                addDestination(end, Math.round(road.mDuration / 60) + " minutes");
             } else if (mean.equals("walk")) {
                 route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.green), 10.0f);
                 myMap.getOverlays().add(route);
-                addSource(start,Math.round(road.mDuration/60)+" minutes");
-                addDestination(end,Math.round(road.mDuration/60)+" minutes");
+                addSource(start, Math.round(road.mDuration / 60) + " minutes");
+                addDestination(end, Math.round(road.mDuration / 60) + " minutes");
             }
 
 
