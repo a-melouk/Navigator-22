@@ -691,6 +691,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int bis = 0;
         if (mean.toLowerCase().equals("walk")) {
             fetchRoute(src, dst, true);
+//            addSource(srcCoord, srcNumber);
+//            addDestination(dstCoord, dstNumber + "\n " + fetchTime(src, dst));
         }
         //
         else if (mean.toLowerCase().equals("tramway")) {
@@ -724,8 +726,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
             }
             g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+            Log.d("TramwayError", g.getVertex(srcNumber) + " | " + g.getVertex(dstNumber));
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
 
 
             for (int k = 1; k < path.size(); k++)
@@ -776,7 +779,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
             for (int k = 1; k < path.size(); k++) {
                 for (int i = 0; i < stationsBus3.size(); i++)
                     if (path.get(k).name.equals(stationsBus3.get(i).numero))
@@ -896,7 +899,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             addBusNavigation(stationsBus27);
 
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
             for (int k = 1; k < path.size(); k++)
                 for (int i = 0; i < allStations.size(); i++)
                     if (path.get(k).name.equals(allStations.get(i).numero))
@@ -913,7 +916,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
             }//
 
-/*            else if (mean.equals(removeFromStart(result.get(0).numero))) {
+            else if (mean.equals(removeFromStart(result.get(0).numero))) {
                 getBestRoute(
                         adresse + "result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
@@ -921,11 +924,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-            }*/
+            }
             else if (mean.equals("buses")) {
 
-            }
-            else if (mean.equals("All")) {
+            } else if (mean.equals("All")) {
 
             }
 //            fetchRoute(src, result.get(0).coordonnees, true);
@@ -942,12 +944,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
             if (result.get(result.size() - 1).type.equals("tramway"))
-                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost, "tramway");
+                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost+" minutes", "tramway");
             else {
-                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost, "bus");
-                Log.d("TracerBus","Ouaiiiis");
+                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost+" minutes", "bus");
+                Log.d("TracerBus", "Ouaiiiis");
             }
-
 
 
             //Dernière station to Destination
@@ -961,7 +962,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else {
-            fetchRoute(src, dst, true);
+//            fetchRoute(src, dst, true);
             Log.d("Routeee", "mefihech");
         }
 
@@ -993,7 +994,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 150);
         }
         path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-        cost = g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+        cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber))/60);
 
         result = new ArrayList<>();
 
@@ -1014,7 +1015,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
-
 
 
     //Menu Navigation
@@ -1344,7 +1344,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
     }
-
 
 
     @Override
@@ -2135,6 +2134,111 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.showInfoWindow();
     }
 
+    //Get road points and details
+    String fetchRoute(GeoPoint start, GeoPoint end, boolean draw) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        if (car.isSelected())
+            roadManager.addRequestOption("vehicle=car");
+        else roadManager.addRequestOption("vehicle=foot");
+
+
+        Road road = roadManager.getRoad(roadPoints);
+        Polyline route;
+        if (road.mLength == 0) {
+            distanceTo = getDistanceOffline(start, end);
+            timeTo = 99999.0;
+            return "Route indisponible";
+        }
+        if (draw) {
+            if (car.isSelected())
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
+            else
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.black), 10.0f);
+
+            myMap.getOverlays().add(route);
+        }
+        String duration = format(road.mDuration / 60);
+        String dist = format(road.mLength);
+        String distanceTo = "km " + dist + " كم";
+        String timeTo = "minutes " + duration + " دقيقة";
+        return distanceTo + "\n" + timeTo;
+    }
+
+    void fetchRouteByMean(GeoPoint start, GeoPoint end, String mean, boolean draw) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        if (mean.equals("car"))
+            roadManager.addRequestOption("vehicle=car");
+        else if (mean.equals("walk"))
+            roadManager.addRequestOption("vehicle=foot");
+        Road road = roadManager.getRoad(roadPoints);
+        Polyline route;
+        if (road.mLength == 0) {
+            distanceTo = getDistanceOffline(start, end);
+            timeTo = 99999.0;
+            Toast.makeText(getApplicationContext(), "Route indisponible", Toast.LENGTH_LONG).show();
+        }
+        if (draw)
+            if (mean.equals("car")) {
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
+                myMap.getOverlays().add(route);
+                addSource(start,Math.round(road.mDuration/60)+" minutes");
+                addDestination(end,Math.round(road.mDuration/60)+" minutes");
+            } else if (mean.equals("walk")) {
+                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.green), 10.0f);
+                myMap.getOverlays().add(route);
+                addSource(start,Math.round(road.mDuration/60)+" minutes");
+                addDestination(end,Math.round(road.mDuration/60)+" minutes");
+            }
+
+
+    }
+
+    double fetchDistance(GeoPoint start, GeoPoint end) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        roadManager.addRequestOption("vehicle=foot");
+
+        Road road = roadManager.getRoad(roadPoints);
+        if (road.mLength == 0) {
+            return getDistanceOffline(start, end);
+        }
+        return road.mLength;
+
+    }
+
+    double fetchTime(GeoPoint start, GeoPoint end) {
+        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
+        getLocation();
+        roadPoints.add((start));
+        roadPoints.add(end);
+        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
+        roadManager.addRequestOption("vehicle=foot");
+        Road road = roadManager.getRoad(roadPoints);
+        if (road.mLength == 0) {
+            return 99999;
+        }
+        return road.mDuration / 60;
+
+    }
+
+    private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
+        float[] distance = new float[2];
+        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
+                targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
+        return distance[0];
+    }
+
     public void addStationTramway(MapView mapMarker, GeoPoint positionMarker, String nomFrMarker) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
@@ -2256,107 +2360,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mapView.getOverlayManager().add(line);
         customOverlays.add(customOverlays.size(), new CustomOverlay(numero, line));
         mapView.invalidate();
-    }
-
-    //Get road points and details
-    String fetchRoute(GeoPoint start, GeoPoint end, boolean draw) {
-        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
-        roadPoints.add((start));
-        roadPoints.add(end);
-        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
-        if (car.isSelected())
-            roadManager.addRequestOption("vehicle=car");
-        else roadManager.addRequestOption("vehicle=foot");
-
-
-        Road road = roadManager.getRoad(roadPoints);
-        Polyline route;
-        if (road.mLength == 0) {
-            distanceTo = getDistanceOffline(start, end);
-            timeTo = 99999.0;
-            return "Route indisponible";
-        }
-        if (draw) {
-            if (car.isSelected())
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
-            else
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.black), 10.0f);
-
-            myMap.getOverlays().add(route);
-        }
-        String duration = format(road.mDuration / 60);
-        String dist = format(road.mLength);
-        String distanceTo = "km " + dist + " كم";
-        String timeTo = "minutes " + duration + " دقيقة";
-        return distanceTo + "\n" + timeTo;
-    }
-
-    void fetchRouteByMean(GeoPoint start, GeoPoint end, String mean, boolean draw) {
-        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
-        roadPoints.add((start));
-        roadPoints.add(end);
-        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
-        if (mean.equals("car"))
-            roadManager.addRequestOption("vehicle=car");
-        else if (mean.equals("walk"))
-            roadManager.addRequestOption("vehicle=foot");
-        Road road = roadManager.getRoad(roadPoints);
-        Polyline route;
-        if (road.mLength == 0) {
-            distanceTo = getDistanceOffline(start, end);
-            timeTo = 99999.0;
-            Toast.makeText(getApplicationContext(), "Route indisponible", Toast.LENGTH_LONG).show();
-        }
-        if (draw)
-            if (mean.equals("car")) {
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
-                myMap.getOverlays().add(route);
-            } else if (mean.equals("walk")) {
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.green), 10.0f);
-                myMap.getOverlays().add(route);
-            }
-
-
-    }
-
-    double fetchDistance(GeoPoint start, GeoPoint end) {
-        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
-        roadPoints.add((start));
-        roadPoints.add(end);
-        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
-        roadManager.addRequestOption("vehicle=foot");
-
-        Road road = roadManager.getRoad(roadPoints);
-        if (road.mLength == 0) {
-            return getDistanceOffline(start, end);
-        }
-        return road.mLength;
-
-    }
-
-    double fetchTime(GeoPoint start, GeoPoint end) {
-        ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
-        roadPoints.add((start));
-        roadPoints.add(end);
-        RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
-        roadManager.addRequestOption("vehicle=foot");
-        Road road = roadManager.getRoad(roadPoints);
-        if (road.mLength == 0) {
-            return 99999;
-        }
-        return road.mDuration / 60;
-
-    }
-
-    private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
-        float[] distance = new float[2];
-        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
-                targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
-        return distance[0];
     }
 
     //Clean Map from all markers and polylines
