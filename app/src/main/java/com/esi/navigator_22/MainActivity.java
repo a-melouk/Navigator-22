@@ -227,8 +227,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         tramway = findViewById(R.id.tramway);
         car = findViewById(R.id.car);
         walk = findViewById(R.id.walk);
-        bus = findViewById(R.id.bus);
-        tram = findViewById(R.id.tram);
+//        bus = findViewById(R.id.bus);
+//        tram = findViewById(R.id.tram);
 
         mean_walk = findViewById(R.id.mean_walk);
         mean_tram = findViewById(R.id.mean_tramway);
@@ -518,12 +518,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             walk.setSelected(true);
             car.setSelected(false);
             car.setBackground(null);
-            tram.setSelected(false);
-            tram.setBackground(null);
-            bus.setSelected(false);
-            bus.setBackground(null);
+//            tram.setSelected(false);
+//            tram.setBackground(null);
+//            bus.setSelected(false);
+//            bus.setBackground(null);
         });
-        tram.setOnClickListener(v -> {
+        car.setOnClickListener(v -> {
+            car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            car.setSelected(true);
+            walk.setSelected(false);
+            walk.setBackground(null);
+//            tram.setSelected(false);
+//            tram.setBackground(null);
+//            bus.setSelected(false);
+//            bus.setBackground(null);
+        });
+/*        tram.setOnClickListener(v -> {
             tram.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
             tram.setSelected(true);
             car.setSelected(false);
@@ -542,17 +552,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             tram.setBackground(null);
             walk.setSelected(false);
             walk.setBackground(null);
-        });
-        car.setOnClickListener(v -> {
-            car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
-            car.setSelected(true);
-            walk.setSelected(false);
-            walk.setBackground(null);
-            tram.setSelected(false);
-            tram.setBackground(null);
-            bus.setSelected(false);
-            bus.setBackground(null);
-        });
+        });*/
 
         mean_walk.setOnClickListener(new View.OnClickListener() {
             @Override

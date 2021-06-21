@@ -35,16 +35,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:layout_marginEnd="10dp"
                 android:layout_marginTop="3dp"
+                android:layout_marginEnd="10dp"
+
                 android:elevation="2dp"
                 android:src="@drawable/icon_close" />
 
             <SearchView
-                android:layout_below="@id/close"
                 android:id="@+id/stationSource"
                 android:layout_width="350dp"
                 android:layout_height="40dp"
+                android:layout_below="@id/close"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
@@ -57,11 +58,11 @@
                 android:id="@+id/stationDestination"
                 android:layout_width="350dp"
                 android:layout_height="40dp"
+                android:layout_below="@id/stationSource"
                 android:layout_centerHorizontal="true"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:layout_marginRight="10dp"
-                android:layout_below="@id/stationSource"
 
                 android:queryHint="Destination"
                 android:searchIcon="@drawable/pin_destination"
@@ -295,7 +296,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="6dp"
             android:elevation="10dp"
             android:src="@drawable/icon_reset" />
 
@@ -303,8 +304,8 @@
             android:id="@+id/currentPosition"
             android:layout_width="40dp"
             android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
             android:layout_toStartOf="@id/reset"
-            android:elevation="10dp"
             android:src="@drawable/icon_current" />
 
         <ImageView
@@ -317,6 +318,16 @@
             android:src="@drawable/icon_car" />
 
         <ImageView
+            android:id="@+id/walk"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/car"
+            android:background="@drawable/gradient"
+            android:elevation="5dp"
+            android:src="@drawable/icon_walk" />
+
+        <!--        <ImageView
             android:id="@+id/bus"
             android:layout_width="40dp"
             android:layout_height="match_parent"
@@ -330,16 +341,7 @@
             android:layout_height="match_parent"
             android:layout_toEndOf="@id/bus"
             android:elevation="5dp"
-            android:src="@drawable/icon_tram" />
-
-        <ImageView
-            android:id="@+id/walk"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_toEndOf="@id/tram"
-            android:background="@drawable/gradient"
-            android:elevation="5dp"
-            android:src="@drawable/icon_walk" />
+            android:src="@drawable/icon_tram" />-->
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.Guideline
