@@ -22,70 +22,70 @@
         </menu>
     </item>
 
-    <item
-        android:id="@+id/test"
-        android:title="Navigation">
+<!--    <item-->
+<!--        android:id="@+id/test"-->
+<!--        android:title="Navigation">-->
 
 
-        <menu>
-            <item
-                android:id="@+id/WALK"
-                android:icon="@drawable/icon_walk"
-                android:title="Walk"
-                app:actionViewClass="android.widget.CheckBox" />
+<!--        <menu>-->
+<!--            <item-->
+<!--                android:id="@+id/WALK"-->
+<!--                android:icon="@drawable/icon_walk"-->
+<!--                android:title="Walk"-->
+<!--                app:actionViewClass="android.widget.CheckBox" />-->
 
-            <item
-                android:id="@+id/TRAMWAY"
-                android:icon="@drawable/icon_tram"
-                android:title="Tramway"
-                app:actionViewClass="android.widget.CheckBox" />
-            <item
-                android:id="@+id/les_bus"
-                android:title="Bus">
-
-
-                    <item
-                        android:id="@+id/BUSA03"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A03"
-                        app:actionViewClass="android.widget.CheckBox" />
-                    <item
-                        android:id="@+id/BUSA11"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A11"
-                        app:actionViewClass="android.widget.CheckBox" />
-                    <item
-                        android:id="@+id/BUSA16"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A16"
-                        app:actionViewClass="android.widget.CheckBox" />
-                    <item
-                        android:id="@+id/BUSA17"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A17"
-                        app:actionViewClass="android.widget.CheckBox" />
-                    <item
-                        android:id="@+id/BUSA22"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A22"
-                        app:actionViewClass="android.widget.CheckBox" />
-                    <item
-                        android:id="@+id/BUSA25"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A25"
-                        app:actionViewClass="android.widget.CheckBox" />
-                    <item
-                        android:id="@+id/BUSA27"
-                        android:icon="@drawable/icon_bus"
-                        android:title="Bus A27"
-                        app:actionViewClass="android.widget.CheckBox" />
+<!--            <item-->
+<!--                android:id="@+id/TRAMWAY"-->
+<!--                android:icon="@drawable/icon_tram"-->
+<!--                android:title="Tramway"-->
+<!--                app:actionViewClass="android.widget.CheckBox" />-->
+<!--            <item-->
+<!--                android:id="@+id/les_bus"-->
+<!--                android:title="Bus">-->
 
 
-            </item>
-        </menu>
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA03"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A03"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA11"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A11"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA16"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A16"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA17"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A17"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA22"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A22"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA25"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A25"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
+<!--                    <item-->
+<!--                        android:id="@+id/BUSA27"-->
+<!--                        android:icon="@drawable/icon_bus"-->
+<!--                        android:title="Bus A27"-->
+<!--                        app:actionViewClass="android.widget.CheckBox" />-->
 
 
-    </item>
+<!--            </item>-->
+<!--        </menu>-->
+
+
+<!--    </item>-->
 
 
 </menu>

@@ -955,7 +955,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (result.get(i).type.equals("tramway"))
                     addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
                 else
-                    addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
+                    addPin(result.get(i).coordonnees, result.get(i).nomFr+", "+   removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
             }
 
 
@@ -1039,7 +1039,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void setNavigationViewListener() {
         navigationView = findViewById(R.id.navigation_view);
         navigationView.setNavigationItemSelectedListener(this);
-        MenuItem menuItem = navigationView.getMenu().findItem(R.id.TRAMWAY);
+
+
+        /*MenuItem menuItem = navigationView.getMenu().findItem(R.id.TRAMWAY);
         CompoundButton tramway = (CompoundButton) menuItem.getActionView();
         menuItem = navigationView.getMenu().findItem(R.id.BUSA03);
         CompoundButton bus3 = (CompoundButton) menuItem.getActionView();
@@ -1360,7 +1362,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bus3.setChecked(false);
             } else {
             }
-        });
+        });*/
     }
 
 
@@ -1386,7 +1388,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationSearchViews.setVisibility(View.VISIBLE);
             stationSource();
             stationDestination();
-            draggableMarker = new Marker(myMap);
+            /*draggableMarker = new Marker(myMap);
             draggableMarker.setVisible(false);
             myMap.invalidate();
             draggableMarker.setPosition(currentLocation);
@@ -1415,7 +1417,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             myMap.getOverlays().add(draggableMarker);
 
-
+*/
         } else {
             Log.d("EnablingC", "bestroute");
         }
