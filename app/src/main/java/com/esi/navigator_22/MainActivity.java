@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     String urlRouteBus = adresse + "bus";
     String urlCorrespondance = adresse + "correspondance";
     String urlMatrice = adresse + "matrice";
-    String graphhopperkey = "ad22b4cb-e61e-40f0-a44c-86ac712b8337";
+    static String graphhopperkey = "b0bf12d1-16d3-4b69-a5dd-7b58508cc8e6";
 
     private String myResponse;
 
@@ -518,20 +518,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             walk.setSelected(true);
             car.setSelected(false);
             car.setBackground(null);
-//            tram.setSelected(false);
-//            tram.setBackground(null);
-//            bus.setSelected(false);
-//            bus.setBackground(null);
         });
         car.setOnClickListener(v -> {
             car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
             car.setSelected(true);
             walk.setSelected(false);
             walk.setBackground(null);
-//            tram.setSelected(false);
-//            tram.setBackground(null);
-//            bus.setSelected(false);
-//            bus.setBackground(null);
         });
 /*        tram.setOnClickListener(v -> {
             tram.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
