@@ -942,14 +942,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //1ère station to Size()-1
             linear_steps.removeAllViewsInLayout();
             for (int i = 0; i < result.size() - 1; i++) {
-                if (result.get(i).type.equals("tramway"))
+                if (result.get(i).type.equals("tramway")) {
                     addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
-                else
+                    TextView txt = (TextView) View.inflate(this, R.layout.step, null);
+                    txt.setText(result.get(i).nomFr + " to " + result.get(i + 1).nomFr + ": " + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))) + "\n");
+                    linear_steps.addView(txt);
+                } else {
                     addPin(result.get(i).coordonnees, result.get(i).nomFr + ", " + removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
+                    TextView txt = (TextView) View.inflate(this, R.layout.step, null);
+                    txt.setText(result.get(i).nomFr + " " + removeFromStart(result.get(i).numero) + " to " + result.get(i + 1).nomFr + " " + removeFromStart(result.get(i+1).numero) + ": " + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))) + "\n");
+                    linear_steps.addView(txt);
+                }
 
-                TextView txt = (TextView) View.inflate(this, R.layout.step, null);
-                txt.setText(result.get(i).nomFr + " to " + result.get(i + 1).nomFr + ": " + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))) + "\n");
-                linear_steps.addView(txt);
+
             }
 
 
