@@ -37,6 +37,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
@@ -111,6 +112,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageButton close;
     Button start;
     ListView searchStations, navigationSource, navigationDestination;
+    CardView choices_card;
+    RelativeLayout choices_layout;
     NavigationView navigationView;
 
     Station station = new Station();
