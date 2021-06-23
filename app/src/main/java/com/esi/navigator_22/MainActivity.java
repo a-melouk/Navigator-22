@@ -524,26 +524,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             walk.setSelected(false);
             walk.setBackground(null);
         });
-/*        tram.setOnClickListener(v -> {
-            tram.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
-            tram.setSelected(true);
-            car.setSelected(false);
-            car.setBackground(null);
-            walk.setSelected(false);
-            walk.setBackground(null);
-            bus.setSelected(false);
-            bus.setBackground(null);
-        });
-        bus.setOnClickListener(v -> {
-            bus.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
-            bus.setSelected(true);
-            car.setSelected(false);
-            car.setBackground(null);
-            tram.setSelected(false);
-            tram.setBackground(null);
-            walk.setSelected(false);
-            walk.setBackground(null);
-        });*/
 
         mean_walk.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -642,14 +622,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (mean_walk.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "walk", true);
                 else if (mean_tram.isSelected())
-                    navigation(srcCoord, dstCoord, "tramway");
+                    navigation(srcCoord, dstCoord, "tramway", "distance");
                 else if (mean_bus.isSelected())
 //                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
-                    navigation(srcCoord, dstCoord, "buses");
+                    navigation(srcCoord, dstCoord, "buses", "distance");
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
-                    navigation(srcCoord, dstCoord, "All");
+                    navigation(srcCoord, dstCoord, "All", "distance");
             }
         });
     }
@@ -678,242 +658,352 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    public void navigation(GeoPoint src, GeoPoint dst, String mean) {
+    public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
         int time;
         int bis = 0;
-        if (mean.toLowerCase().equals("walk")) {
-            fetchRoute(src, dst, true);
-//            addSource(srcCoord, srcNumber);
-//            addDestination(dstCoord, dstNumber + "\n " + fetchTime(src, dst));
-        }
-        //
-        else if (mean.toLowerCase().equals("tramway")) {
-
-            g.edges.clear();
-            g.getVertices().clear();
+        if (criteria.equals("time")) {
+            if (mean.toLowerCase().equals("tramway")) {
+                g.edges.clear();
+                g.getVertices().clear();
 //                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-            for (int i = 0; i < stationsTramway.size(); i++) {
-                g.addVertex(stationsTramway.get(i).numero);
+                int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+                for (int i = 0; i < stationsTramway.size(); i++)
+                    g.addVertex(stationsTramway.get(i).numero);
+
+                for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
+                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
+
+                g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+
+                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                    for (int k = 1; k < path.size(); k++)
+                        for (int i = 0; i < stationsTramway.size(); i++)
+                            if (path.get(k).name.equals(stationsTramway.get(i).numero))
+                                result.add(stationsTramway.get(i));
+                } else
+                    Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
             }
+            //
+            else if (mean.equals("A03")) {
+                g.getVertices().clear();
+                g.edges.clear();
+
+                for (int i = 0; i < stationsBus3.size(); i++)
+                    g.addVertex(stationsBus3.get(i).numero);
+
+                for (int i = 0; i < stationsBus3bis.size(); i++)
+                    g.addVertex(stationsBus3bis.get(i).numero);
+
+                for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
+                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
+
+                for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
+                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
+
+                g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
 
 
-
-            /*
-            //time on foot between source|destination and all tramway stations
-            source = new Vertex("Current");
-            destination = new Vertex("Destination");
-            g.addVertex(source);
-            g.addVertex(destination);
-            for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
-                g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsTramway.get(compteur).coordonnees) * 60));
-                g.addEdge(destination, g.getVertices().get(compteur), time);
-            }
-            */
-
-
-            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++) {
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
-            }
-            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
-
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < stationsTramway.size(); i++)
-                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
-                            result.add(stationsTramway.get(i));
-            } else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-
-
-        }
-        //
-        else if (mean.equals("A03")) {
-
-            g.getVertices().clear();
-            g.edges.clear();
-
-            for (int i = 0; i < stationsBus3.size(); i++) {
-                g.addVertex(stationsBus3.get(i).numero);
-            }
-            for (int i = 0; i < stationsBus3bis.size(); i++) {
-                g.addVertex(stationsBus3bis.get(i).numero);
-            }
-            /*
-            source = new Vertex("Current");
-            destination = new Vertex("Destination");
-            g.addVertex(source);
-            g.addVertex(destination);
-            for (int compteur = 0; compteur < stationsBus3.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsBus3.get(compteur).coordonnees) * 60));
-                g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsBus3.get(compteur).coordonnees) * 60));
-                g.addEdge(destination, g.getVertices().get(compteur), time);
-            }
-
-            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size(); compteur++) {
-                time = (int) Math.round((fetchTime(src, stationsBus3bis.get(bis).coordonnees) * 60));
-                g.addEdge(source, g.getVertices().get(compteur), time);
-                time = (int) Math.round((fetchTime(dst, stationsBus3bis.get(bis).coordonnees) * 60));
-                g.addEdge(destination, g.getVertices().get(compteur), time);
-                bis++;
-            }*/
-
-            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++) {
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
-
-            }
-            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++) {
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
-            }
-            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
-
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                for (int k = 1; k < path.size(); k++) {
-                    for (int i = 0; i < stationsBus3.size(); i++)
-                        if (path.get(k).name.equals(stationsBus3.get(i).numero))
-                            result.add(stationsBus3.get(i));
-                    for (int i = 0; i < stationsBus3bis.size(); i++)
-                        if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
-                            result.add(stationsBus3bis.get(i));
-                }
-            } else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-
-        }
-        //
-        else if (mean.equals("A11")) {
-            result = busNavigation(src, dst, stationsBus11, 129);
-        }
-        //
-        else if (mean.equals("A16")) {
-            result = busNavigation(src, dst, stationsBus16, 113);
-        }
-        //
-        else if (mean.equals("A17")) {
-            result = busNavigation(src, dst, stationsBus17, 125);
-        }
-        //
-        else if (mean.equals("A22")) {
-            result = busNavigation(src, dst, stationsBus22, 188);
-        }
-        //
-        else if (mean.equals("A25")) {
-            result = busNavigation(src, dst, stationsBus25, 180);
-        }
-        //
-        else if (mean.equals("A27")) {
-            result = busNavigation(src, dst, stationsBus27, 270);
-        }
-        //
-        else if (mean.equals("buses")) {
-
-            g.edges.clear();
-            g.getVertices().clear();
-
-            for (int i = 0; i < stationsBus.size(); i++) {
-                g.addVertex(stationsBus.get(i).numero);
-            }
-
-            /*g.addVertex(source);
-            g.addVertex(destination);
-            source = new Vertex("Current");
-            destination = new Vertex("Destination");*/
-            int walk = 0;
-            for (int compteur = 0; compteur < allStations.size(); compteur++) {
-                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                    if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
-                        g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
+                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                    for (int k = 1; k < path.size(); k++) {
+                        for (int i = 0; i < stationsBus3.size(); i++)
+                            if (path.get(k).name.equals(stationsBus3.get(i).numero))
+                                result.add(stationsBus3.get(i));
+                        for (int i = 0; i < stationsBus3bis.size(); i++)
+                            if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
+                                result.add(stationsBus3bis.get(i));
                     }
-                    walk++;
-                    if (walk == 6441) walk = 0;
-                }
-            }
-            addBusNavigation(stationsBus3, 120);
-            addBusNavigation(stationsBus3bis, 100);
-            addBusNavigation(stationsBus11, 129);
-            addBusNavigation(stationsBus16, 113);
-            addBusNavigation(stationsBus17, 125);
-            addBusNavigation(stationsBus22, 188);
-            addBusNavigation(stationsBus25, 180);
-            addBusNavigation(stationsBus27, 270);
+                } else
+                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
 
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+            }
+            //
+            else if (mean.equals("A11")) {
+                result = busNavigation(src, dst, stationsBus11, 129);
+            }
+            //
+            else if (mean.equals("A16")) {
+                result = busNavigation(src, dst, stationsBus16, 113);
+            }
+            //
+            else if (mean.equals("A17")) {
+                result = busNavigation(src, dst, stationsBus17, 125);
+            }
+            //
+            else if (mean.equals("A22")) {
+                result = busNavigation(src, dst, stationsBus22, 188);
+            }
+            //
+            else if (mean.equals("A25")) {
+                result = busNavigation(src, dst, stationsBus25, 180);
+            }
+            //
+            else if (mean.equals("A27")) {
+                result = busNavigation(src, dst, stationsBus27, 270);
+            }
+            //
+            else if (mean.equals("buses")) {
+                g.edges.clear();
+                g.getVertices().clear();
+
+                for (int i = 0; i < stationsBus.size(); i++)
+                    g.addVertex(stationsBus.get(i).numero);
+
+                int walk = 0;
+                for (int compteur = 0; compteur < allStations.size(); compteur++)
+                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                        if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
+                            g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
+                        }
+                        walk++;
+                        if (walk == 6441) walk = 0;
+                    }
+
+                addBusNavigation(stationsBus3, 120);
+                addBusNavigation(stationsBus3bis, 100);
+                addBusNavigation(stationsBus11, 129);
+                addBusNavigation(stationsBus16, 113);
+                addBusNavigation(stationsBus17, 125);
+                addBusNavigation(stationsBus22, 188);
+                addBusNavigation(stationsBus25, 180);
+                addBusNavigation(stationsBus27, 270);
+
+                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                    for (int k = 1; k < path.size(); k++)
+                        for (int i = 0; i < stationsBus.size(); i++)
+                            if (path.get(k).name.equals(stationsBus.get(i).numero))
+                                result.add(stationsBus.get(i));
+                } else
+                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+            }
+            //
+            else if (mean.equals("All")) {
+
+                g.edges.clear();
+                g.getVertices().clear();
+
+                for (int i = 0; i < allStations.size(); i++)
+                    g.addVertex(allStations.get(i).numero);
+
+                int walk = 0;
+                for (int compteur = 0; compteur < allStations.size(); compteur++)
+                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                        g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
+                        walk++;
+                        if (walk == 6441) walk = 0;
+                    }
+
+                ArrayList<Edge> temp = new ArrayList<>();
+                //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
+                int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+
+                for (int i = 0; i < g.edges.size(); i++)
+                    if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
+                        int sourceName = Integer.parseInt(g.edges.get(i).source.name);
+                        int targetName = Integer.parseInt(g.edges.get(i).target.name);
+                        int diff = sourceName - targetName;
+                        for (int j = 0; j < stationsTramway.size() - 1; j++)
+                            if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
+                                temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
+                    }
+
+                for (int i = 0; i < temp.size(); i++)
+                    g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
+
+                addBusNavigation(stationsBus3, 120);
+                addBusNavigation(stationsBus3bis, 100);
+                addBusNavigation(stationsBus11, 129);
+                addBusNavigation(stationsBus16, 113);
+                addBusNavigation(stationsBus17, 125);
+                addBusNavigation(stationsBus22, 188);
+                addBusNavigation(stationsBus25, 180);
+                addBusNavigation(stationsBus27, 270);
+
                 path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
                 cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
                 for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < stationsBus.size(); i++)
-                        if (path.get(k).name.equals(stationsBus.get(i).numero))
-                            result.add(stationsBus.get(i));
-            } else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+                    for (int i = 0; i < allStations.size(); i++)
+                        if (path.get(k).name.equals(allStations.get(i).numero))
+                            result.add(allStations.get(i));
+            }
         }
         //
-        else if (mean.equals("All")) {
+        else if (criteria.equals("distance")) {
+            if (mean.toLowerCase().equals("tramway")) {
+                g.edges.clear();
+                g.getVertices().clear();
 
-            g.edges.clear();
-            g.getVertices().clear();
+                for (int i = 0; i < stationsTramway.size(); i++)
+                    g.addVertex(stationsTramway.get(i).numero);
 
-            for (int i = 0; i < allStations.size(); i++) {
-                g.addVertex(allStations.get(i).numero);
+                for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
+                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+
+                g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
+
+                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                    for (int k = 1; k < path.size(); k++)
+                        for (int i = 0; i < stationsTramway.size(); i++)
+                            if (path.get(k).name.equals(stationsTramway.get(i).numero))
+                                result.add(stationsTramway.get(i));
+                } else
+                    Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
             }
+            //
+            else if (mean.equals("A03")) {
+                g.getVertices().clear();
+                g.edges.clear();
 
-            /*source = new Vertex("Current");
-            destination = new Vertex("Destination");
-            g.addVertex(source);
-            g.addVertex(destination);*/
-            int walk = 0;
-            for (int compteur = 0; compteur < allStations.size(); compteur++) {
-                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                    g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
-                    walk++;
-                    if (walk == 6441) walk = 0;
-                }
+                for (int i = 0; i < stationsBus3.size(); i++)
+                    g.addVertex(stationsBus3.get(i).numero);
+
+                for (int i = 0; i < stationsBus3bis.size(); i++)
+                    g.addVertex(stationsBus3bis.get(i).numero);
+
+                for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
+                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+
+                for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
+                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+
+                g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 104);
+
+
+                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                    for (int k = 1; k < path.size(); k++) {
+                        for (int i = 0; i < stationsBus3.size(); i++)
+                            if (path.get(k).name.equals(stationsBus3.get(i).numero))
+                                result.add(stationsBus3.get(i));
+                        for (int i = 0; i < stationsBus3bis.size(); i++)
+                            if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
+                                result.add(stationsBus3bis.get(i));
+                    }
+                } else
+                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+
             }
-            ArrayList<Edge> temp = new ArrayList<>();
-            //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-
-            for (int i = 0; i < g.edges.size(); i++) {
-                if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                    int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                    int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                    int diff = sourceName - targetName;
-                    for (int j = 0; j < stationsTramway.size() - 1; j++)
-                        if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                            temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
-                }
+            //
+            else if (mean.equals("A11")) {
+                result = busNavigation(src, dst, stationsBus11, 0);
             }
-            for (int i = 0; i < temp.size(); i++)
-                g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
+            //
+            else if (mean.equals("A16")) {
+                result = busNavigation(src, dst, stationsBus16, 0);
+            }
+            //
+            else if (mean.equals("A17")) {
+                result = busNavigation(src, dst, stationsBus17, 0);
+            }
+            //
+            else if (mean.equals("A22")) {
+                result = busNavigation(src, dst, stationsBus22, 0);
+            }
+            //
+            else if (mean.equals("A25")) {
+                result = busNavigation(src, dst, stationsBus25, 0);
+            }
+            //
+            else if (mean.equals("A27")) {
+                result = busNavigation(src, dst, stationsBus27, 0);
+            }
+            //
+            else if (mean.equals("buses")) {
+                g.edges.clear();
+                g.getVertices().clear();
 
-            addBusNavigation(stationsBus3, 120);
-            addBusNavigation(stationsBus3bis, 100);
-            addBusNavigation(stationsBus11, 129);
-            addBusNavigation(stationsBus16, 113);
-            addBusNavigation(stationsBus17, 125);
-            addBusNavigation(stationsBus22, 188);
-            addBusNavigation(stationsBus25, 180);
-            addBusNavigation(stationsBus27, 270);
+                for (int i = 0; i < stationsBus.size(); i++)
+                    g.addVertex(stationsBus.get(i).numero);
 
-            path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-            cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-            for (int k = 1; k < path.size(); k++)
+                int walk = 0;
+                for (int compteur = 0; compteur < allStations.size(); compteur++)
+                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                        if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
+                            g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).distance);
+                        }
+                        walk++;
+                        if (walk == 6441) walk = 0;
+                    }
+
+                addBusNavigation(stationsBus3, 0);
+                addBusNavigation(stationsBus3bis, 0);
+                addBusNavigation(stationsBus11, 0);
+                addBusNavigation(stationsBus16, 0);
+                addBusNavigation(stationsBus17, 0);
+                addBusNavigation(stationsBus22, 0);
+                addBusNavigation(stationsBus25, 0);
+                addBusNavigation(stationsBus27, 0);
+
+                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                    for (int k = 1; k < path.size(); k++)
+                        for (int i = 0; i < stationsBus.size(); i++)
+                            if (path.get(k).name.equals(stationsBus.get(i).numero))
+                                result.add(stationsBus.get(i));
+                } else
+                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+            }
+            //
+            else if (mean.equals("All")) {
+
+                g.edges.clear();
+                g.getVertices().clear();
+
                 for (int i = 0; i < allStations.size(); i++)
-                    if (path.get(k).name.equals(allStations.get(i).numero))
-                        result.add(allStations.get(i));
+                    g.addVertex(allStations.get(i).numero);
+
+                int walk = 0;
+                for (int compteur = 0; compteur < allStations.size(); compteur++)
+                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                        g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).distance);
+                        walk++;
+                        if (walk == 6441) walk = 0;
+                    }
+
+                ArrayList<Edge> temp = new ArrayList<>();
+
+                for (int i = 0; i < g.edges.size(); i++)
+                    if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
+                        int sourceName = Integer.parseInt(g.edges.get(i).source.name);
+                        int targetName = Integer.parseInt(g.edges.get(i).target.name);
+                        int diff = sourceName - targetName;
+                        for (int j = 0; j < stationsTramway.size() - 1; j++)
+                            if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
+                                temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 0));
+                    }
+
+                for (int i = 0; i < temp.size(); i++)
+                    g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
+
+                addBusNavigation(stationsBus3, 0);
+                addBusNavigation(stationsBus3bis, 0);
+                addBusNavigation(stationsBus11, 0);
+                addBusNavigation(stationsBus16, 0);
+                addBusNavigation(stationsBus17, 0);
+                addBusNavigation(stationsBus22, 0);
+                addBusNavigation(stationsBus25, 0);
+                addBusNavigation(stationsBus27, 0);
+
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < allStations.size(); i++)
+                        if (path.get(k).name.equals(allStations.get(i).numero))
+                            result.add(allStations.get(i));
+            }
         }
-        //
+
         if (result.size() > 0) {
 
             if (mean.equals("tramway")) {
@@ -1153,8 +1243,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void stationSource() {
-        Marker source = new Marker(myMap);
-        source.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_source));
+//        Marker source = new Marker(myMap);
+//        source.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_source));
         SearchView pointSource = findViewById(R.id.stationSource);
         pointSource.setBackgroundResource(R.drawable.rounded);
         pointSource.setVisibility(View.VISIBLE);
@@ -1180,13 +1270,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationSource.setAdapter(stationNameAdapter);
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
-                    myMap.getOverlays().remove(source);
+//                    myMap.getOverlays().remove(source);
                     Station o = (Station) navigationSource.getItemAtPosition(position);
-                    source.setPosition(o.coordonnees);
-                    source.setTitle("Depart");
-                    myMap.getOverlays().add(source);
-                    myMap.invalidate();
-                    customOverlays.add(new CustomOverlay("searchSource", source));
+//                    source.setPosition(o.coordonnees);
+//                    source.setTitle("Depart");
+//                    myMap.getOverlays().add(source);
+//                    myMap.invalidate();
+//                    customOverlays.add(new CustomOverlay("searchSource", source));
                     pointSource.setQuery(o.nomFr, true);
                     srcCoord = o.coordonnees;
                     srcNumber = o.numero;
@@ -1202,14 +1292,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointSource.setOnCloseListener(() -> {
             navigationSource.setVisibility(View.INVISIBLE);
-            myMap.getOverlays().remove(source);
+//            myMap.getOverlays().remove(source);
             return false;
         });
     }
 
     private void stationDestination() {
-        Marker destination = new Marker(myMap);
-        destination.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_destination));
+//        Marker destination = new Marker(myMap);
+//        destination.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_destination));
         SearchView pointDestination = findViewById(R.id.stationDestination);
 
         pointDestination.setBackgroundResource(R.drawable.rounded);
@@ -1236,15 +1326,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationDestination.setAdapter(stationNameAdapter);
                 navigationDestination.setOnItemClickListener((parent, view, position, id) -> {
-                    myMap.getOverlays().remove(destination);
+//                    myMap.getOverlays().remove(destination);
                     Station o = (Station) navigationDestination.getItemAtPosition(position);
 //                    addDestination(o.coordonnees, o.nomFr);
 
-                    destination.setPosition(o.coordonnees);
-                    destination.setTitle("Destination");
-                    myMap.getOverlays().add(destination);
-                    myMap.invalidate();
-                    customOverlays.add(new CustomOverlay("searchDestination", destination));
+//                    destination.setPosition(o.coordonnees);
+//                    destination.setTitle("Destination");
+//                    myMap.getOverlays().add(destination);
+//                    myMap.invalidate();
+//                    customOverlays.add(new CustomOverlay("searchDestination", destination));
                     pointDestination.setQuery(o.nomFr, true);
                     dstCoord = o.coordonnees;
                     dstNumber = o.numero;
@@ -1259,7 +1349,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointDestination.setOnCloseListener(() -> {
             navigationDestination.setVisibility(View.INVISIBLE);
-            myMap.getOverlays().remove(destination);
+//            myMap.getOverlays().remove(destination);
             return false;
         });
     }
