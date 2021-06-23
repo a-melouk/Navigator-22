@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:background="@drawable/rounded_lignes"
-            android:visibility="visible">
+            android:visibility="invisible">
 
             <ImageButton
                 android:id="@+id/close"
@@ -161,6 +161,7 @@
             android:layout_height="60dp"
             android:layout_below="@id/searchViews"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="1dp"
             android:layout_marginRight="20dp" />
 
         <ListView
@@ -169,6 +170,7 @@
             android:layout_height="60dp"
             android:layout_below="@id/searchViews"
             android:layout_marginLeft="20dp"
+            android:layout_marginTop="1dp"
             android:layout_marginRight="20dp" />
 
     </RelativeLayout>
@@ -347,7 +349,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="1dp"
         android:background="#ECECE9"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/horGuideline93"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">

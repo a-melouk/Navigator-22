@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="30dp"
-    android:background="@color/white"
+    android:background="@drawable/rounded_search"
     android:orientation="horizontal">
 
     <TextView
@@ -11,6 +11,7 @@
         android:layout_height="30dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="5dp"
+        android:gravity="center"
         android:text="@string/random_text"
         android:textAlignment="center"
         android:textColor="@color/black"
@@ -23,6 +24,7 @@
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
         android:layout_marginEnd="5dp"
+        android:gravity="center"
         android:text="@string/random_text"
         android:textColor="@color/black"
         android:textSize="16sp" />

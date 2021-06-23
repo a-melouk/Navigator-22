@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -65,6 +66,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
@@ -403,6 +405,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             myMap.getController().setZoom(16.0);
             myMap.getController().setCenter(currentLocation);
         });
+
         tramway.setOnClickListener(v -> {
             int i = tramway_click;
             if (i == 1) {
@@ -639,24 +642,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 the_best_time.setBackground(null);
             }
         });
-        close_steps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scroll_steps.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        setUpList();
-        initSearch();
-
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                navigationSearchViews.setVisibility(View.INVISIBLE);
-                navigationDestination.setVisibility(View.INVISIBLE);
-                navigationSource.setVisibility(View.INVISIBLE);
-            }
-        });
 
         start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -666,7 +651,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (mean_walk.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "walk", true);
                 else if (mean_tram.isSelected())
-                    navigation(srcCoord, dstCoord, "tramway", "time");
+                    navigation(srcCoord, dstCoord, "tramway", "distance");
                 else if (mean_bus.isSelected())
 //                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
                     navigation(srcCoord, dstCoord, "buses", "time");
@@ -678,35 +663,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigation(srcCoord, dstCoord, "All", "distance");
             }
         });
-    }
 
-    public int removeAfter(String a) {
-        int res;
-        String b = a.substring(a.indexOf("_") + 1);
-        res = Integer.parseInt(b);
-        return res;
-    }
+        close_steps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scroll_steps.setVisibility(View.INVISIBLE);
+            }
+        });
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                navigationSearchViews.setVisibility(View.INVISIBLE);
+                navigationDestination.setVisibility(View.INVISIBLE);
+                navigationSource.setVisibility(View.INVISIBLE);
+            }
+        });
 
-    public String removeFromStart(String a) {
-        String b = a.substring(0, 3);
-        return b;
-    }
-
-    public boolean isNumeric(String strNum) {
-        if (strNum == null) {
-            return false;
-        }
-        try {
-            double d = Double.parseDouble(strNum);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
+        setUpList();
+        initSearch();
     }
 
     public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
+        source = new Vertex("source");
+        destination = new Vertex("destination");
         int time;
         int bis = 0;
         if (criteria.equals("time")) {
@@ -717,11 +698,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
                 for (int i = 0; i < stationsTramway.size(); i++)
                     g.addVertex(stationsTramway.get(i).numero);
-
                 for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
                     g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
-
                 g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+
+                if (srcNumber.toLowerCase().equals("source")) {
+                    g.addVertex(source);
+                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                        time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
+                        g.addEdge(source, g.getVertices().get(compteur), time);
+                    }
+                }
+
+                for (int i = 0; i < g.edges.size(); i++)
+                    Log.d("Arete", g.edges.get(i) + "");
 
                 if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                     path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
@@ -882,17 +872,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (criteria.equals("distance")) {
+            Log.d("Distance", fetchDistance(currentLocation, stationsTramway.get(21).coordonnees) + "");
             if (mean.toLowerCase().equals("tramway")) {
                 g.edges.clear();
                 g.getVertices().clear();
 
                 for (int i = 0; i < stationsTramway.size(); i++)
                     g.addVertex(stationsTramway.get(i).numero);
-
                 for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
                     g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
-
                 g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
+
+                if (srcNumber.toLowerCase().equals("source")) {
+                    g.addVertex(source);
+                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                        time = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
+                        g.addEdge(source, g.getVertices().get(compteur), time);
+                    }
+                }
 
                 if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                     path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
@@ -1199,36 +1196,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationSearchViews.setVisibility(View.VISIBLE);
             stationSource();
             stationDestination();
-            /*draggableMarker = new Marker(myMap);
-            draggableMarker.setVisible(false);
-            myMap.invalidate();
-            draggableMarker.setPosition(currentLocation);
-            draggableMarker.setIcon(getApplicationContext().getDrawable(R.drawable.pin));
-            draggableMarker.setDraggable(true);
-
-            draggableMarker.setOnMarkerDragListener(new Marker.OnMarkerDragListener() {
-                @Override
-                public void onMarkerDrag(Marker marker) {
-                }
-
-                @Override
-                public void onMarkerDragEnd(Marker marker) {
-
-                    if (tram.isSelected())
-                        navigation(currentLocation, marker.getPosition(), "tramway");
-                    else if (bus.isSelected())
-                        navigation(allStations.get(91).coordonnees, allStations.get(21).coordonnees, "All");
-                }
-
-                @Override
-                public void onMarkerDragStart(Marker marker) {
-
-                }
-            });
-
-            myMap.getOverlays().add(draggableMarker);
-
-*/
         } else {
             Log.d("EnablingC", "bestroute");
         }
@@ -1298,8 +1265,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void stationSource() {
-//        Marker source = new Marker(myMap);
-//        source.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_source));
         SearchView pointSource = findViewById(R.id.stationSource);
         pointSource.setBackgroundResource(R.drawable.rounded);
         pointSource.setVisibility(View.VISIBLE);
@@ -1319,23 +1284,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
                 ArrayList<Station> stations = new ArrayList<>();
+                getLocation();
+                stations.add(new Station("current", "Current location", "source", currentLocation));
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationSource.setAdapter(stationNameAdapter);
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
-//                    myMap.getOverlays().remove(source);
                     Station o = (Station) navigationSource.getItemAtPosition(position);
-//                    source.setPosition(o.coordonnees);
-//                    source.setTitle("Depart");
-//                    myMap.getOverlays().add(source);
-//                    myMap.invalidate();
-//                    customOverlays.add(new CustomOverlay("searchSource", source));
                     pointSource.setQuery(o.nomFr, true);
                     srcCoord = o.coordonnees;
                     srcNumber = o.numero;
-
+                    addSource(srcCoord, "source");
                 });
                 return true;
             }
@@ -1375,6 +1336,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationSource.setVisibility(View.INVISIBLE);
                 ArrayList<Station> stations = new ArrayList<>();
+                stations.add(new Station("current", "current", "Current", currentLocation));
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
@@ -1393,6 +1355,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     pointDestination.setQuery(o.nomFr, true);
                     dstCoord = o.coordonnees;
                     dstNumber = o.numero;
+                    addDestination(o.coordonnees, "Destination");
                 });
                 return false;
             }
@@ -2348,5 +2311,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
+    }
+
+    public int removeAfter(String a) {
+        int res;
+        String b = a.substring(a.indexOf("_") + 1);
+        res = Integer.parseInt(b);
+        return res;
+    }
+
+    public String removeFromStart(String a) {
+        String b = a.substring(0, 3);
+        return b;
+    }
+
+    public boolean isNumeric(String strNum) {
+        if (strNum == null) {
+            return false;
+        }
+        try {
+            double d = Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 }

@@ -26,12 +26,17 @@ public class StationNameAdapter extends ArrayAdapter<Station> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.row_cell, parent, false);
         }
 
-        TextView tv = convertView.findViewById(R.id.stationName);
+        TextView name = convertView.findViewById(R.id.stationName);
         TextView number = convertView.findViewById(R.id.stationNumber);
-        tv.setText(station.nomFr);
-        if (station.type.equals("bus")) number.setText(station.numero);
-        else number.setText("Tramway");
+        name.setText(station.nomFr);
+        if (station.type.equals("bus")) number.setText(removeFromStart(station.numero));
+        else if (station.type.equals("tramway")) number.setText("Tramway");
+        else number.setText(" ");
 
         return convertView;
+    }
+
+    public String removeFromStart(String a) {
+        return a.substring(0, 3);
     }
 }
