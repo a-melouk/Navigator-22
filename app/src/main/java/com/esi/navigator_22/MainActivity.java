@@ -25,8 +25,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,12 +110,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     RelativeLayout menu_linear, navigationSearchViews;
     ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car, bus, tram;
-    ImageView mean_walk, mean_car, mean_bus, mean_tram, the_best_time;
+    ImageView mean_walk, mean_car, mean_bus, mean_tram, the_best_time, the_best_distance;
     ImageButton close;
     Button start;
     ListView searchStations, navigationSource, navigationDestination;
     CardView choices_card;
+    ScrollView scroll_steps;
+    LinearLayout linear_steps;
     RelativeLayout choices_layout;
+    ImageView close_steps;
     NavigationView navigationView;
 
     Station station = new Station();
@@ -237,6 +242,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mean_bus = findViewById(R.id.mean_bus);
         mean_car = findViewById(R.id.mean_car);
         the_best_time = findViewById(R.id.the_best_time);
+        the_best_distance = findViewById(R.id.the_best_distance);
         start = findViewById(R.id.start);
         close = findViewById(R.id.close);
         menu_linear = findViewById(R.id.menu_linear);
@@ -245,6 +251,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
+        scroll_steps = findViewById(R.id.scroll_steps);
+        linear_steps = findViewById(R.id.linear_steps);
+        close_steps = findViewById(R.id.close_steps);
 
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
@@ -516,13 +525,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         reset.setOnClickListener(v -> clearMap());
         walk.setOnClickListener(v -> {
-            walk.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            walk.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient_bottom));
             walk.setSelected(true);
             car.setSelected(false);
             car.setBackground(null);
         });
         car.setOnClickListener(v -> {
-            car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient));
+            car.setBackground(ContextCompat.getDrawable(getApplicationContext(), R.drawable.gradient_bottom));
             car.setSelected(true);
             walk.setSelected(false);
             walk.setBackground(null);
@@ -531,23 +540,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mean_walk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mean_walk.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_walk.setBackgroundResource(R.drawable.gradient_mean);
                 mean_walk.setSelected(true);
                 mean_tram.setBackground(null);
                 mean_bus.setBackground(null);
                 mean_car.setBackground(null);
-
                 mean_tram.setSelected(false);
                 mean_bus.setSelected(false);
                 mean_car.setSelected(false);
                 the_best_time.setSelected(false);
                 the_best_time.setBackground(null);
+                the_best_distance.setBackground(null);
+                the_best_distance.setSelected(false);
             }
         });
         mean_tram.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mean_tram.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_tram.setBackgroundResource(R.drawable.gradient_mean);
                 mean_tram.setSelected(true);
                 mean_walk.setBackground(null);
                 mean_bus.setBackground(null);
@@ -557,12 +567,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mean_car.setSelected(false);
                 the_best_time.setSelected(false);
                 the_best_time.setBackground(null);
+                the_best_distance.setBackground(null);
+                the_best_distance.setSelected(false);
             }
         });
         mean_bus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mean_bus.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_bus.setBackgroundResource(R.drawable.gradient_mean);
                 mean_bus.setSelected(true);
                 mean_tram.setBackground(null);
                 mean_walk.setBackground(null);
@@ -572,12 +584,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mean_car.setSelected(false);
                 the_best_time.setSelected(false);
                 the_best_time.setBackground(null);
+                the_best_distance.setBackground(null);
+                the_best_distance.setSelected(false);
             }
         });
         mean_car.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mean_car.setBackgroundResource(R.drawable.rounded_lignes);
+                mean_car.setBackgroundResource(R.drawable.gradient_mean);
                 mean_car.setSelected(true);
                 mean_tram.setBackground(null);
                 mean_bus.setBackground(null);
@@ -587,12 +601,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mean_tram.setSelected(false);
                 the_best_time.setSelected(false);
                 the_best_time.setBackground(null);
+                the_best_distance.setBackground(null);
+                the_best_distance.setSelected(false);
             }
         });
         the_best_time.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                the_best_time.setBackgroundResource(R.drawable.rounded_lignes);
+                the_best_time.setBackgroundResource(R.drawable.gradient_mean);
                 the_best_time.setSelected(true);
                 mean_tram.setBackground(null);
                 mean_bus.setBackground(null);
@@ -602,6 +618,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 mean_tram.setSelected(false);
                 mean_car.setSelected(false);
                 mean_car.setBackground(null);
+                the_best_distance.setBackground(null);
+                the_best_distance.setSelected(false);
+            }
+        });
+        the_best_distance.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                the_best_distance.setBackgroundResource(R.drawable.gradient_mean);
+                the_best_distance.setSelected(true);
+                mean_tram.setBackground(null);
+                mean_bus.setBackground(null);
+                mean_walk.setBackground(null);
+                mean_walk.setSelected(false);
+                mean_bus.setSelected(false);
+                mean_tram.setSelected(false);
+                mean_car.setSelected(false);
+                mean_car.setBackground(null);
+                the_best_time.setSelected(false);
+                the_best_time.setBackground(null);
+            }
+        });
+        close_steps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scroll_steps.setVisibility(View.INVISIBLE);
             }
         });
 
@@ -625,13 +666,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (mean_walk.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "walk", true);
                 else if (mean_tram.isSelected())
-                    navigation(srcCoord, dstCoord, "tramway", "distance");
+                    navigation(srcCoord, dstCoord, "tramway", "time");
                 else if (mean_bus.isSelected())
 //                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
-                    navigation(srcCoord, dstCoord, "buses", "distance");
+                    navigation(srcCoord, dstCoord, "buses", "time");
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
+                    navigation(srcCoord, dstCoord, "All", "time");
+                else if (the_best_distance.isSelected())
                     navigation(srcCoord, dstCoord, "All", "distance");
             }
         });
@@ -1036,11 +1079,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             //1ère station to Size()-1
             for (int i = 0; i < result.size() - 1; i++) {
-                if (result.get(i).type.equals("tramway"))
+                if (result.get(i).type.equals("tramway")) {
                     addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
-                else
+
+                } else
                     addPin(result.get(i).coordonnees, result.get(i).nomFr + ", " + removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
             }
+            View card = View.inflate(this, R.layout.card_view, null);
+            TextView criteria_text = card.findViewById(R.id.criteria);
+            criteria_text.setText("Distance");
+            TextView weight_text = card.findViewById(R.id.weight);
+            weight_text.setText(cost + "");
+
+            linear_steps.addView(card);
 
 
             if (result.get(result.size() - 1).type.equals("tramway"))

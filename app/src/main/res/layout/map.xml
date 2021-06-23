@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:background="@drawable/rounded_lignes"
-            android:visibility="invisible">
+            android:visibility="visible">
 
             <ImageButton
                 android:id="@+id/close"
@@ -37,7 +37,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="3dp"
                 android:layout_marginEnd="10dp"
-
                 android:elevation="2dp"
                 android:src="@drawable/icon_close" />
 
@@ -121,11 +120,21 @@
                 android:layout_height="30dp"
                 android:layout_below="@id/stationDestination"
                 android:layout_marginTop="10dp"
-
                 android:layout_marginBottom="10dp"
                 android:layout_toEndOf="@id/mean_car"
                 android:padding="4dp"
                 android:src="@drawable/icon_time" />
+
+            <ImageView
+                android:id="@+id/the_best_distance"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/the_best_time"
+                android:padding="4dp"
+                android:src="@drawable/icon_distance" />
 
             <Button
                 android:id="@+id/start"
@@ -284,7 +293,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@drawable/gradient2"
+        android:background="@drawable/gradient"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="@id/horGuideline93">
@@ -295,8 +304,8 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:background="?attr/selectableItemBackground"
             android:layout_marginEnd="6dp"
+            android:background="?attr/selectableItemBackground"
             android:elevation="10dp"
             android:src="@drawable/icon_reset" />
 
@@ -305,8 +314,8 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
-            android:background="?attr/selectableItemBackground"
             android:layout_toStartOf="@id/reset"
+            android:background="?attr/selectableItemBackground"
             android:src="@drawable/icon_current" />
 
         <ImageView
@@ -324,11 +333,42 @@
             android:layout_height="match_parent"
             android:layout_marginStart="10dp"
             android:layout_toEndOf="@id/car"
-            android:background="@drawable/gradient"
+            android:background="@drawable/gradient_bottom"
             android:elevation="5dp"
             android:src="@drawable/icon_walk" />
 
+
     </RelativeLayout>
+
+    <ScrollView
+        android:id="@+id/scroll_steps"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="1dp"
+        android:background="#ECECE9"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline93"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <LinearLayout
+            android:id="@+id/linear_steps"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/horGuideline93">
+
+            <ImageView
+                android:id="@+id/close_steps"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/icon_close" />
+
+        </LinearLayout>
+    </ScrollView>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline8"
