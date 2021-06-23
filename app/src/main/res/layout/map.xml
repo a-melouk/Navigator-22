@@ -281,7 +281,6 @@
 
     </RelativeLayout>
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -296,6 +295,7 @@
             android:layout_height="match_parent"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
+            android:background="?attr/selectableItemBackground"
             android:layout_marginEnd="6dp"
             android:elevation="10dp"
             android:src="@drawable/icon_reset" />
@@ -305,6 +305,7 @@
             android:layout_width="40dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
+            android:background="?attr/selectableItemBackground"
             android:layout_toStartOf="@id/reset"
             android:src="@drawable/icon_current" />
 
@@ -327,21 +328,6 @@
             android:elevation="5dp"
             android:src="@drawable/icon_walk" />
 
-        <!--        <ImageView
-            android:id="@+id/bus"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_toEndOf="@id/car"
-            android:elevation="5dp"
-            android:src="@drawable/icon_bus" />
-
-        <ImageView
-            android:id="@+id/tram"
-            android:layout_width="40dp"
-            android:layout_height="match_parent"
-            android:layout_toEndOf="@id/bus"
-            android:elevation="5dp"
-            android:src="@drawable/icon_tram" />-->
     </RelativeLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -372,14 +358,12 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.93" />
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verGuideline80"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.80" />
-
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/verGuideline90"
