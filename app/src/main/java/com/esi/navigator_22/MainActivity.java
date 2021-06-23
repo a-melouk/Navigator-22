@@ -1085,6 +1085,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else
                     addPin(result.get(i).coordonnees, result.get(i).nomFr + ", " + removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
             }
+            linear_steps.removeAllViewsInLayout();
             View card = View.inflate(this, R.layout.card_view, null);
             TextView criteria_text = card.findViewById(R.id.criteria);
             criteria_text.setText("Distance");
