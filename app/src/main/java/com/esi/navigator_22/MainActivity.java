@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayAdapter<String> arrayAdapter;
     OkHttpClient client = new OkHttpClient();
     Graph g = new Graph();
+    Vertex current;
     Vertex source = new Vertex("Current");
     Vertex destination = new Vertex("Destination");
     ArrayList<Vertex> path;
@@ -345,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean longPressHelper(GeoPoint p) {
                 InfoWindow.closeAllInfoWindowsOn(myMap);
-                clearMap();
+
                 return false;
             }
         });
@@ -686,6 +687,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
+        current = new Vertex("current");
         source = new Vertex("source");
         destination = new Vertex("destination");
         int time;
@@ -872,7 +874,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (criteria.equals("distance")) {
-            Log.d("Distance", fetchDistance(currentLocation, stationsTramway.get(21).coordonnees) + "");
             if (mean.toLowerCase().equals("tramway")) {
                 g.edges.clear();
                 g.getVertices().clear();
@@ -883,11 +884,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
                 g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
 
-                if (srcNumber.toLowerCase().equals("source")) {
-                    g.addVertex(source);
+                if (srcNumber.toLowerCase().equals("current")) {
+                    g.addVertex(current);
                     for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
                         time = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
-                        g.addEdge(source, g.getVertices().get(compteur), time);
+                        g.addEdge(current, g.getVertices().get(compteur), time);
                     }
                 }
 
@@ -1268,12 +1269,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SearchView pointSource = findViewById(R.id.stationSource);
         pointSource.setBackgroundResource(R.drawable.rounded);
         pointSource.setVisibility(View.VISIBLE);
+        final Marker[] marker_source = new Marker[1];
+        Marker final_source;
         pointSource.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
+
 
                 return false;
             }
@@ -1285,18 +1289,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationDestination.setVisibility(View.INVISIBLE);
                 ArrayList<Station> stations = new ArrayList<>();
                 getLocation();
-                stations.add(new Station("current", "Current location", "source", currentLocation));
+                stations.add(new Station("current", "Current location", "current", currentLocation));
+                stations.add(new Station("source", "Custom source", "source", defaultLocation));
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationSource.setAdapter(stationNameAdapter);
+
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
                     Station o = (Station) navigationSource.getItemAtPosition(position);
+                    if (o.numero.equals("source")) {
+                        marker_source[0] = new Marker(myMap);
+                        marker_source[0].setDraggable(false);
+                        marker_source[0].setPosition(defaultLocation);
+                        marker_source[0].setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
+                        myMap.getOverlays().add(marker_source[0]);
+                        Overlay mOverlay = new Overlay() {
+
+                            @Override
+                            public boolean onScroll(MotionEvent pEvent1, MotionEvent pEvent2, float pDistanceX, float pDistanceY, MapView pMapView) {
+                                marker_source[0].setPosition(new GeoPoint((float) pMapView.getMapCenter().getLatitude(),
+                                        (float) pMapView.getMapCenter().getLongitude()));
+                                o.coordonnees.setLatitude(marker_source[0].getPosition().getLatitude());
+                                o.coordonnees.setLongitude(marker_source[0].getPosition().getLongitude());
+                                return super.onScroll(pEvent1, pEvent2, pDistanceX, pDistanceY, pMapView);
+                            }
+                        };
+                        myMap.getOverlays().add(mOverlay);
+                        srcCoord = o.coordonnees;
+                        srcNumber = o.numero;
+                    } else {
+                        srcCoord = o.coordonnees;
+                        srcNumber = o.numero;
+                        addSource(srcCoord, "Depart");
+                    }
                     pointSource.setQuery(o.nomFr, true);
-                    srcCoord = o.coordonnees;
-                    srcNumber = o.numero;
-                    addSource(srcCoord, "source");
+
+
                 });
                 return true;
             }
@@ -1308,6 +1338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointSource.setOnCloseListener(() -> {
             navigationSource.setVisibility(View.INVISIBLE);
+
 //            myMap.getOverlays().remove(source);
             return false;
         });
@@ -1852,6 +1883,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPanToView(true);
         myMap.invalidate();
         myMap.getOverlays().add(marker);
+        customOverlays.add(new CustomOverlay("source", marker));
         getLocation();
         marker.setSnippet(nom);
         marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
@@ -1866,7 +1898,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 InfoWindow.closeAllInfoWindowsOn(myMap);
             }
         });
-        marker.showInfoWindow();
+//        marker.showInfoWindow();
     }
 
     void addPin(GeoPoint coordinates, String nom, Drawable d) {
@@ -1910,6 +1942,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         marker.setPanToView(true);
         myMap.invalidate();
         myMap.getOverlays().add(marker);
+        customOverlays.add(new CustomOverlay("destination", marker));
         getLocation();
         marker.setSnippet(nom);
         marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
