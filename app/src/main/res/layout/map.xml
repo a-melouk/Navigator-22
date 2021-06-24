@@ -176,6 +176,17 @@
     </RelativeLayout>
 
     <ImageView
+        android:id="@+id/ok"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+
+        android:src="@drawable/arrow_up"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@id/verGuideline90"
+        app:layout_constraintStart_toStartOf="@id/verGuideline80"
+        app:layout_constraintTop_toTopOf="@id/horGuideline40" />
+
+    <ImageView
         android:id="@+id/arrow_down"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -385,6 +396,13 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.40" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline50"

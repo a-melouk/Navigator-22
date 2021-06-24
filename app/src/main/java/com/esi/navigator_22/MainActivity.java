@@ -58,7 +58,11 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
+import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapEventsReceiver;
+import org.osmdroid.events.MapListener;
+import org.osmdroid.events.ScrollEvent;
+import org.osmdroid.events.ZoomEvent;
 import org.osmdroid.tileprovider.cachemanager.CacheManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.BoundingBox;
@@ -112,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     RelativeLayout menu_linear, navigationSearchViews;
     ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
     ImageView walk, car, bus, tram;
-    ImageView mean_walk, mean_car, mean_bus, mean_tram, the_best_time, the_best_distance;
+    ImageView mean_walk, mean_car, mean_bus, mean_tram, the_best_time, the_best_distance, ok_marker;
     ImageButton close;
     Button start;
     ListView searchStations, navigationSource, navigationDestination;
@@ -246,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mean_car = findViewById(R.id.mean_car);
         the_best_time = findViewById(R.id.the_best_time);
         the_best_distance = findViewById(R.id.the_best_distance);
+        ok_marker = findViewById(R.id.ok);
         start = findViewById(R.id.start);
         close = findViewById(R.id.close);
         menu_linear = findViewById(R.id.menu_linear);
@@ -1299,26 +1304,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
                     Station o = (Station) navigationSource.getItemAtPosition(position);
-                    if (o.numero.equals("source")) {
-                        marker_source[0] = new Marker(myMap);
+                    if (o.numero.equals(("source"))) {
+                        markerRouting = new Marker(myMap);
+                        ok_marker.setVisibility(View.VISIBLE);
+                        final Marker[] marker_source = {new Marker(myMap)};
                         marker_source[0].setDraggable(false);
                         marker_source[0].setPosition(defaultLocation);
                         marker_source[0].setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
                         myMap.getOverlays().add(marker_source[0]);
-                        Overlay mOverlay = new Overlay() {
+                        myMap.setMapListener(new MapListener() {
+                            @Override
+                            public boolean onScroll(ScrollEvent event) {
+
+                                marker_source[0].setPosition(new GeoPoint((float) myMap.getMapCenter().getLatitude(),
+                                        (float) myMap.getMapCenter().getLongitude()));
+                                ok_marker.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
+                                        markerRouting.setPosition(marker_source[0].getPosition());
+                                        o.coordonnees.setLatitude(markerRouting.getPosition().getLatitude());
+                                        o.coordonnees.setLongitude(markerRouting.getPosition().getLongitude());
+                                        myMap.getOverlays().add(markerRouting);
+                                        srcCoord = o.coordonnees;
+                                        srcNumber = o.numero;
+                                        marker_source[0].setVisible(false);
+                                    }
+                                });
+                                return false;
+                            }
 
                             @Override
-                            public boolean onScroll(MotionEvent pEvent1, MotionEvent pEvent2, float pDistanceX, float pDistanceY, MapView pMapView) {
-                                marker_source[0].setPosition(new GeoPoint((float) pMapView.getMapCenter().getLatitude(),
-                                        (float) pMapView.getMapCenter().getLongitude()));
-                                o.coordonnees.setLatitude(marker_source[0].getPosition().getLatitude());
-                                o.coordonnees.setLongitude(marker_source[0].getPosition().getLongitude());
-                                return super.onScroll(pEvent1, pEvent2, pDistanceX, pDistanceY, pMapView);
+                            public boolean onZoom(ZoomEvent event) {
+                                return false;
                             }
-                        };
-                        myMap.getOverlays().add(mOverlay);
-                        srcCoord = o.coordonnees;
-                        srcNumber = o.numero;
+                        });
                     } else {
                         srcCoord = o.coordonnees;
                         srcNumber = o.numero;
@@ -1343,6 +1363,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return false;
         });
     }
+
+/*    private void reloadMarker() {
+        Marker marker_source = new Marker(myMap);
+        marker_source.setDraggable(false);
+        marker_source.setPosition(defaultLocation);
+        marker_source.setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
+        myMap.getOverlays().add(marker_source);
+        Overlay mOverlay = new Overlay() {
+
+            @Override
+            public boolean onScroll(MotionEvent pEvent1, MotionEvent pEvent2, float pDistanceX, float pDistanceY, MapView pMapView) {
+                marker_source.setPosition(new GeoPoint((float) pMapView.getMapCenter().getLatitude(),
+                        (float) pMapView.getMapCenter().getLongitude()));
+                o.coordonnees.setLatitude(marker_source.getPosition().getLatitude());
+                o.coordonnees.setLongitude(marker_source.getPosition().getLongitude());
+                return super.onScroll(pEvent1, pEvent2, pDistanceX, pDistanceY, pMapView);
+            }
+        };
+        myMap.getOverlays().add(mOverlay);
+        srcCoord = o.coordonnees;
+        srcNumber = o.numero;
+    }*/
 
     private void stationDestination() {
 //        Marker destination = new Marker(myMap);
