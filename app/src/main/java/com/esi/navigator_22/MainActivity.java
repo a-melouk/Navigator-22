@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
@@ -58,7 +57,6 @@ import org.json.JSONObject;
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
-import org.osmdroid.events.DelayedMapListener;
 import org.osmdroid.events.MapEventsReceiver;
 import org.osmdroid.events.MapListener;
 import org.osmdroid.events.ScrollEvent;
@@ -70,7 +68,6 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.MapEventsOverlay;
 import org.osmdroid.views.overlay.Marker;
-import org.osmdroid.views.overlay.Overlay;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.ScaleBarOverlay;
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay;
@@ -110,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     MyLocationNewOverlay mLocationOverlay;
     RotationGestureOverlay mRotationGestureOverlay;
     MapEventsOverlay mapEventsOverlay;
-    Marker draggableMarker, markerRouting;
+    Marker draggableMarker, markerSource, markerDestination;
 
     ImageView currentPosition, reset;
     RelativeLayout menu_linear, navigationSearchViews;
@@ -697,6 +694,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         destination = new Vertex("destination");
         int time;
         int bis = 0;
+        Log.d("Distance Number", srcNumber + " | " + dstNumber);
+        Log.d("Distance coords", srcCoord + " | " + dstCoord);
         if (criteria.equals("time")) {
             if (mean.toLowerCase().equals("tramway")) {
                 g.edges.clear();
@@ -883,6 +882,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.edges.clear();
                 g.getVertices().clear();
 
+
+
                 for (int i = 0; i < stationsTramway.size(); i++)
                     g.addVertex(stationsTramway.get(i).numero);
                 for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
@@ -897,6 +898,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
 
+                if (srcNumber.toLowerCase().equals("source")) {
+                    g.addVertex(source);
+                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                        time = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
+                        g.addEdge(source, g.getVertices().get(compteur), time);
+                    }
+                }
+
+                if (dstNumber.toLowerCase().equals("destination")) {
+                    g.addVertex(destination);
+                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                        time = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
+                        g.addEdge(destination, g.getVertices().get(compteur), time);
+                    }
+                }
+
                 if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                     path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
                     cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
@@ -904,6 +921,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         for (int i = 0; i < stationsTramway.size(); i++)
                             if (path.get(k).name.equals(stationsTramway.get(i).numero))
                                 result.add(stationsTramway.get(i));
+                    for (int i = 0; i < g.getVertices().size(); i++)
+                        Log.d("Distance AreteVertex", g.getVertices().get(i) + "");
+                    for (int i = 0; i < g.edges.size(); i++)
+                        Log.d("Distance AreteArete", g.edges.get(i) + "");
+
                 } else
                     Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
             }
@@ -1274,16 +1296,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SearchView pointSource = findViewById(R.id.stationSource);
         pointSource.setBackgroundResource(R.drawable.rounded);
         pointSource.setVisibility(View.VISIBLE);
-        final Marker[] marker_source = new Marker[1];
-        Marker final_source;
         pointSource.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-
-
                 return false;
             }
 
@@ -1292,43 +1310,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.VISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-                ArrayList<Station> stations = new ArrayList<>();
+
                 getLocation();
+                getLocation();
+                ArrayList<Station> stations = new ArrayList<>();
                 stations.add(new Station("current", "Current location", "current", currentLocation));
                 stations.add(new Station("source", "Custom source", "source", defaultLocation));
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
+
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationSource.setAdapter(stationNameAdapter);
 
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
                     Station o = (Station) navigationSource.getItemAtPosition(position);
                     if (o.numero.equals(("source"))) {
-                        markerRouting = new Marker(myMap);
+                        Marker markerSource = new Marker(myMap);
                         ok_marker.setVisibility(View.VISIBLE);
-                        final Marker[] marker_source = {new Marker(myMap)};
-                        marker_source[0].setDraggable(false);
-                        marker_source[0].setPosition(defaultLocation);
-                        marker_source[0].setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
-                        myMap.getOverlays().add(marker_source[0]);
+                        final Marker[] tempSource = {new Marker(myMap)};
+                        tempSource[0].setDraggable(false);
+                        tempSource[0].setPosition(defaultLocation);
+                        tempSource[0].setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
+                        myMap.getOverlays().add(tempSource[0]);
                         myMap.setMapListener(new MapListener() {
                             @Override
                             public boolean onScroll(ScrollEvent event) {
 
-                                marker_source[0].setPosition(new GeoPoint((float) myMap.getMapCenter().getLatitude(),
+                                tempSource[0].setPosition(new GeoPoint((float) myMap.getMapCenter().getLatitude(),
                                         (float) myMap.getMapCenter().getLongitude()));
                                 ok_marker.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        markerRouting.setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
-                                        markerRouting.setPosition(marker_source[0].getPosition());
-                                        o.coordonnees.setLatitude(markerRouting.getPosition().getLatitude());
-                                        o.coordonnees.setLongitude(markerRouting.getPosition().getLongitude());
-                                        myMap.getOverlays().add(markerRouting);
-                                        srcCoord = o.coordonnees;
+                                        markerSource.setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
+                                        markerSource.setPosition(tempSource[0].getPosition());
+                                        o.coordonnees.setLatitude(markerSource.getPosition().getLatitude());
+                                        o.coordonnees.setLongitude(markerSource.getPosition().getLongitude());
+                                        myMap.getOverlays().add(markerSource);
+                                        srcCoord = markerSource.getPosition();
                                         srcNumber = o.numero;
-                                        marker_source[0].setVisible(false);
+                                        tempSource[0].setVisible(false);
                                     }
                                 });
                                 return false;
@@ -1342,15 +1363,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else {
                         srcCoord = o.coordonnees;
                         srcNumber = o.numero;
-                        addSource(srcCoord, "Depart");
                     }
                     pointSource.setQuery(o.nomFr, true);
-
-
                 });
                 return true;
             }
         });
+
+
         pointSource.setOnSearchClickListener(v -> {
             navigationSource.setVisibility(View.VISIBLE);
             searchStations.setVisibility(View.INVISIBLE);
@@ -1358,45 +1378,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointSource.setOnCloseListener(() -> {
             navigationSource.setVisibility(View.INVISIBLE);
-
-//            myMap.getOverlays().remove(source);
             return false;
         });
     }
 
-/*    private void reloadMarker() {
-        Marker marker_source = new Marker(myMap);
-        marker_source.setDraggable(false);
-        marker_source.setPosition(defaultLocation);
-        marker_source.setIcon(getApplicationContext().getDrawable(R.drawable.marker_source));
-        myMap.getOverlays().add(marker_source);
-        Overlay mOverlay = new Overlay() {
-
-            @Override
-            public boolean onScroll(MotionEvent pEvent1, MotionEvent pEvent2, float pDistanceX, float pDistanceY, MapView pMapView) {
-                marker_source.setPosition(new GeoPoint((float) pMapView.getMapCenter().getLatitude(),
-                        (float) pMapView.getMapCenter().getLongitude()));
-                o.coordonnees.setLatitude(marker_source.getPosition().getLatitude());
-                o.coordonnees.setLongitude(marker_source.getPosition().getLongitude());
-                return super.onScroll(pEvent1, pEvent2, pDistanceX, pDistanceY, pMapView);
-            }
-        };
-        myMap.getOverlays().add(mOverlay);
-        srcCoord = o.coordonnees;
-        srcNumber = o.numero;
-    }*/
-
     private void stationDestination() {
-//        Marker destination = new Marker(myMap);
-//        destination.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.icon_destination));
         SearchView pointDestination = findViewById(R.id.stationDestination);
-
         pointDestination.setBackgroundResource(R.drawable.rounded);
         pointDestination.setVisibility(View.VISIBLE);
         pointDestination.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
@@ -1408,31 +1400,68 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationDestination.setVisibility(View.VISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationSource.setVisibility(View.INVISIBLE);
+                getLocation();
                 ArrayList<Station> stations = new ArrayList<>();
-                stations.add(new Station("current", "current", "Current", currentLocation));
+                stations.add(new Station("current", "Current location", "current", currentLocation));
+                stations.add(new Station("destination", "Custom destination", "destination", defaultLocation));
+
+
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
+
+
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationDestination.setAdapter(stationNameAdapter);
-                navigationDestination.setOnItemClickListener((parent, view, position, id) -> {
-//                    myMap.getOverlays().remove(destination);
-                    Station o = (Station) navigationDestination.getItemAtPosition(position);
-//                    addDestination(o.coordonnees, o.nomFr);
 
-//                    destination.setPosition(o.coordonnees);
-//                    destination.setTitle("Destination");
-//                    myMap.getOverlays().add(destination);
-//                    myMap.invalidate();
-//                    customOverlays.add(new CustomOverlay("searchDestination", destination));
+                navigationDestination.setOnItemClickListener((parent, view, position, id) -> {
+                    Station o = (Station) navigationDestination.getItemAtPosition(position);
+                    if (o.numero.equals(("destination"))) {
+                        Marker markerDestination = new Marker(myMap);
+                        ok_marker.setVisibility(View.VISIBLE);
+                        final Marker[] temp_destination = {new Marker(myMap)};
+                        temp_destination[0].setDraggable(false);
+                        temp_destination[0].setPosition(defaultLocation);
+                        temp_destination[0].setIcon(getApplicationContext().getDrawable(R.drawable.marker_destination));
+                        myMap.getOverlays().add(temp_destination[0]);
+                        myMap.setMapListener(new MapListener() {
+                            @Override
+                            public boolean onScroll(ScrollEvent event) {
+
+                                temp_destination[0].setPosition(new GeoPoint((float) myMap.getMapCenter().getLatitude(),
+                                        (float) myMap.getMapCenter().getLongitude()));
+                                ok_marker.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        markerDestination.setIcon(getApplicationContext().getDrawable(R.drawable.marker_destination));
+                                        markerDestination.setPosition(temp_destination[0].getPosition());
+                                        o.coordonnees.setLatitude(markerDestination.getPosition().getLatitude());
+                                        o.coordonnees.setLongitude(markerDestination.getPosition().getLongitude());
+                                        myMap.getOverlays().add(markerDestination);
+                                        dstCoord = markerDestination.getPosition();
+                                        dstNumber = o.numero;
+                                        temp_destination[0].setVisible(false);
+                                    }
+                                });
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onZoom(ZoomEvent event) {
+                                return false;
+                            }
+                        });
+                    } else {
+                        dstCoord = o.coordonnees;
+                        dstNumber = o.numero;
+                    }
                     pointDestination.setQuery(o.nomFr, true);
-                    dstCoord = o.coordonnees;
-                    dstNumber = o.numero;
-                    addDestination(o.coordonnees, "Destination");
+
                 });
-                return false;
+                return true;
             }
         });
+
         pointDestination.setOnSearchClickListener(v -> {
             navigationDestination.setVisibility(View.VISIBLE);
             searchStations.setVisibility(View.INVISIBLE);
@@ -1440,7 +1469,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         pointDestination.setOnCloseListener(() -> {
             navigationDestination.setVisibility(View.INVISIBLE);
-//            myMap.getOverlays().remove(destination);
             return false;
         });
     }
