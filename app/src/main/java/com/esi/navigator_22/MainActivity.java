@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint srcCoord = new GeoPoint(0.0, 0.0);
     GeoPoint dstCoord = new GeoPoint(0.0, 0.0);
-    String srcNumber="", dstNumber="";
+    String srcNumber = "", dstNumber = "";
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
@@ -891,7 +891,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (result.size() > 0) {
 
                 if (mean.equals("tramway")) {
-                    Log.d("RouteeeTram", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                    Log.d("Navigation_Tramway_URL", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                             result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                     getBestRoute(
                             adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
@@ -903,7 +903,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 adresse + "result/" + result.get(0).numero + "/"
                                         + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                         result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
-                        Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
+                        Log.d("Navigation_Bus_URL", adresse + "result/" + result.get(0).numero + "/"
                                 + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
                                 result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
                     } else if (mean.equals("buses")) {
@@ -937,7 +937,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "tramway");
                 else {
                     addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "bus");
-                    Log.d("TracerBus", "Ouaiiiis");
                 }
 
 
@@ -953,7 +952,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //
             else {
 //            fetchRoute(src, dst, true);
-                Log.d("Routeee", "mefihech");
+                Log.d("Error", "No possible way with public transport");
             }
 
         }
@@ -1022,12 +1021,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (int i = 0; i < stationsTramway.size(); i++)
                         if (path.get(k).name.equals(stationsTramway.get(i).numero))
                             result.add(stationsTramway.get(i));
-                for (int i = 0; i < g.getVertices().size(); i++)
-                    Log.d("Distance_Vertices", g.getVertices().get(i) + "");
-                for (int i = 0; i < g.edges.size(); i++)
-                    Log.d("Distance_Arete", g.edges.get(i) + "");
-                Log.d("Distance_Path", path + "");
-
             } else
                 Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
         }
@@ -1084,11 +1077,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (int i = 0; i < stationsTramway.size(); i++)
                         if (path.get(k).name.equals(stationsTramway.get(i).numero))
                             result.add(stationsTramway.get(i));
-                for (int i = 0; i < g.getVertices().size(); i++)
-                    Log.d("Distance_Vertices", g.getVertices().get(i) + "");
-                for (int i = 0; i < g.edges.size(); i++)
-                    Log.d("Distance_Arete", g.edges.get(i) + "");
-                Log.d("Distance_Path", path + "");
             } else
                 Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
         }
@@ -1175,14 +1163,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     void addBusNavigation(ArrayList<Station> list, int weight) {
-        for (int i = 0; i < g.getVertices().size(); i++) {
-            for (int j = 0; j < list.size() - 1; j++) {
-                if (g.getVertices().get(i).name.equals(list.get(j).numero)) {
+        for (int i = 0; i < g.getVertices().size(); i++)
+            for (int j = 0; j < list.size() - 1; j++)
+                if (g.getVertices().get(i).name.equals(list.get(j).numero))
                     if (Math.abs(removeAfter(g.getVertices().get(i).name) - removeAfter(list.get(j + 1).numero)) == 1)
                         g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), weight);
-                }
-            }
-        }
     }
 
     //Menu Navigation
@@ -1196,7 +1181,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NotNull MenuItem item) {
         getLocation();
         Bundle send = new Bundle();
-
 
         if (item.getItemId() == R.id.allTramwayStations) {
             Intent intent = new Intent(MainActivity.this, AllNearTramwayStationsActivity.class);
@@ -1215,7 +1199,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             stationSource();
             stationDestination();
         } else {
-            Log.d("EnablingC", "bestroute");
+            Log.d("Error", "MenuNavigationError");
         }
         return true;
     }
@@ -1292,7 +1276,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-                Log.d("DistanceSource", srcNumber);
+                Log.d("Navigation_Source", srcNumber);
                 return false;
             }
 
@@ -1351,7 +1335,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else {
                         srcCoord = o.coordonnees;
                         srcNumber = o.numero;
-                        Log.d("TestTest1", o.nomFr);
                     }
                     pointSource.setQuery(o.nomFr, true);
                 });
@@ -1379,7 +1362,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-                Log.d("DistanceDestination", dstNumber);
+                Log.d("Navigation_Destination", dstNumber);
                 return false;
             }
 
@@ -1437,7 +1420,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else {
                         dstCoord = o.coordonnees;
                         dstNumber = o.numero;
-                        Log.d("TestTest2", o.nomFr);
                     }
                     pointDestination.setQuery(o.nomFr, true);
 
@@ -1679,7 +1661,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
             station.coordonnees = point;
-            Log.d("Nouvelle_station", station.toString());
+            Log.d("Insertion_Station", station.toString());
             database.addStation(station);
         }
     }
@@ -2354,7 +2336,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     insertAllStations(response);
-                    Log.d("Nouvelle_station", "success");
+                    Log.d("Insertion_Station", "success");
                 }
             }
         });
