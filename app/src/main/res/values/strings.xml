@@ -36,5 +36,6 @@
     <string name="gare_routiere_sud">Gare Routière Sud</string>
     <string name="stations_de_tramway">Stations de Tramway</string>
     <string name="random_text">Just random text</string>
+    <string name="todo">TODO</string>
 
 </resources>

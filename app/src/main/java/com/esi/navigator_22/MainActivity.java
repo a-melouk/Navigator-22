@@ -91,7 +91,7 @@ import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String adresse = "http://192.168.1.12:3000/";
+    String adresse = "http://192.168.1.8:3000/";
     //    String adresse = "https://routing22.herokuapp.com/";
     String urlStations = adresse + "stations_sba";
     String urlRouteTramway = adresse + "subway";
@@ -252,8 +252,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         close = findViewById(R.id.close);
         menu_linear = findViewById(R.id.menu_linear);
         navigationSearchViews = findViewById(R.id.searchViews);
-        arrow_down = findViewById(R.id.arrow_down);
-        arrow_up = findViewById(R.id.arrow_up);
+//        arrow_down = findViewById(R.id.arrow_down);
+//        arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         scroll_steps = findViewById(R.id.scroll_steps);
@@ -389,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Animation animationToVisible = AnimationUtils.loadAnimation(this, R.anim.to_visible);
         Animation animationToInvisible = AnimationUtils.loadAnimation(this, R.anim.to_invisible);
 
-        arrow_down.setOnClickListener(v -> {
+/*        arrow_down.setOnClickListener(v -> {
 
             menu_linear.startAnimation(animationToVisible);
             menu_linear.setVisibility(View.VISIBLE);
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             menu_linear.setVisibility(View.INVISIBLE);
             arrow_up.setVisibility(View.INVISIBLE);
             arrow_down.setVisibility(View.VISIBLE);
-        });
+        });*/
         currentPosition.setOnClickListener(v -> {
             getLocation();
 
