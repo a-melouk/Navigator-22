@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint srcCoord = new GeoPoint(0.0, 0.0);
     GeoPoint dstCoord = new GeoPoint(0.0, 0.0);
-    String srcNumber, dstNumber;
+    String srcNumber="", dstNumber="";
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
@@ -177,9 +177,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayAdapter<String> arrayAdapter;
     OkHttpClient client = new OkHttpClient();
     Graph g = new Graph();
-    Vertex current = new Vertex("current");
-    Vertex source = new Vertex("source");
-    Vertex destination = new Vertex("destination");
+    Vertex current;
+    Vertex source;
+    Vertex destination;
     ArrayList<Vertex> path;
     private double cost;
 
@@ -691,9 +691,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
-        current = new Vertex("current");
-        source = new Vertex("source");
-        destination = new Vertex("destination");
         int time;
         if (src.equals(dst))
             Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_SHORT).show();
@@ -967,9 +964,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         g.getVertices().clear();
         int distance = 0;
         int time = 0;
-        Vertex current = new Vertex("current");
-        Vertex source = new Vertex("source");
-        Vertex destination = new Vertex("destination");
+        current = new Vertex("current");
+        source = new Vertex("source");
+        destination = new Vertex("destination");
         ArrayList<Station> result = new ArrayList<>();
         if (criteria.equals("time")) {
 //                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
@@ -1097,71 +1094,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return result;
     }
-
-    /*ArrayList<Station> bus3Navigation(GeoPoint src, GeoPoint dst, String criteria) {
-        g.getVertices().clear();
-        g.edges.clear();
-        ArrayList<Station> result = new ArrayList<>();
-
-        for (int i = 0; i < stationsBus3.size(); i++)
-            g.addVertex(stationsBus3.get(i).numero);
-        for (int i = 0; i < stationsBus3bis.size(); i++)
-            g.addVertex(stationsBus3bis.get(i).numero);
-
-        if (criteria.equals("time")) {
-            for (int i = 0; i < stationsBus3.size(); i++)
-                g.addVertex(stationsBus3.get(i).numero);
-            for (int i = 0; i < stationsBus3bis.size(); i++)
-                g.addVertex(stationsBus3bis.get(i).numero);
-            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
-            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
-            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
-
-            Log.d("Distance",g.getVertex(srcNumber)+" | "+g.getVertex(dstNumber));
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                for (int k = 1; k < path.size(); k++) {
-                    for (int i = 0; i < stationsBus3.size(); i++)
-                        if (path.get(k).name.equals(stationsBus3.get(i).numero))
-                            result.add(stationsBus3.get(i));
-                    for (int i = 0; i < stationsBus3bis.size(); i++)
-                        if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
-                            result.add(stationsBus3bis.get(i));
-                }
-            }
-            //
-            else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-        }
-        //
-        else if (criteria.equals("distance")) {
-            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
-            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
-            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 104);
-
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                for (int k = 1; k < path.size(); k++) {
-                    for (int i = 0; i < stationsBus3.size(); i++)
-                        if (path.get(k).name.equals(stationsBus3.get(i).numero))
-                            result.add(stationsBus3.get(i));
-                    for (int i = 0; i < stationsBus3bis.size(); i++)
-                        if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
-                            result.add(stationsBus3bis.get(i));
-                }
-            } else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-        }
-        return result;
-    }*/
 
     ArrayList<Station> bus3Navigation(GeoPoint src, GeoPoint dst, String criteria) {
         g.getVertices().clear();

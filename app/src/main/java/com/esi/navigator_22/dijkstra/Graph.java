@@ -103,7 +103,6 @@ public class Graph {
 
     public ArrayList<Vertex> affichage(Graph g, Vertex source, Vertex dest) {
         ArrayList<Vertex> result = new ArrayList<>();
-        result.add(source);
         g.calculate(source);
         System.out.print(source + " to " + dest + " Distance : " + dest.cost + " Path : [");
         for (int i = 0; i < g.getVertices().size(); i++) {
