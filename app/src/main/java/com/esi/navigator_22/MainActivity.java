@@ -650,7 +650,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onClick(View v) {
                 getLocation();
-                myMap.setVisibility(0);
+                addSource(srcCoord,"Source");
+                addDestination(dstCoord,"Destination");
                 if (mean_walk.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "walk", true);
                 else if (mean_tram.isSelected())
@@ -706,7 +707,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 else if (mean.equals("A22")) result = busNavigation(src, dst, stationsBus22, 188);
                 else if (mean.equals("A25")) result = busNavigation(src, dst, stationsBus25, 180);
                 else if (mean.equals("A27")) result = busNavigation(src, dst, stationsBus27, 270);
-                else if (mean.equals("buses")) {
+                /*else if (mean.equals("buses")) {
                     g.edges.clear();
                     g.getVertices().clear();
 
@@ -741,8 +742,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     result.add(stationsBus.get(i));
                     } else
                         Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-                }
-                //
+                }*/
+                else if (mean.equals("buses")) result = busesNavigation(src, dst, "time");
+                    //
                 else if (mean.equals("All")) {
 
                     g.edges.clear();
@@ -1159,6 +1161,88 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         result.add(list.get(i));
         } else
             Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+        return result;
+    }
+
+    ArrayList<Station> busesNavigation(GeoPoint src, GeoPoint dst, String criteria) {
+        g.edges.clear();
+        g.getVertices().clear();
+        int distance = 0;
+        int time = 0;
+        int walk = 0;
+        current = new Vertex("current");
+        source = new Vertex("source");
+        destination = new Vertex("destination");
+        ArrayList<Station> result = new ArrayList<>();
+        if (criteria.equals("time")) {
+
+            //Initialisation
+            for (int i = 0; i < stationsBus.size(); i++)
+                g.addVertex(stationsBus.get(i).numero);
+
+            for (int compteur = 0; compteur < allStations.size(); compteur++)
+                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                    if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
+                        g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
+                    }
+                    walk++;
+                    if (walk == 6441) walk = 0;
+                }
+            addBusNavigation(stationsBus3, 120);
+            addBusNavigation(stationsBus3bis, 100);
+            addBusNavigation(stationsBus11, 129);
+            addBusNavigation(stationsBus16, 113);
+            addBusNavigation(stationsBus17, 125);
+            addBusNavigation(stationsBus22, 188);
+            addBusNavigation(stationsBus25, 180);
+            addBusNavigation(stationsBus27, 270);
+
+            //Si Source est Current Location
+            if (srcNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsBus.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(src, stationsBus.get(compteur).coordonnees) * 60));
+                    g.addEdge(current, g.getVertices().get(compteur), time);
+                }
+            }
+
+            //Si Source = Custom marker on map
+            if (srcNumber.toLowerCase().equals("source")) {
+                g.addVertex(source);
+                for (int compteur = 0; compteur < stationsBus.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(src, stationsBus.get(compteur).coordonnees) * 60));
+                    g.addEdge(source, g.getVertices().get(compteur), time);
+                }
+            }
+
+            //Si Destination est Current Location
+            if (dstNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsBus.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(dst, stationsBus.get(compteur).coordonnees) * 60));
+                    g.addEdge(current, g.getVertices().get(compteur), time);
+                }
+            }
+
+            //Si Destination = Custom marker on map
+            if (dstNumber.toLowerCase().equals("destination")) {
+                g.addVertex(destination);
+                for (int compteur = 0; compteur < stationsBus.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(dst, stationsBus.get(compteur).coordonnees) * 60));
+                    g.addEdge(destination, g.getVertices().get(compteur), time);
+                }
+            }
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < stationsBus.size(); i++)
+                        if (path.get(k).name.equals(stationsBus.get(i).numero))
+                            result.add(stationsBus.get(i));
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+        }
         return result;
     }
 
