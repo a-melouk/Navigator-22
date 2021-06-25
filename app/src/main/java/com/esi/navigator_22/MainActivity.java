@@ -656,8 +656,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 else if (mean_tram.isSelected())
                     navigation(srcCoord, dstCoord, "tramway", "time");
                 else if (mean_bus.isSelected())
-                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
-//                    navigation(srcCoord, dstCoord, "A03", "time");
+//                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
+                    navigation(srcCoord, dstCoord, "buses", "time");
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
