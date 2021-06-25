@@ -177,9 +177,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ArrayAdapter<String> arrayAdapter;
     OkHttpClient client = new OkHttpClient();
     Graph g = new Graph();
-    Vertex current;
-    Vertex source = new Vertex("Current");
-    Vertex destination = new Vertex("Destination");
+    Vertex current = new Vertex("current");
+    Vertex source = new Vertex("source");
+    Vertex destination = new Vertex("destination");
     ArrayList<Vertex> path;
     private double cost;
 
@@ -654,10 +654,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (mean_walk.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "walk", true);
                 else if (mean_tram.isSelected())
-                    navigation(srcCoord, dstCoord, "tramway", "distance");
+                    navigation(srcCoord, dstCoord, "tramway", "time");
                 else if (mean_bus.isSelected())
 //                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
-                    navigation(srcCoord, dstCoord, "buses", "time");
+                    navigation(srcCoord, dstCoord, "A03", "time");
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
@@ -693,442 +693,256 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         source = new Vertex("source");
         destination = new Vertex("destination");
         int time;
-        int bis = 0;
-        Log.d("Distance Number", srcNumber + " | " + dstNumber);
-        Log.d("Distance coords", srcCoord + " | " + dstCoord);
-        if (criteria.equals("time")) {
-            if (mean.toLowerCase().equals("tramway")) {
-                g.edges.clear();
-                g.getVertices().clear();
-//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-                int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-                for (int i = 0; i < stationsTramway.size(); i++)
-                    g.addVertex(stationsTramway.get(i).numero);
-                for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
-                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
-                g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+        if (src.equals(dst))
+            Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_SHORT).show();
+        else {
+            if (criteria.equals("time")) {
+                if (mean.toLowerCase().equals("tramway"))
+                    result = tramwayNavigation(src, dst, "time");
+                else if (mean.equals("A03")) result = bus3Navigation(src, dst, "time");
+                else if (mean.equals("A11")) result = busNavigation(src, dst, stationsBus11, 129);
+                else if (mean.equals("A16")) result = busNavigation(src, dst, stationsBus16, 113);
+                else if (mean.equals("A17")) result = busNavigation(src, dst, stationsBus17, 125);
+                else if (mean.equals("A22")) result = busNavigation(src, dst, stationsBus22, 188);
+                else if (mean.equals("A25")) result = busNavigation(src, dst, stationsBus25, 180);
+                else if (mean.equals("A27")) result = busNavigation(src, dst, stationsBus27, 270);
+                else if (mean.equals("buses")) {
+                    g.edges.clear();
+                    g.getVertices().clear();
 
-                if (srcNumber.toLowerCase().equals("source")) {
-                    g.addVertex(source);
-                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                        time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
-                        g.addEdge(source, g.getVertices().get(compteur), time);
-                    }
-                }
+                    for (int i = 0; i < stationsBus.size(); i++)
+                        g.addVertex(stationsBus.get(i).numero);
 
-                for (int i = 0; i < g.edges.size(); i++)
-                    Log.d("Arete", g.edges.get(i) + "");
-
-                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                    for (int k = 1; k < path.size(); k++)
-                        for (int i = 0; i < stationsTramway.size(); i++)
-                            if (path.get(k).name.equals(stationsTramway.get(i).numero))
-                                result.add(stationsTramway.get(i));
-                } else
-                    Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
-            }
-            //
-            else if (mean.equals("A03")) {
-                g.getVertices().clear();
-                g.edges.clear();
-
-                for (int i = 0; i < stationsBus3.size(); i++)
-                    g.addVertex(stationsBus3.get(i).numero);
-
-                for (int i = 0; i < stationsBus3bis.size(); i++)
-                    g.addVertex(stationsBus3bis.get(i).numero);
-
-                for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
-                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
-
-                for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
-                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
-
-                g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
-
-
-                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                    for (int k = 1; k < path.size(); k++) {
-                        for (int i = 0; i < stationsBus3.size(); i++)
-                            if (path.get(k).name.equals(stationsBus3.get(i).numero))
-                                result.add(stationsBus3.get(i));
-                        for (int i = 0; i < stationsBus3bis.size(); i++)
-                            if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
-                                result.add(stationsBus3bis.get(i));
-                    }
-                } else
-                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-
-            }
-            //
-            else if (mean.equals("A11")) {
-                result = busNavigation(src, dst, stationsBus11, 129);
-            }
-            //
-            else if (mean.equals("A16")) {
-                result = busNavigation(src, dst, stationsBus16, 113);
-            }
-            //
-            else if (mean.equals("A17")) {
-                result = busNavigation(src, dst, stationsBus17, 125);
-            }
-            //
-            else if (mean.equals("A22")) {
-                result = busNavigation(src, dst, stationsBus22, 188);
-            }
-            //
-            else if (mean.equals("A25")) {
-                result = busNavigation(src, dst, stationsBus25, 180);
-            }
-            //
-            else if (mean.equals("A27")) {
-                result = busNavigation(src, dst, stationsBus27, 270);
-            }
-            //
-            else if (mean.equals("buses")) {
-                g.edges.clear();
-                g.getVertices().clear();
-
-                for (int i = 0; i < stationsBus.size(); i++)
-                    g.addVertex(stationsBus.get(i).numero);
-
-                int walk = 0;
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                        if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
-                            g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
+                    int walk = 0;
+                    for (int compteur = 0; compteur < allStations.size(); compteur++)
+                        for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                            if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
+                                g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
+                            }
+                            walk++;
+                            if (walk == 6441) walk = 0;
                         }
-                        walk++;
-                        if (walk == 6441) walk = 0;
-                    }
 
-                addBusNavigation(stationsBus3, 120);
-                addBusNavigation(stationsBus3bis, 100);
-                addBusNavigation(stationsBus11, 129);
-                addBusNavigation(stationsBus16, 113);
-                addBusNavigation(stationsBus17, 125);
-                addBusNavigation(stationsBus22, 188);
-                addBusNavigation(stationsBus25, 180);
-                addBusNavigation(stationsBus27, 270);
+                    addBusNavigation(stationsBus3, 120);
+                    addBusNavigation(stationsBus3bis, 100);
+                    addBusNavigation(stationsBus11, 129);
+                    addBusNavigation(stationsBus16, 113);
+                    addBusNavigation(stationsBus17, 125);
+                    addBusNavigation(stationsBus22, 188);
+                    addBusNavigation(stationsBus25, 180);
+                    addBusNavigation(stationsBus27, 270);
 
-                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                    for (int k = 1; k < path.size(); k++)
-                        for (int i = 0; i < stationsBus.size(); i++)
-                            if (path.get(k).name.equals(stationsBus.get(i).numero))
-                                result.add(stationsBus.get(i));
-                } else
-                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-            }
-            //
-            else if (mean.equals("All")) {
+                    if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                        path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                        cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                        for (int k = 1; k < path.size(); k++)
+                            for (int i = 0; i < stationsBus.size(); i++)
+                                if (path.get(k).name.equals(stationsBus.get(i).numero))
+                                    result.add(stationsBus.get(i));
+                    } else
+                        Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+                }
+                //
+                else if (mean.equals("All")) {
 
-                g.edges.clear();
-                g.getVertices().clear();
+                    g.edges.clear();
+                    g.getVertices().clear();
 
-                for (int i = 0; i < allStations.size(); i++)
-                    g.addVertex(allStations.get(i).numero);
-
-                int walk = 0;
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                        g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
-                        walk++;
-                        if (walk == 6441) walk = 0;
-                    }
-
-                ArrayList<Edge> temp = new ArrayList<>();
-                //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-                int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-
-                for (int i = 0; i < g.edges.size(); i++)
-                    if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                        int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                        int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                        int diff = sourceName - targetName;
-                        for (int j = 0; j < stationsTramway.size() - 1; j++)
-                            if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                                temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
-                    }
-
-                for (int i = 0; i < temp.size(); i++)
-                    g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-
-                addBusNavigation(stationsBus3, 120);
-                addBusNavigation(stationsBus3bis, 100);
-                addBusNavigation(stationsBus11, 129);
-                addBusNavigation(stationsBus16, 113);
-                addBusNavigation(stationsBus17, 125);
-                addBusNavigation(stationsBus22, 188);
-                addBusNavigation(stationsBus25, 180);
-                addBusNavigation(stationsBus27, 270);
-
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                for (int k = 1; k < path.size(); k++)
                     for (int i = 0; i < allStations.size(); i++)
-                        if (path.get(k).name.equals(allStations.get(i).numero))
-                            result.add(allStations.get(i));
-            }
-        }
-        //
-        else if (criteria.equals("distance")) {
-            if (mean.toLowerCase().equals("tramway")) {
-                g.edges.clear();
-                g.getVertices().clear();
+                        g.addVertex(allStations.get(i).numero);
 
+                    int walk = 0;
+                    for (int compteur = 0; compteur < allStations.size(); compteur++)
+                        for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                            g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
+                            walk++;
+                            if (walk == 6441) walk = 0;
+                        }
 
+                    ArrayList<Edge> temp = new ArrayList<>();
+                    //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
+                    int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
 
-                for (int i = 0; i < stationsTramway.size(); i++)
-                    g.addVertex(stationsTramway.get(i).numero);
-                for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
-                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
-                g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
-
-                if (srcNumber.toLowerCase().equals("current")) {
-                    g.addVertex(current);
-                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                        time = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
-                        g.addEdge(current, g.getVertices().get(compteur), time);
-                    }
-                }
-
-                if (srcNumber.toLowerCase().equals("source")) {
-                    g.addVertex(source);
-                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                        time = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
-                        g.addEdge(source, g.getVertices().get(compteur), time);
-                    }
-                }
-
-                if (dstNumber.toLowerCase().equals("destination")) {
-                    g.addVertex(destination);
-                    for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                        time = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
-                        g.addEdge(destination, g.getVertices().get(compteur), time);
-                    }
-                }
-
-                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                    for (int k = 1; k < path.size(); k++)
-                        for (int i = 0; i < stationsTramway.size(); i++)
-                            if (path.get(k).name.equals(stationsTramway.get(i).numero))
-                                result.add(stationsTramway.get(i));
-                    for (int i = 0; i < g.getVertices().size(); i++)
-                        Log.d("Distance AreteVertex", g.getVertices().get(i) + "");
                     for (int i = 0; i < g.edges.size(); i++)
-                        Log.d("Distance AreteArete", g.edges.get(i) + "");
-
-                } else
-                    Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
-            }
-            //
-            else if (mean.equals("A03")) {
-                g.getVertices().clear();
-                g.edges.clear();
-
-                for (int i = 0; i < stationsBus3.size(); i++)
-                    g.addVertex(stationsBus3.get(i).numero);
-
-                for (int i = 0; i < stationsBus3bis.size(); i++)
-                    g.addVertex(stationsBus3bis.get(i).numero);
-
-                for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
-                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
-
-                for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
-                    g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
-
-                g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 104);
-
-
-                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                    for (int k = 1; k < path.size(); k++) {
-                        for (int i = 0; i < stationsBus3.size(); i++)
-                            if (path.get(k).name.equals(stationsBus3.get(i).numero))
-                                result.add(stationsBus3.get(i));
-                        for (int i = 0; i < stationsBus3bis.size(); i++)
-                            if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
-                                result.add(stationsBus3bis.get(i));
-                    }
-                } else
-                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-
-            }
-            //
-            else if (mean.equals("A11")) {
-                result = busNavigation(src, dst, stationsBus11, 0);
-            }
-            //
-            else if (mean.equals("A16")) {
-                result = busNavigation(src, dst, stationsBus16, 0);
-            }
-            //
-            else if (mean.equals("A17")) {
-                result = busNavigation(src, dst, stationsBus17, 0);
-            }
-            //
-            else if (mean.equals("A22")) {
-                result = busNavigation(src, dst, stationsBus22, 0);
-            }
-            //
-            else if (mean.equals("A25")) {
-                result = busNavigation(src, dst, stationsBus25, 0);
-            }
-            //
-            else if (mean.equals("A27")) {
-                result = busNavigation(src, dst, stationsBus27, 0);
-            }
-            //
-            else if (mean.equals("buses")) {
-                g.edges.clear();
-                g.getVertices().clear();
-
-                for (int i = 0; i < stationsBus.size(); i++)
-                    g.addVertex(stationsBus.get(i).numero);
-
-                int walk = 0;
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                        if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
-                            g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).distance);
+                        if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
+                            int sourceName = Integer.parseInt(g.edges.get(i).source.name);
+                            int targetName = Integer.parseInt(g.edges.get(i).target.name);
+                            int diff = sourceName - targetName;
+                            for (int j = 0; j < stationsTramway.size() - 1; j++)
+                                if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
+                                    temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
                         }
-                        walk++;
-                        if (walk == 6441) walk = 0;
-                    }
 
-                addBusNavigation(stationsBus3, 0);
-                addBusNavigation(stationsBus3bis, 0);
-                addBusNavigation(stationsBus11, 0);
-                addBusNavigation(stationsBus16, 0);
-                addBusNavigation(stationsBus17, 0);
-                addBusNavigation(stationsBus22, 0);
-                addBusNavigation(stationsBus25, 0);
-                addBusNavigation(stationsBus27, 0);
+                    for (int i = 0; i < temp.size(); i++)
+                        g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
 
-                if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                    addBusNavigation(stationsBus3, 120);
+                    addBusNavigation(stationsBus3bis, 100);
+                    addBusNavigation(stationsBus11, 129);
+                    addBusNavigation(stationsBus16, 113);
+                    addBusNavigation(stationsBus17, 125);
+                    addBusNavigation(stationsBus22, 188);
+                    addBusNavigation(stationsBus25, 180);
+                    addBusNavigation(stationsBus27, 270);
+
+                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                    for (int k = 1; k < path.size(); k++)
+                        for (int i = 0; i < allStations.size(); i++)
+                            if (path.get(k).name.equals(allStations.get(i).numero))
+                                result.add(allStations.get(i));
+                }
+            }
+            //
+            else if (criteria.equals("distance")) {
+                if (mean.toLowerCase().equals("tramway"))
+                    result = tramwayNavigation(src, dst, "distance");
+                else if (mean.equals("A03")) bus3Navigation(src,dst,"distance");
+                else if (mean.equals("A11")) result = busNavigation(src, dst, stationsBus11, 0);
+                else if (mean.equals("A16")) result = busNavigation(src, dst, stationsBus16, 0);
+                else if (mean.equals("A17")) result = busNavigation(src, dst, stationsBus17, 0);
+                else if (mean.equals("A22")) result = busNavigation(src, dst, stationsBus22, 0);
+                else if (mean.equals("A25")) result = busNavigation(src, dst, stationsBus25, 0);
+                else if (mean.equals("A27")) result = busNavigation(src, dst, stationsBus27, 0);
+                else if (mean.equals("buses")) {
+                    g.edges.clear();
+                    g.getVertices().clear();
+
+                    for (int i = 0; i < stationsBus.size(); i++)
+                        g.addVertex(stationsBus.get(i).numero);
+
+                    int walk = 0;
+                    for (int compteur = 0; compteur < allStations.size(); compteur++)
+                        for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                            if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
+                                g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).distance);
+                            }
+                            walk++;
+                            if (walk == 6441) walk = 0;
+                        }
+
+                    addBusNavigation(stationsBus3, 0);
+                    addBusNavigation(stationsBus3bis, 0);
+                    addBusNavigation(stationsBus11, 0);
+                    addBusNavigation(stationsBus16, 0);
+                    addBusNavigation(stationsBus17, 0);
+                    addBusNavigation(stationsBus22, 0);
+                    addBusNavigation(stationsBus25, 0);
+                    addBusNavigation(stationsBus27, 0);
+
+                    if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                        path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                        cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                        for (int k = 1; k < path.size(); k++)
+                            for (int i = 0; i < stationsBus.size(); i++)
+                                if (path.get(k).name.equals(stationsBus.get(i).numero))
+                                    result.add(stationsBus.get(i));
+                    } else
+                        Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+                }
+                else if (mean.equals("All")) {
+
+                    g.edges.clear();
+                    g.getVertices().clear();
+
+                    for (int i = 0; i < allStations.size(); i++)
+                        g.addVertex(allStations.get(i).numero);
+
+                    int walk = 0;
+                    for (int compteur = 0; compteur < allStations.size(); compteur++)
+                        for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
+                            g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).distance);
+                            walk++;
+                            if (walk == 6441) walk = 0;
+                        }
+
+                    ArrayList<Edge> temp = new ArrayList<>();
+
+                    for (int i = 0; i < g.edges.size(); i++)
+                        if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
+                            int sourceName = Integer.parseInt(g.edges.get(i).source.name);
+                            int targetName = Integer.parseInt(g.edges.get(i).target.name);
+                            int diff = sourceName - targetName;
+                            for (int j = 0; j < stationsTramway.size() - 1; j++)
+                                if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
+                                    temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 0));
+                        }
+
+                    for (int i = 0; i < temp.size(); i++)
+                        g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
+
+                    addBusNavigation(stationsBus3, 0);
+                    addBusNavigation(stationsBus3bis, 0);
+                    addBusNavigation(stationsBus11, 0);
+                    addBusNavigation(stationsBus16, 0);
+                    addBusNavigation(stationsBus17, 0);
+                    addBusNavigation(stationsBus22, 0);
+                    addBusNavigation(stationsBus25, 0);
+                    addBusNavigation(stationsBus27, 0);
+
                     path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
                     cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
                     for (int k = 1; k < path.size(); k++)
-                        for (int i = 0; i < stationsBus.size(); i++)
-                            if (path.get(k).name.equals(stationsBus.get(i).numero))
-                                result.add(stationsBus.get(i));
-                } else
-                    Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-            }
-            //
-            else if (mean.equals("All")) {
-
-                g.edges.clear();
-                g.getVertices().clear();
-
-                for (int i = 0; i < allStations.size(); i++)
-                    g.addVertex(allStations.get(i).numero);
-
-                int walk = 0;
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                        g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).distance);
-                        walk++;
-                        if (walk == 6441) walk = 0;
-                    }
-
-                ArrayList<Edge> temp = new ArrayList<>();
-
-                for (int i = 0; i < g.edges.size(); i++)
-                    if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                        int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                        int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                        int diff = sourceName - targetName;
-                        for (int j = 0; j < stationsTramway.size() - 1; j++)
-                            if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                                temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 0));
-                    }
-
-                for (int i = 0; i < temp.size(); i++)
-                    g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-
-                addBusNavigation(stationsBus3, 0);
-                addBusNavigation(stationsBus3bis, 0);
-                addBusNavigation(stationsBus11, 0);
-                addBusNavigation(stationsBus16, 0);
-                addBusNavigation(stationsBus17, 0);
-                addBusNavigation(stationsBus22, 0);
-                addBusNavigation(stationsBus25, 0);
-                addBusNavigation(stationsBus27, 0);
-
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < allStations.size(); i++)
-                        if (path.get(k).name.equals(allStations.get(i).numero))
-                            result.add(allStations.get(i));
-            }
-        }
-
-        if (result.size() > 0) {
-
-            if (mean.equals("tramway")) {
-                Log.d("RouteeeTram", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                        result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                getBestRoute(
-                        adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
-            }//
-            else if (result.get(0).type.equals("bus"))
-                if (mean.equals(removeFromStart(result.get(0).numero))) {
-                    getBestRoute(
-                            adresse + "result/" + result.get(0).numero + "/"
-                                    + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                    result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
-                    Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
-                            + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                            result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                } else if (mean.equals("buses")) {
-
-                } else if (mean.equals("All")) {
-
+                        for (int i = 0; i < allStations.size(); i++)
+                            if (path.get(k).name.equals(allStations.get(i).numero))
+                                result.add(allStations.get(i));
                 }
+            }
+
+            if (result.size() > 0) {
+
+                if (mean.equals("tramway")) {
+                    Log.d("RouteeeTram", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                            result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                    getBestRoute(
+                            adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                    result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
+                }//
+                else if (result.get(0).type.equals("bus"))
+                    if (mean.equals(removeFromStart(result.get(0).numero))) {
+                        getBestRoute(
+                                adresse + "result/" + result.get(0).numero + "/"
+                                        + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                        result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
+                        Log.d("RouteeeBus", adresse + "result/" + result.get(0).numero + "/"
+                                + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
+                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
+                    } else if (mean.equals("buses")) {
+
+                    } else if (mean.equals("All")) {
+
+                    }
 //            fetchRoute(src, result.get(0).coordonnees, true);
 //            fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
 //            addSource(src, "From current location to \n" + result.get(0).nomFr + ":\n" + (int) Math.round(g.cost(g, source, path.get(1))));
 
-            //1ère station to Size()-1
-            for (int i = 0; i < result.size() - 1; i++) {
-                if (result.get(i).type.equals("tramway")) {
-                    addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
+                //1ère station to Size()-1
+                for (int i = 0; i < result.size() - 1; i++) {
+                    if (result.get(i).type.equals("tramway")) {
+                        addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
 
-                } else
-                    addPin(result.get(i).coordonnees, result.get(i).nomFr + ", " + removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
-            }
-            linear_steps.removeAllViewsInLayout();
-            View card = View.inflate(this, R.layout.card_view, null);
-            TextView criteria_text = card.findViewById(R.id.criteria);
-            criteria_text.setText("Distance");
-            TextView weight_text = card.findViewById(R.id.weight);
-            weight_text.setText(cost + "");
+                    } else
+                        addPin(result.get(i).coordonnees, result.get(i).nomFr + ", " + removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
+                }
+                linear_steps.removeAllViewsInLayout();
+                View card = View.inflate(this, R.layout.card_view, null);
+                TextView criteria_text = card.findViewById(R.id.criteria);
+                criteria_text.setText("Distance");
+                TextView weight_text = card.findViewById(R.id.weight);
+                weight_text.setText(cost + "");
 
-            linear_steps.addView(card);
-
-
-            if (result.get(result.size() - 1).type.equals("tramway"))
-                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "tramway");
-            else {
-                addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "bus");
-                Log.d("TracerBus", "Ouaiiiis");
-            }
+                linear_steps.addView(card);
 
 
-            //Dernière station to Destination
+                if (result.get(result.size() - 1).type.equals("tramway"))
+                    addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "tramway");
+                else {
+                    addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "bus");
+                    Log.d("TracerBus", "Ouaiiiis");
+                }
+
+
+                //Dernière station to Destination
 //            if (result.get(result.size() - 1).type.equals("tramway"))
 //                addPin(result.get(result.size() - 1).coordonnees, result.get(result.size() - 1).nomFr + " to \n" + path.get(path.size() - 1).name + ":\n" +
 //                        (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "tramway");
@@ -1136,14 +950,219 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to \n" + path.get(path.size() - 1).name + ":\n" +
 //                        (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "bus");
 //            addDestination(dst, "From current to destination: " + "\n" + (int) Math.round(cost / 60) + "minutes");
+            }
+            //
+            else {
+//            fetchRoute(src, dst, true);
+                Log.d("Routeee", "mefihech");
+            }
+
+        }
+    }
+
+    ArrayList<Station> tramwayNavigation(GeoPoint src, GeoPoint dst, String criteria) {
+        g.edges.clear();
+        g.getVertices().clear();
+        int distance = 0;
+        int time = 0;
+        Vertex current = new Vertex("current");
+        Vertex source = new Vertex("source");
+        Vertex destination = new Vertex("destination");
+        ArrayList<Station> result = new ArrayList<>();
+        if (criteria.equals("time")) {
+//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
+            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
+
+            //Initialisation
+            for (int i = 0; i < stationsTramway.size(); i++)
+                g.addVertex(stationsTramway.get(i).numero);
+            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
+            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
+
+            //Si Source est Current Location
+            if (srcNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
+                    g.addEdge(current, g.getVertices().get(compteur), time);
+                }
+            }
+
+            //Si Source = Custom marker on map
+            if (srcNumber.toLowerCase().equals("source")) {
+                g.addVertex(source);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
+                    g.addEdge(source, g.getVertices().get(compteur), time);
+                }
+            }
+
+            //Si Destination est Current Location
+            if (dstNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(dst, stationsTramway.get(compteur).coordonnees) * 60));
+                    g.addEdge(current, g.getVertices().get(compteur), time);
+                }
+            }
+
+            //Si Destination = Custom marker on map
+            if (dstNumber.toLowerCase().equals("destination")) {
+                g.addVertex(destination);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    time = (int) Math.round((fetchTime(dst, stationsTramway.get(compteur).coordonnees) * 60));
+                    g.addEdge(destination, g.getVertices().get(compteur), time);
+                }
+            }
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < stationsTramway.size(); i++)
+                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
+                            result.add(stationsTramway.get(i));
+                for (int i = 0; i < g.getVertices().size(); i++)
+                    Log.d("Distance_Vertices", g.getVertices().get(i) + "");
+                for (int i = 0; i < g.edges.size(); i++)
+                    Log.d("Distance_Arete", g.edges.get(i) + "");
+                Log.d("Distance_Path", path + "");
+
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
         }
         //
-        else {
-//            fetchRoute(src, dst, true);
-            Log.d("Routeee", "mefihech");
+        else if (criteria.equals("distance")) {
+            //Initialisation du graphe avec {tous les sommets = stations de tramway} et {les arêtes entre chaque deux stations}
+            for (int i = 0; i < stationsTramway.size(); i++)
+                g.addVertex(stationsTramway.get(i).numero);
+            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
+
+            //Si Source est Current Location
+            if (srcNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(current, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            //Si Source = Custom marker on map
+            if (srcNumber.toLowerCase().equals("source")) {
+                g.addVertex(source);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(source, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            //Si Destination est Current Location
+            if (dstNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(current, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            //Si Destination = Custom marker on map
+            if (dstNumber.toLowerCase().equals("destination")) {
+                g.addVertex(destination);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(destination, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < stationsTramway.size(); i++)
+                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
+                            result.add(stationsTramway.get(i));
+                for (int i = 0; i < g.getVertices().size(); i++)
+                    Log.d("Distance_Vertices", g.getVertices().get(i) + "");
+                for (int i = 0; i < g.edges.size(); i++)
+                    Log.d("Distance_Arete", g.edges.get(i) + "");
+                Log.d("Distance_Path", path + "");
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
         }
+        return result;
+    }
+
+    ArrayList<Station> bus3Navigation(GeoPoint src, GeoPoint dst, String criteria) {
+        g.getVertices().clear();
+        g.edges.clear();
+        ArrayList<Station> result = new ArrayList<>();
+        Log.d("Distance","EIIIIh");
+
+        for (int i = 0; i < stationsBus3.size(); i++)
+            g.addVertex(stationsBus3.get(i).numero);
+        for (int i = 0; i < stationsBus3bis.size(); i++)
+            g.addVertex(stationsBus3bis.get(i).numero);
+
+        if (criteria.equals("time")) {
+            for (int i = 0; i < stationsBus3.size(); i++)
+                g.addVertex(stationsBus3.get(i).numero);
+            for (int i = 0; i < stationsBus3bis.size(); i++)
+                g.addVertex(stationsBus3bis.get(i).numero);
+            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 120);
+            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 100);
+            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 150);
+
+            Log.d("Distance",g.edges+"");
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                Log.d("TheDistance1",srcNumber+" | "+dstNumber);
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                Log.d("TheDistance2",srcNumber+" | "+dstNumber);
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                Log.d("TheDistance3",srcNumber+" | "+dstNumber);
+                for (int k = 1; k < path.size(); k++) {
+                    for (int i = 0; i < stationsBus3.size(); i++)
+                        if (path.get(k).name.equals(stationsBus3.get(i).numero))
+                            result.add(stationsBus3.get(i));
+                    for (int i = 0; i < stationsBus3bis.size(); i++)
+                        if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
+                            result.add(stationsBus3bis.get(i));
+                }
+            }
+            //
+            else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+        }
+        //
+        else if (criteria.equals("distance")) {
+            for (int compteur = 0; compteur < stationsBus3.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+            for (int compteur = stationsBus3.size(); compteur < stationsBus3.size() + stationsBus3bis.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+            g.addEdge(g.getVertices().get(0), g.getVertices().get(stationsBus3.size()), 104);
 
 
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                for (int k = 1; k < path.size(); k++) {
+                    for (int i = 0; i < stationsBus3.size(); i++)
+                        if (path.get(k).name.equals(stationsBus3.get(i).numero))
+                            result.add(stationsBus3.get(i));
+                    for (int i = 0; i < stationsBus3bis.size(); i++)
+                        if (path.get(k).name.equals(stationsBus3bis.get(i).numero))
+                            result.add(stationsBus3bis.get(i));
+                }
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
+        }
+        return result;
     }
 
     public ArrayList<Station> busNavigation(GeoPoint src, GeoPoint dst, ArrayList<Station> list, int weight) {
@@ -1151,25 +1170,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         g.edges.clear();
         g.getVertices().clear();
         ArrayList<Station> result;
-        int time;
-        int bis = 0;
-        for (int i = 0; i < list.size(); i++) {
+        for (int i = 0; i < list.size(); i++)
             g.addVertex(list.get(i).numero);
-        }
-        /*
-        source = new Vertex("Current");
-        destination = new Vertex("Destination");
-        g.addVertex(source);
-        g.addVertex(destination);
-        for (int compteur = 0; compteur < list.size(); compteur++) {
-            time = (int) Math.round((fetchTime(src, list.get(compteur).coordonnees) * 60));
-            g.addEdge(source, g.getVertices().get(compteur), time);
-            time = (int) Math.round((fetchTime(dst, list.get(compteur).coordonnees) * 60));
-            g.addEdge(destination, g.getVertices().get(compteur), time);
-        }*/
-        for (int compteur = 0; compteur < list.size() - 1; compteur++) {
-            g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), weight);
-        }
+        for (int i = 0; i < list.size() - 1; i++)
+            g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), weight);
 
         result = new ArrayList<>();
         if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
@@ -1302,6 +1306,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
+                Log.d("DistanceSource",srcNumber);
                 return false;
             }
 
@@ -1310,8 +1315,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.VISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-
-                getLocation();
                 getLocation();
                 ArrayList<Station> stations = new ArrayList<>();
                 stations.add(new Station("current", "Current location", "current", currentLocation));
@@ -1322,7 +1325,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationSource.setAdapter(stationNameAdapter);
-
                 navigationSource.setOnItemClickListener((parent, view, position, id) -> {
                     Station o = (Station) navigationSource.getItemAtPosition(position);
                     if (o.numero.equals(("source"))) {
@@ -1363,14 +1365,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else {
                         srcCoord = o.coordonnees;
                         srcNumber = o.numero;
+                        Log.d("TestTest1", o.nomFr);
                     }
                     pointSource.setQuery(o.nomFr, true);
                 });
                 return true;
             }
         });
-
-
         pointSource.setOnSearchClickListener(v -> {
             navigationSource.setVisibility(View.VISIBLE);
             searchStations.setVisibility(View.INVISIBLE);
@@ -1392,6 +1393,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
+                Log.d("DistanceDestination",dstNumber);
                 return false;
             }
 
@@ -1404,16 +1406,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ArrayList<Station> stations = new ArrayList<>();
                 stations.add(new Station("current", "Current location", "current", currentLocation));
                 stations.add(new Station("destination", "Custom destination", "destination", defaultLocation));
-
-
                 for (int i = 0; i < allStations.size(); i++)
                     if (allStations.get(i).nomFr.toLowerCase().contains(newText.toLowerCase()))
                         stations.add(allStations.get(i));
-
-
                 StationNameAdapter stationNameAdapter = new StationNameAdapter(getApplicationContext(), 0, stations);
                 navigationDestination.setAdapter(stationNameAdapter);
-
                 navigationDestination.setOnItemClickListener((parent, view, position, id) -> {
                     Station o = (Station) navigationDestination.getItemAtPosition(position);
                     if (o.numero.equals(("destination"))) {
@@ -1454,6 +1451,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     } else {
                         dstCoord = o.coordonnees;
                         dstNumber = o.numero;
+                        Log.d("TestTest2", o.nomFr);
                     }
                     pointDestination.setQuery(o.nomFr, true);
 
