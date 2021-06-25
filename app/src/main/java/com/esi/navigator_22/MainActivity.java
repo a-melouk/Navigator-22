@@ -1489,7 +1489,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void stationSource() {
         SearchView pointSource = findViewById(R.id.stationSource);
-        pointSource.setBackgroundResource(R.drawable.rounded);
+        pointSource.setBackgroundResource(R.drawable.background_primary);
         pointSource.setVisibility(View.VISIBLE);
         pointSource.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -1575,7 +1575,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void stationDestination() {
         SearchView pointDestination = findViewById(R.id.stationDestination);
-        pointDestination.setBackgroundResource(R.drawable.rounded);
+        pointDestination.setBackgroundResource(R.drawable.background_primary);
         pointDestination.setVisibility(View.VISIBLE);
         pointDestination.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override

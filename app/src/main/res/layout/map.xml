@@ -27,7 +27,7 @@
             android:layout_width="320dp"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/rounded_lignes"
+            android:background="@drawable/background_white_primary_15dp"
             android:visibility="visible">
 
             <ImageButton
@@ -201,7 +201,7 @@
         android:id="@+id/menu_linear"
         android:layout_width="90dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/rounded_lignes"
+        android:background="@drawable/background_white_primary_15dp"
         android:orientation="horizontal"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
