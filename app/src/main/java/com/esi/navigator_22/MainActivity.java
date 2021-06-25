@@ -656,8 +656,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 else if (mean_tram.isSelected())
                     navigation(srcCoord, dstCoord, "tramway", "time");
                 else if (mean_bus.isSelected())
-//                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber));
-                    navigation(srcCoord, dstCoord, "A03", "time");
+                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
+//                    navigation(srcCoord, dstCoord, "A03", "time");
                 else if (mean_car.isSelected())
                     fetchRouteByMean(srcCoord, dstCoord, "car", true);
                 else if (the_best_time.isSelected())
@@ -800,7 +800,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             else if (criteria.equals("distance")) {
                 if (mean.toLowerCase().equals("tramway"))
                     result = tramwayNavigation(src, dst, "distance");
-                else if (mean.equals("A03")) bus3Navigation(src,dst,"distance");
+                else if (mean.equals("A03")) bus3Navigation(src, dst, "distance");
                 else if (mean.equals("A11")) result = busNavigation(src, dst, stationsBus11, 0);
                 else if (mean.equals("A16")) result = busNavigation(src, dst, stationsBus16, 0);
                 else if (mean.equals("A17")) result = busNavigation(src, dst, stationsBus17, 0);
@@ -842,8 +842,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     result.add(stationsBus.get(i));
                     } else
                         Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-                }
-                else if (mean.equals("All")) {
+                } else if (mean.equals("All")) {
 
                     g.edges.clear();
                     g.getVertices().clear();
@@ -1224,13 +1223,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         path.clear();
         g.edges.clear();
         g.getVertices().clear();
-        ArrayList<Station> result;
+        ArrayList<Station> result = new ArrayList<>();
+
         for (int i = 0; i < list.size(); i++)
             g.addVertex(list.get(i).numero);
         for (int i = 0; i < list.size() - 1; i++)
             g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), weight);
 
-        result = new ArrayList<>();
         if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
             path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
             cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
@@ -1361,7 +1360,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-                Log.d("DistanceSource",srcNumber);
+                Log.d("DistanceSource", srcNumber);
                 return false;
             }
 
@@ -1448,7 +1447,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigationSource.setVisibility(View.INVISIBLE);
                 searchStations.setVisibility(View.INVISIBLE);
                 navigationDestination.setVisibility(View.INVISIBLE);
-                Log.d("DistanceDestination",dstNumber);
+                Log.d("DistanceDestination", dstNumber);
                 return false;
             }
 
