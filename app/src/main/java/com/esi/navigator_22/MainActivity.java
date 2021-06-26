@@ -126,9 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     NavigationView navigationView;
 
     Station station = new Station();
-    MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero",
-            new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero",
-            new GeoPoint(0.0, 0.0)), 0.0, 0.0);
+    MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), 0.0, 0.0);
     GeoPoint defaultLocation = new GeoPoint(35.19115853846664, -0.6298066051152207);
     static GeoPoint currentLocation = new GeoPoint(0.0, 0.0);
     GeoPoint srcCoord = new GeoPoint(0.0, 0.0);
@@ -171,9 +169,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int[] ids_bus22 = new int[8];
     int[] ids_bus25 = new int[10];
     int[] ids_bus27 = new int[7];
-    int[] couleurs;
-    int bus3_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1,
-            bus27_click = 1, tramway_click = 1;
+    int bus3_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1, bus27_click = 1, tramway_click = 1;
 
     ArrayAdapter<String> arrayAdapter;
     OkHttpClient client = new OkHttpClient();
@@ -187,41 +183,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        ids_tramway = new int[]{R.id.station1, R.id.station2, R.id.station3, R.id.station4, R.id.station5, R.id.station6, R.id.station7, R.id.station8, R.id.station9,
-                R.id.station10, R.id.station11, R.id.station12, R.id.station13, R.id.station14, R.id.station15, R.id.station16, R.id.station17, R.id.station18,
-                R.id.station19, R.id.station20, R.id.station21, R.id.station22};
-        ids_bus3 = new int[]{R.id.station_3_1, R.id.station_3_2, R.id.station_3_3, R.id.station_3_4, R.id.station_3_5, R.id.station_3_6, R.id.station_3_7, R.id.station_3_8,
-                R.id.station_3_9,
-                R.id.station_3_10, R.id.station_3_11, R.id.station_3_12, R.id.station_3_13, R.id.station_3_14, R.id.station_3_15};
-        ids_bus3bis = new int[]{R.id.station_3bis_1, R.id.station_3bis_2, R.id.station_3bis_3, R.id.station_3bis_4, R.id.station_3bis_5, R.id.station_3bis_6, R.id.station_3bis_7,
-                R.id.station_3bis_8, R.id.station_3bis_9};
-        ids_bus11 = new int[]{R.id.station_11_1, R.id.station_11_2, R.id.station_11_3, R.id.station_11_4, R.id.station_11_5, R.id.station_11_6, R.id.station_11_7, R.id.station_11_8,
-                R.id.station_11_9,
-                R.id.station_11_10, R.id.station_11_11, R.id.station_11_12, R.id.station_11_13, R.id.station_11_14};
+        ids_tramway = new int[]{R.id.station1, R.id.station2, R.id.station3, R.id.station4, R.id.station5, R.id.station6, R.id.station7, R.id.station8, R.id.station9, R.id.station10, R.id.station11, R.id.station12, R.id.station13, R.id.station14, R.id.station15, R.id.station16, R.id.station17, R.id.station18, R.id.station19, R.id.station20, R.id.station21, R.id.station22};
+        ids_bus3 = new int[]{R.id.station_3_1, R.id.station_3_2, R.id.station_3_3, R.id.station_3_4, R.id.station_3_5, R.id.station_3_6, R.id.station_3_7, R.id.station_3_8, R.id.station_3_9, R.id.station_3_10, R.id.station_3_11, R.id.station_3_12, R.id.station_3_13, R.id.station_3_14, R.id.station_3_15};
+        ids_bus3bis = new int[]{R.id.station_3bis_1, R.id.station_3bis_2, R.id.station_3bis_3, R.id.station_3bis_4, R.id.station_3bis_5, R.id.station_3bis_6, R.id.station_3bis_7, R.id.station_3bis_8, R.id.station_3bis_9};
+        ids_bus11 = new int[]{R.id.station_11_1, R.id.station_11_2, R.id.station_11_3, R.id.station_11_4, R.id.station_11_5, R.id.station_11_6, R.id.station_11_7, R.id.station_11_8, R.id.station_11_9, R.id.station_11_10, R.id.station_11_11, R.id.station_11_12, R.id.station_11_13, R.id.station_11_14};
 
-        ids_bus16 = new int[]{R.id.station_16_1, R.id.station_16_2, R.id.station_16_3, R.id.station_16_4, R.id.station_16_5, R.id.station_16_6, R.id.station_16_7, R.id.station_16_8,
-                R.id.station_16_9,
-                R.id.station_16_10, R.id.station_16_11, R.id.station_16_12, R.id.station_16_13, R.id.station_16_14, R.id.station_16_15, R.id.station_16_15};
+        ids_bus16 = new int[]{R.id.station_16_1, R.id.station_16_2, R.id.station_16_3, R.id.station_16_4, R.id.station_16_5, R.id.station_16_6, R.id.station_16_7, R.id.station_16_8, R.id.station_16_9, R.id.station_16_10, R.id.station_16_11, R.id.station_16_12, R.id.station_16_13, R.id.station_16_14, R.id.station_16_15, R.id.station_16_15};
 
-        ids_bus17 = new int[]{R.id.station_17_1, R.id.station_17_2, R.id.station_17_3, R.id.station_17_4, R.id.station_17_5, R.id.station_17_6, R.id.station_17_7, R.id.station_17_8,
-                R.id.station_17_9,
-                R.id.station_17_10, R.id.station_17_11, R.id.station_17_12};
+        ids_bus17 = new int[]{R.id.station_17_1, R.id.station_17_2, R.id.station_17_3, R.id.station_17_4, R.id.station_17_5, R.id.station_17_6, R.id.station_17_7, R.id.station_17_8, R.id.station_17_9, R.id.station_17_10, R.id.station_17_11, R.id.station_17_12};
 
         ids_bus22 = new int[]{R.id.station_22_1, R.id.station_22_2, R.id.station_22_3, R.id.station_22_4, R.id.station_22_5, R.id.station_22_6, R.id.station_22_7, R.id.station_22_8,};
 
-        ids_bus25 = new int[]{R.id.station_25_1, R.id.station_25_2, R.id.station_25_3, R.id.station_25_4, R.id.station_25_5, R.id.station_25_6, R.id.station_25_7, R.id.station_25_8,
-                R.id.station_25_9,
-                R.id.station_25_10};
+        ids_bus25 = new int[]{R.id.station_25_1, R.id.station_25_2, R.id.station_25_3, R.id.station_25_4, R.id.station_25_5, R.id.station_25_6, R.id.station_25_7, R.id.station_25_8, R.id.station_25_9, R.id.station_25_10};
 
         ids_bus27 = new int[]{R.id.station_27_1, R.id.station_27_2, R.id.station_27_3, R.id.station_27_4, R.id.station_27_5, R.id.station_27_6, R.id.station_27_7};
-
-        couleurs = new int[]{getApplicationContext().getResources().getColor(R.color.black),
-                getApplicationContext().getResources().getColor(R.color.red),
-                getApplicationContext().getResources().getColor(R.color.green),
-                getApplicationContext().getResources().getColor(R.color.blue),
-                getApplicationContext().getResources().getColor(R.color.yellow),
-                getApplicationContext().getResources().getColor(R.color.dark_blue)};
-
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -252,8 +227,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         close = findViewById(R.id.close);
         menu_linear = findViewById(R.id.menu_linear);
         navigationSearchViews = findViewById(R.id.searchViews);
-//        arrow_down = findViewById(R.id.arrow_down);
-//        arrow_up = findViewById(R.id.arrow_up);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         scroll_steps = findViewById(R.id.scroll_steps);
@@ -330,14 +303,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Drawable currentDraw = ResourcesCompat.getDrawable(getResources(), R.drawable.person, null);
         Bitmap currentIcon = null;
-        if (currentDraw != null) {
+        if (currentDraw != null)
             currentIcon = ((BitmapDrawable) currentDraw).getBitmap();
-        }
         mLocationOverlay.setDirectionArrow(currentIcon, currentIcon);
         mLocationOverlay.enableMyLocation();
-
         mLocationOverlay.getMyLocation();
         myMap.getOverlays().add(mLocationOverlay);
+
         mapEventsOverlay = new MapEventsOverlay(new MapEventsReceiver() {
             @Override
             public boolean singleTapConfirmedHelper(GeoPoint p) {
@@ -348,17 +320,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean longPressHelper(GeoPoint p) {
                 InfoWindow.closeAllInfoWindowsOn(myMap);
-
                 return false;
             }
         });
         myMap.getOverlays().add(mapEventsOverlay);
+
         echelle = new ScaleBarOverlay(myMap);
         myMap.getOverlays().add(echelle);
-        myMap.setMultiTouchControls(true);
+
+
         mRotationGestureOverlay = new RotationGestureOverlay(myMap);
         mRotationGestureOverlay.setEnabled(true);
         myMap.getOverlays().add(mRotationGestureOverlay);
+
+        myMap.setMultiTouchControls(true);
 
 //        getRouteTramway();
 //        getRouteBus();
@@ -453,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             myMap.getController().setZoom(16.0);
             myMap.getController().setCenter(currentLocation);
         });
-
         tramway.setOnClickListener(v -> {
             int i = tramway_click;
             if (i == 1) {
@@ -587,7 +561,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             walk.setSelected(false);
             walk.setBackground(null);
         });
-
         mean_walk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -690,7 +663,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 the_best_time.setBackground(null);
             }
         });
-
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -712,7 +684,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     navigation(srcCoord, dstCoord, "All", "distance");
             }
         });
-
         close_steps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -751,9 +722,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     result = tramwayNavigation(src, dst, "distance");
                 else if (mean.equals("buses")) result = busesNavigation(src, dst, "distance");
                 else if (mean.equals("All")) result = allNavigation(src, dst, "distance");
-            }
-            for (int i = 0; i < g.edges.size(); i++) {
-                Log.d("Path", g.edges.get(i) + "");
             }
 
             if (result.size() > 0) {
@@ -797,7 +765,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 criteria_text.setText("Distance");
                 TextView weight_text = card.findViewById(R.id.weight);
                 weight_text.setText(cost + "");
-
                 linear_steps.addView(card);
 
 
@@ -1344,7 +1311,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-
     @Override
     public boolean onNavigationItemSelected(@NotNull MenuItem item) {
         getLocation();
@@ -1416,9 +1382,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         addStationTramway(myMap, o.coordonnees, o.nomFr);
                         myMap.getController().setCenter(o.coordonnees);
                         myMap.invalidate();
-
                     }
-
                 });
                 return false;
             }
@@ -1687,7 +1651,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus3.size()) {
                 if (item.getItemId() == ids_bus3[parcours]) {
-                    addMarker(myMap, stationsBus3.get(parcours).coordonnees, stationsBus3.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus3.get(parcours).coordonnees, stationsBus3.get(parcours).nomFr, "A03");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1698,7 +1662,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus3bis.size()) {
                 if (item.getItemId() == ids_bus3bis[parcours]) {
-                    addMarker(myMap, stationsBus3bis.get(parcours).coordonnees, stationsBus3bis.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus3bis.get(parcours).coordonnees, stationsBus3bis.get(parcours).nomFr, "A03");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1709,7 +1673,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus11.size()) {
                 if (item.getItemId() == ids_bus11[parcours]) {
-                    addMarker(myMap, stationsBus11.get(parcours).coordonnees, stationsBus11.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus11.get(parcours).coordonnees, stationsBus11.get(parcours).nomFr, "A11");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1720,7 +1684,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus16.size()) {
                 if (item.getItemId() == ids_bus16[parcours]) {
-                    addMarker(myMap, stationsBus16.get(parcours).coordonnees, stationsBus16.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus16.get(parcours).coordonnees, stationsBus16.get(parcours).nomFr, "A16");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1731,7 +1695,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus17.size()) {
                 if (item.getItemId() == ids_bus17[parcours]) {
-                    addMarker(myMap, stationsBus17.get(parcours).coordonnees, stationsBus17.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus17.get(parcours).coordonnees, stationsBus17.get(parcours).nomFr, "A17");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1742,7 +1706,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus22.size()) {
                 if (item.getItemId() == ids_bus22[parcours]) {
-                    addMarker(myMap, stationsBus22.get(parcours).coordonnees, stationsBus22.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus22.get(parcours).coordonnees, stationsBus22.get(parcours).nomFr, "A22");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1753,7 +1717,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus25.size()) {
                 if (item.getItemId() == ids_bus25[parcours]) {
-                    addMarker(myMap, stationsBus25.get(parcours).coordonnees, stationsBus25.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus25.get(parcours).coordonnees, stationsBus25.get(parcours).nomFr, "A25");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1764,7 +1728,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             parcours = 0;
             while (verify != 0 && parcours < stationsBus27.size()) {
                 if (item.getItemId() == ids_bus27[parcours]) {
-                    addMarker(myMap, stationsBus27.get(parcours).coordonnees, stationsBus27.get(parcours).nomFr, "bus");
+                    addMarker(myMap, stationsBus27.get(parcours).coordonnees, stationsBus27.get(parcours).nomFr, "A25");
                     verify = 0;
                 } else {
                     parcours++;
@@ -1776,9 +1740,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Get current location
     public void getLocation() {
-        if (mLocationOverlay.getMyLocation() != null) {
+        if (mLocationOverlay.getMyLocation() != null)
             currentLocation = mLocationOverlay.getMyLocation();
-        } else {
+        else {
             currentLocation = defaultLocation;
             Toast.makeText(getApplicationContext(),
                     "Using default location, consider enabling the GPS and restarting the app", Toast.LENGTH_SHORT).show();
@@ -1957,8 +1921,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         assert result != null;
         JSONArray datas = result.getJSONArray("datas");
-//        JSONArray duration = result.getJSONArray("duration");
-
         bestRoute.clear();
         for (int i = 0; i < datas.length(); i++) {
             JSONObject jsonobject;
@@ -1986,9 +1948,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Adding Overlays
     private void addStationsTramway() {
-        for (int i = 0; i < stationsTramway.size(); i++) {
+        for (int i = 0; i < stationsTramway.size(); i++)
             addStationTramway(myMap, stationsTramway.get(i).coordonnees, stationsTramway.get(i).nomFr);
-        }
     }
 
     private void tracerCheminTramway(ArrayList<GeoPoint> chemin, MapView mapView) {
@@ -1997,37 +1958,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        line.getOutlinePaint();
         line.setColor(Color.rgb(230, 138, 0));
         line.setDensityMultiplier(0.1f);
-        line.setPoints(chemin);
         line.setGeodesic(true);
+        line.setPoints(chemin);
         mapView.getOverlayManager().add(line);
         customOverlays.add(customOverlays.size(), new CustomOverlay("tramway", line));
     }
 
     private void tracerCorrespondance(ArrayList<GeoPoint> chemin, MapView mapView) {
-        Polyline line = new Polyline();
-        line.setWidth(12);
-//        line.getOutlinePaint();
-        line.setColor(Color.rgb(0, 0, 0));
-        line.setDensityMultiplier(0.9f);
-        line.setPoints(chemin);
-        line.setGeodesic(true);
-        mapView.getOverlayManager().add(line);
-        customOverlays.add(customOverlays.size(), new CustomOverlay("correspondance", line));
+        Polyline polyline_correspondance = new Polyline();
+        polyline_correspondance.setWidth(12);
+        polyline_correspondance.setColor(Color.rgb(0, 0, 0));
+        polyline_correspondance.setDensityMultiplier(0.9f);
+        polyline_correspondance.setGeodesic(true);
+        polyline_correspondance.setPoints(chemin);
+        mapView.getOverlayManager().add(polyline_correspondance);
+        customOverlays.add(customOverlays.size(), new CustomOverlay("correspondance", polyline_correspondance));
     }
 
-    public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom, String type) {
+    public void addMarker(MapView mapMarker, GeoPoint positionMarker, String nom, String numero) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
-        marker.setAlpha(0.8f);
         marker.setDraggable(false);
-        if (type.equals("tramway"))
+        if (numero.equals("tramway"))
             marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_tramway));
-        else
-            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus));
+        else if (numero.equals("A03"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_03));
+        else if (numero.equals("A11"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_11));
+        else if (numero.equals("A16"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_16));
+        else if (numero.equals("A17"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_17));
+        else if (numero.equals("A22"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_22));
+        else if (numero.equals("A25"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_25));
+        else if (numero.equals("A27"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_27));
         marker.setPanToView(true);
-        mapMarker.invalidate();
         mapMarker.getOverlays().add(marker);
+        mapMarker.invalidate();
         getLocation();
         marker.setSnippet(nom + "\n" + fetchRoute(currentLocation, marker.getPosition(), true));
         marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
@@ -2072,23 +2043,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 InfoWindow.closeAllInfoWindowsOn(myMap);
             }
         });
-//        marker.showInfoWindow();
     }
 
     void addSource(GeoPoint coordinates, String nom) {
         Marker marker = new Marker(myMap);
         marker.setPosition(coordinates);
-        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
-        marker.setAlpha(0.8f);
         marker.setDraggable(false);
-
         marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_source));
-
-        marker.setPanToView(true);
-        myMap.invalidate();
         myMap.getOverlays().add(marker);
+        myMap.invalidate();
         customOverlays.add(new CustomOverlay("source", marker));
-        getLocation();
         marker.setSnippet(nom);
         marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
             @Override
@@ -2102,48 +2066,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 InfoWindow.closeAllInfoWindowsOn(myMap);
             }
         });
-//        marker.showInfoWindow();
-    }
-
-    void addPin(GeoPoint coordinates, String nom, Drawable d) {
-        Marker marker = new Marker(myMap);
-        marker.setPosition(coordinates);
-        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
-        marker.setAlpha(0.8f);
-        marker.setDraggable(false);
-
-        marker.setIcon(d);
-
-        marker.setPanToView(true);
-        myMap.invalidate();
-        myMap.getOverlays().add(marker);
-        getLocation();
-        marker.setSnippet(nom);
-        marker.setInfoWindow(new InfoWindow(R.layout.custom_bubble, myMap) {
-            @Override
-            public void onOpen(Object item) {
-                TextView station = mView.findViewById(R.id.nomStation);
-                station.setText(marker.getSnippet());
-            }
-
-            @Override
-            public void onClose() {
-                InfoWindow.closeAllInfoWindowsOn(myMap);
-            }
-        });
-        marker.showInfoWindow();
     }
 
     void addDestination(GeoPoint coordinates, String nom) {
         Marker marker = new Marker(myMap);
         marker.setPosition(coordinates);
-        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
-        marker.setAlpha(0.8f);
         marker.setDraggable(false);
         marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.marker_destination));
         marker.setPanToView(true);
-        myMap.invalidate();
         myMap.getOverlays().add(marker);
+        myMap.invalidate();
         customOverlays.add(new CustomOverlay("destination", marker));
         getLocation();
         marker.setSnippet(nom);
@@ -2165,17 +2097,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //Get road points and details
     String fetchRoute(GeoPoint start, GeoPoint end, boolean draw) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
         RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
-        if (car.isSelected())
-            roadManager.addRequestOption("vehicle=car");
+        if (car.isSelected()) roadManager.addRequestOption("vehicle=car");
         else roadManager.addRequestOption("vehicle=foot");
-
-
         Road road = roadManager.getRoad(roadPoints);
-        Polyline route;
+        Polyline polyline;
         if (road.mLength == 0) {
             distanceTo = getDistanceOffline(start, end);
             timeTo = 99999.0;
@@ -2183,11 +2111,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         if (draw) {
             if (car.isSelected())
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
+                polyline = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.taxi), 10.0f);
             else
-                route = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.black), 10.0f);
+                polyline = RoadManager.buildRoadOverlay(road, getApplicationContext().getResources().getColor(R.color.black), 10.0f);
 
-            myMap.getOverlays().add(route);
+            myMap.getOverlays().add(polyline);
         }
         String duration = format(road.mDuration / 60);
         String dist = format(road.mLength);
@@ -2225,45 +2153,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 addSource(start, Math.round(road.mDuration / 60) + " minutes");
                 addDestination(end, Math.round(road.mDuration / 60) + " minutes");
             }
-
-
     }
 
     double fetchDistance(GeoPoint start, GeoPoint end) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
         RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
         roadManager.addRequestOption("vehicle=foot");
 
         Road road = roadManager.getRoad(roadPoints);
-        if (road.mLength == 0) {
-            return getDistanceOffline(start, end);
-        }
+        if (road.mLength == 0) return getDistanceOffline(start, end);
         return road.mLength;
 
     }
 
     double fetchTime(GeoPoint start, GeoPoint end) {
         ArrayList<GeoPoint> roadPoints = new ArrayList<>();
-        getLocation();
         roadPoints.add((start));
         roadPoints.add(end);
         RoadManager roadManager = new GraphHopperRoadManager(graphhopperkey, false);
         roadManager.addRequestOption("vehicle=foot");
         Road road = roadManager.getRoad(roadPoints);
-        if (road.mLength == 0) {
-            return 99999;
-        }
+        if (road.mLength == 0) return 99999;
         return road.mDuration / 60;
-
     }
 
     private double getDistanceOffline(GeoPoint currentLocation, GeoPoint targetedLocation) {
         float[] distance = new float[2];
-        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(),
-                targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
+        Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), targetedLocation.getLatitude(), targetedLocation.getLongitude(), distance);
         return distance[0];
     }
 
@@ -2298,8 +2216,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
             marker1.showInfoWindow();
             marker1.setPanToView(true);
-//            mapView.getController().setCenter(marker1.getPosition());
-//            mapView.getController().setZoom(16.0);
             return true;
         });
     }
@@ -2313,12 +2229,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ArrayList<Station> searchBusStationByNumber(String name) {
         ArrayList<Station> result = new ArrayList<>();
-        for (int i = 0; i < stationsBus.size(); i++) {
-            if (stationsBus.get(i).numero.contains(name)) {
+        for (int i = 0; i < stationsBus.size(); i++)
+            if (stationsBus.get(i).numero.contains(name))
                 result.add(stationsBus.get(i));
-            } else {
-            }
-        }
         return result;
     }
 
@@ -2336,16 +2249,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     void addBus(ArrayList<RouteBus> chemin, MapView mapView, int red, int green, int blue, String numero) {
         tracerCheminBus(chemin, mapView, red, green, blue, numero);
         addBusStationByNumber(numero);
-
     }
 
     void addStationBus(MapView mapMarker, GeoPoint positionMarker, String nomFr, String numLigne) {
         Marker marker = new Marker(mapMarker);
         marker.setPosition(positionMarker);
         marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
-        marker.setAlpha(0.8f);
-        marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus));
-        marker.setTitle(nomFr + " " + numLigne);
+        if (removeFromStart(numLigne).equals("A03"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_03));
+        else if (removeFromStart(numLigne).equals("A11"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_11));
+        else if (removeFromStart(numLigne).equals("A16"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_16));
+        else if (removeFromStart(numLigne).equals("A17"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_17));
+        else if (removeFromStart(numLigne).equals("A22"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_22));
+        else if (removeFromStart(numLigne).equals("A25"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_25));
+        else if (removeFromStart(numLigne).equals("A27"))
+            marker.setIcon(getApplicationContext().getResources().getDrawable(R.drawable.pin_bus_27));
+        marker.setTitle(nomFr + " " + removeFromStart(numLigne));
         marker.setPanToView(true);
         myMap.invalidate();
         myMap.getOverlays().add(marker);
@@ -2397,6 +2321,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.getOverlays().add(mRotationGestureOverlay);
         myMap.getOverlays().add(echelle);
         myMap.getOverlays().add(mapEventsOverlay);
+        InfoWindow.closeAllInfoWindowsOn(myMap);
 //        myMap.getOverlays().add(draggableMarker);
         myMap.invalidate();
         bus3_click = bus11_click = bus16_click = bus17_click = bus22_click = bus25_click = bus27_click = tramway_click = 1;
