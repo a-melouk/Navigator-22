@@ -1454,6 +1454,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         srcCoord = markerSource.getPosition();
                                         srcNumber = o.numero;
                                         tempSource[0].setVisible(false);
+                                        ok_marker.setVisibility(View.INVISIBLE);
                                     }
                                 });
                                 return false;
@@ -1539,6 +1540,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         dstCoord = markerDestination.getPosition();
                                         dstNumber = o.numero;
                                         temp_destination[0].setVisible(false);
+                                        ok_marker.setVisibility(View.INVISIBLE);
                                     }
                                 });
                                 return false;

@@ -180,7 +180,7 @@
         android:contentDescription="@string/todo"
         android:scaleType="center"
         android:src="@drawable/icon_ok"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:fabCustomSize="40dp"
         app:layout_constraintBottom_toTopOf="@+id/lignes"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
