@@ -173,15 +173,19 @@
 
     </RelativeLayout>
 
-    <ImageView
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/ok"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/todo"
+        android:scaleType="center"
         android:src="@drawable/icon_ok"
-        android:visibility="invisible"
+        android:visibility="visible"
+        app:fabCustomSize="40dp"
+        app:layout_constraintBottom_toTopOf="@+id/lignes"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
         app:layout_constraintStart_toStartOf="@id/verGuideline80"
-        app:layout_constraintTop_toTopOf="@id/horGuideline40" />
+        app:maxImageSize="32dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/lignes"
@@ -191,7 +195,7 @@
         android:scaleType="center"
         android:src="@drawable/icon_plus"
         app:fabCustomSize="40dp"
-        app:layout_constraintBottom_toBottomOf="@id/horGuideline50"
+        app:layout_constraintBottom_toBottomOf="@id/horGuideline60"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
         app:layout_constraintStart_toStartOf="@id/verGuideline80"
         app:maxImageSize="32dp" />
@@ -205,7 +209,7 @@
         android:orientation="horizontal"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
-        app:layout_constraintTop_toTopOf="@id/horGuideline50">
+        app:layout_constraintTop_toTopOf="@id/horGuideline60">
 
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -425,11 +429,11 @@
         app:layout_constraintGuide_percent="0.40" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horGuideline50"
+        android:id="@+id/horGuideline60"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.50" />
+        app:layout_constraintGuide_percent="0.60" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/horGuideline93"
