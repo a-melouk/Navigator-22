@@ -48,6 +48,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import com.esi.navigator_22.dijkstra.Edge;
 import com.esi.navigator_22.dijkstra.Graph;
 import com.esi.navigator_22.dijkstra.Vertex;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 
 import org.jetbrains.annotations.NotNull;
@@ -111,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ImageView currentPosition, reset;
     RelativeLayout menu_linear, navigationSearchViews;
-    ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, arrow_down, arrow_up, bus_22;
+    ImageView tramway, bus3, bus11, bus16, bus17, bus25, bus27, bus22;
     ImageView walk, car, bus, tram;
     ImageView mean_walk, mean_car, mean_bus, mean_tram, the_best_time, the_best_distance, ok_marker;
     ImageButton close;
@@ -232,14 +233,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bus11 = findViewById(R.id.bus_11);
         bus16 = findViewById(R.id.bus_16);
         bus17 = findViewById(R.id.bus_17);
-        bus_22 = findViewById(R.id.bus_22);
+        bus22 = findViewById(R.id.bus_22);
         bus25 = findViewById(R.id.bus_25);
         bus27 = findViewById(R.id.bus_27);
         tramway = findViewById(R.id.tramway);
         car = findViewById(R.id.car);
         walk = findViewById(R.id.walk);
-//        bus = findViewById(R.id.bus);
-//        tram = findViewById(R.id.tram);
+        FloatingActionButton floatingActionButton = findViewById(R.id.lignes);
 
         mean_walk = findViewById(R.id.mean_walk);
         mean_tram = findViewById(R.id.mean_tramway);
@@ -388,20 +388,65 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         stationsBus27 = searchBusStationByNumber("A27_");
         Animation animationToVisible = AnimationUtils.loadAnimation(this, R.anim.to_visible);
         Animation animationToInvisible = AnimationUtils.loadAnimation(this, R.anim.to_invisible);
+        Animation rotateOpen = AnimationUtils.loadAnimation(this, R.anim.rotate_open_anim);
+        Animation rotateClose = AnimationUtils.loadAnimation(this, R.anim.rotate_close_anim);
+        Animation toLeft = AnimationUtils.loadAnimation(this, R.anim.horizental_to_left);
+        Animation toRight = AnimationUtils.loadAnimation(this, R.anim.horizental_to_right);
+        Animation toTop = AnimationUtils.loadAnimation(this, R.anim.vertical_to_top);
+        Animation toBottom = AnimationUtils.loadAnimation(this, R.anim.vertical_to_bottom);
+        final int[] fab_click = {0};
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fab_click[0] == 0) {
+                    floatingActionButton.startAnimation(rotateOpen);
+                    menu_linear.setVisibility(View.VISIBLE);
+                    menu_linear.startAnimation(toLeft);
+                    tramway.setVisibility(View.VISIBLE);
+                    bus3.setVisibility(View.VISIBLE);
+                    bus11.setVisibility(View.VISIBLE);
+                    bus16.setVisibility(View.VISIBLE);
+                    bus17.setVisibility(View.VISIBLE);
+                    bus22.setVisibility(View.VISIBLE);
+                    bus25.setVisibility(View.VISIBLE);
+                    bus27.setVisibility(View.VISIBLE);
+                    tramway.startAnimation(toLeft);
+                    bus3.startAnimation(toLeft);
+                    bus11.startAnimation(toLeft);
+                    bus16.startAnimation(toLeft);
+                    bus17.startAnimation(toLeft);
+                    bus22.startAnimation(toLeft);
+                    bus25.startAnimation(toLeft);
+                    bus27.startAnimation(toLeft);
+                    fab_click[0]++;
+                    Log.d("Animation1", "" + fab_click[0]);
+                } else if (fab_click[0] == 1) {
+                    floatingActionButton.startAnimation(rotateClose);
+                    menu_linear.setVisibility(View.INVISIBLE);
+                    menu_linear.startAnimation(toRight);
+                    tramway.setVisibility(View.INVISIBLE);
+                    bus3.setVisibility(View.INVISIBLE);
+                    bus11.setVisibility(View.INVISIBLE);
+                    bus16.setVisibility(View.INVISIBLE);
+                    bus17.setVisibility(View.INVISIBLE);
+                    bus22.setVisibility(View.INVISIBLE);
+                    bus25.setVisibility(View.INVISIBLE);
+                    bus27.setVisibility(View.INVISIBLE);
+                    tramway.startAnimation(toRight);
+                    bus3.startAnimation(toRight);
+                    bus11.startAnimation(toRight);
+                    bus16.startAnimation(toRight);
+                    bus17.startAnimation(toRight);
+                    bus22.startAnimation(toRight);
+                    bus25.startAnimation(toRight);
+                    bus27.startAnimation(toRight);
+                    fab_click[0]--;
+                    Log.d("Animation2", "" + fab_click[0]);
+                }
 
-/*        arrow_down.setOnClickListener(v -> {
 
-            menu_linear.startAnimation(animationToVisible);
-            menu_linear.setVisibility(View.VISIBLE);
-            arrow_down.setVisibility(View.INVISIBLE);
-            arrow_up.setVisibility(View.VISIBLE);
+            }
         });
-        arrow_up.setOnClickListener(v -> {
-            menu_linear.startAnimation(animationToInvisible);
-            menu_linear.setVisibility(View.INVISIBLE);
-            arrow_up.setVisibility(View.INVISIBLE);
-            arrow_down.setVisibility(View.VISIBLE);
-        });*/
         currentPosition.setOnClickListener(v -> {
             getLocation();
 
@@ -487,7 +532,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bus17_click--;
             }
         });
-        bus_22.setOnClickListener(v -> {
+        bus22.setOnClickListener(v -> {
             int i = bus22_click;
             if (i == 1) {
                 cheminBus = searchBusRouteByNumber("A22");
@@ -685,8 +730,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUpList();
         initSearch();
-        stationSource();
-        stationDestination();
     }
 
     public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
@@ -699,56 +742,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (mean.toLowerCase().equals("tramway"))
                     result = tramwayNavigation(src, dst, "time");
                 else if (mean.equals("buses")) result = busesNavigation(src, dst, "time");
-                /*else if (mean.equals("All")) {
-
-                    g.edges.clear();
-                    g.getVertices().clear();
-
-                    for (int i = 0; i < allStations.size(); i++)
-                        g.addVertex(allStations.get(i).numero);
-
-                    int walk = 0;
-                    for (int compteur = 0; compteur < allStations.size(); compteur++)
-                        for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                            g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
-                            walk++;
-                            if (walk == 6441) walk = 0;
-                        }
-
-                    ArrayList<Edge> temp = new ArrayList<>();
-                    //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-                    int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-
-                    for (int i = 0; i < g.edges.size(); i++)
-                        if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                            int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                            int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                            int diff = sourceName - targetName;
-                            for (int j = 0; j < stationsTramway.size() - 1; j++)
-                                if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                                    temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
-                        }
-
-                    for (int i = 0; i < temp.size(); i++)
-                        g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-
-                    addBusNavigation(stationsBus3, 120);
-                    addBusNavigation(stationsBus3bis, 100);
-                    addBusNavigation(stationsBus11, 129);
-                    addBusNavigation(stationsBus16, 113);
-                    addBusNavigation(stationsBus17, 125);
-                    addBusNavigation(stationsBus22, 188);
-                    addBusNavigation(stationsBus25, 180);
-                    addBusNavigation(stationsBus27, 270);
-
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                    for (int k = 1; k < path.size(); k++)
-                        for (int i = 0; i < allStations.size(); i++)
-                            if (path.get(k).name.equals(allStations.get(i).numero))
-                                result.add(allStations.get(i));
-                }*/
-                else if (mean.equals("All")) result = allNavigation(src,dst,"time");
+                else if (mean.equals("All")) result = allNavigation(src, dst, "time");
 
             }
             //
@@ -756,57 +750,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if (mean.toLowerCase().equals("tramway"))
                     result = tramwayNavigation(src, dst, "distance");
                 else if (mean.equals("buses")) result = busesNavigation(src, dst, "distance");
-                /*else if (mean.equals("All")) {
-
-                    g.edges.clear();
-                    g.getVertices().clear();
-
-                    for (int i = 0; i < allStations.size(); i++)
-                        g.addVertex(allStations.get(i).numero);
-
-                    int walk = 0;
-                    for (int compteur = 0; compteur < allStations.size(); compteur++)
-                        for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                            g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).distance);
-                            walk++;
-                            if (walk == 6441) walk = 0;
-                        }
-
-                    ArrayList<Edge> temp = new ArrayList<>();
-
-                    for (int i = 0; i < g.edges.size(); i++)
-                        if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                            int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                            int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                            int diff = sourceName - targetName;
-                            for (int j = 0; j < stationsTramway.size() - 1; j++)
-                                if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                                    temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 0));
-                        }
-
-                    for (int i = 0; i < temp.size(); i++)
-                        g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-
-                    addBusNavigation(stationsBus3, 0);
-                    addBusNavigation(stationsBus3bis, 0);
-                    addBusNavigation(stationsBus11, 0);
-                    addBusNavigation(stationsBus16, 0);
-                    addBusNavigation(stationsBus17, 0);
-                    addBusNavigation(stationsBus22, 0);
-                    addBusNavigation(stationsBus25, 0);
-                    addBusNavigation(stationsBus27, 0);
-
-                    path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                    cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                    for (int k = 1; k < path.size(); k++)
-                        for (int i = 0; i < allStations.size(); i++)
-                            if (path.get(k).name.equals(allStations.get(i).numero))
-                                result.add(allStations.get(i));
-                }*/
-                else if (mean.equals("All")) result = allNavigation(src,dst,"distance");
+                else if (mean.equals("All")) result = allNavigation(src, dst, "distance");
             }
-            for (int i=0;i<g.edges.size();i++) {
-                Log.d("Path",g.edges.get(i)+"");
+            for (int i = 0; i < g.edges.size(); i++) {
+                Log.d("Path", g.edges.get(i) + "");
             }
 
             if (result.size() > 0) {

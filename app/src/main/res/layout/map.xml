@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -13,7 +12,7 @@
         app:layout_constraintBottom_toTopOf="@+id/horGuideline93"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/horGuideline8"></org.osmdroid.views.MapView>
+        app:layout_constraintTop_toTopOf="@id/horGuideline8" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -28,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:background="@drawable/background_white_primary_15dp"
-            android:visibility="visible">
+            android:visibility="invisible">
 
             <ImageButton
                 android:id="@+id/close"
@@ -185,6 +184,7 @@
         app:layout_constraintTop_toTopOf="@id/horGuideline40" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/lignes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/todo"
@@ -203,7 +203,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/background_white_primary_15dp"
         android:orientation="horizontal"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@id/verGuideline90"
         app:layout_constraintTop_toTopOf="@id/horGuideline50">
 
@@ -215,6 +215,7 @@
             android:layout_alignParentStart="true"
             android:contentDescription="tramway"
             android:src="@drawable/icon_tramway"
+            android:visibility="invisible"
             app:backgroundTint="@color/black"
             app:fabCustomSize="40dp"
             app:maxImageSize="32dp"
@@ -228,6 +229,7 @@
             android:layout_alignParentEnd="true"
             android:contentDescription="bus_03"
             android:src="@drawable/bus_03"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:fabCustomSize="40dp"
             app:maxImageSize="30dp"
@@ -240,6 +242,7 @@
             android:layout_below="@id/bus_3"
             android:contentDescription="bus_11"
             android:src="@drawable/bus_11"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:fabCustomSize="40dp"
             app:maxImageSize="30dp"
@@ -253,6 +256,7 @@
             android:layout_alignParentEnd="true"
             android:contentDescription="bus_16"
             android:src="@drawable/bus_16"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:fabCustomSize="40dp"
             app:maxImageSize="30dp"
@@ -264,9 +268,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/bus_11"
             android:layout_alignParentStart="true"
-
             android:contentDescription="bus_17"
             android:src="@drawable/bus_17"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:fabCustomSize="40dp"
             app:maxImageSize="30dp"
@@ -280,6 +284,7 @@
             android:layout_alignParentEnd="true"
             android:contentDescription="bus_22"
             android:src="@drawable/bus_22"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:fabCustomSize="40dp"
             app:maxImageSize="30dp"
@@ -293,6 +298,7 @@
             android:layout_alignParentStart="true"
             android:contentDescription="bus_25"
             android:src="@drawable/bus_25"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:elevation="2dp"
             app:fabCustomSize="40dp"
@@ -308,6 +314,7 @@
             android:contentDescription="bus_27"
             android:elevation="2dp"
             android:src="@drawable/bus_27"
+            android:visibility="invisible"
             app:backgroundTint="@color/etu"
             app:fabCustomSize="40dp"
             app:maxImageSize="30dp"
