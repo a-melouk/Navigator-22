@@ -339,7 +339,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        getRouteBus();
 //        getRouteCorrespondance();
 //        getStations();
-//        getMatrice();
+        getMatrice();
 //        getBestRoute();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -2119,10 +2119,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             myMap.getOverlays().add(polyline);
         }
-        String duration = format(road.mDuration / 60);
+        String duration = String.valueOf(Math.round(road.mDuration / 60));
         String dist = format(road.mLength);
-        String distanceTo = "km " + dist + " كم";
-        String timeTo = "minutes " + duration + " دقيقة";
+        String distanceTo = " كم" + dist + " km";
+        String timeTo = " دقيقة " + duration + "minutes";
         return distanceTo + "\n" + timeTo;
     }
 

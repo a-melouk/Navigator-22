@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="100dp"
+    android:layout_width="wrap_content"
     android:layout_height="45dp"
     android:background="@drawable/info_window"
     android:orientation="horizontal"
@@ -11,11 +11,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxHeight="45dp"
-        android:layout_gravity="center"
         android:gravity="center"
         android:maxLines="3"
-        android:padding="3dp"
-        android:text="Station\naaaaa"
+        android:layout_centerHorizontal="true"
+        android:textStyle="bold"
+        android:paddingRight="2dp"
+        android:paddingLeft="5dp"
+        android:text="Direction des services agricoles\n5.41 km\n65 minutes"
+
         android:textColor="#FFFFFF"
         android:textSize="13sp" />
 
