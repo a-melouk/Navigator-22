@@ -187,15 +187,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ids_bus3 = new int[]{R.id.station_3_1, R.id.station_3_2, R.id.station_3_3, R.id.station_3_4, R.id.station_3_5, R.id.station_3_6, R.id.station_3_7, R.id.station_3_8, R.id.station_3_9, R.id.station_3_10, R.id.station_3_11, R.id.station_3_12, R.id.station_3_13, R.id.station_3_14, R.id.station_3_15};
         ids_bus3bis = new int[]{R.id.station_3bis_1, R.id.station_3bis_2, R.id.station_3bis_3, R.id.station_3bis_4, R.id.station_3bis_5, R.id.station_3bis_6, R.id.station_3bis_7, R.id.station_3bis_8, R.id.station_3bis_9};
         ids_bus11 = new int[]{R.id.station_11_1, R.id.station_11_2, R.id.station_11_3, R.id.station_11_4, R.id.station_11_5, R.id.station_11_6, R.id.station_11_7, R.id.station_11_8, R.id.station_11_9, R.id.station_11_10, R.id.station_11_11, R.id.station_11_12, R.id.station_11_13, R.id.station_11_14};
-
         ids_bus16 = new int[]{R.id.station_16_1, R.id.station_16_2, R.id.station_16_3, R.id.station_16_4, R.id.station_16_5, R.id.station_16_6, R.id.station_16_7, R.id.station_16_8, R.id.station_16_9, R.id.station_16_10, R.id.station_16_11, R.id.station_16_12, R.id.station_16_13, R.id.station_16_14, R.id.station_16_15, R.id.station_16_15};
-
         ids_bus17 = new int[]{R.id.station_17_1, R.id.station_17_2, R.id.station_17_3, R.id.station_17_4, R.id.station_17_5, R.id.station_17_6, R.id.station_17_7, R.id.station_17_8, R.id.station_17_9, R.id.station_17_10, R.id.station_17_11, R.id.station_17_12};
-
         ids_bus22 = new int[]{R.id.station_22_1, R.id.station_22_2, R.id.station_22_3, R.id.station_22_4, R.id.station_22_5, R.id.station_22_6, R.id.station_22_7, R.id.station_22_8,};
-
         ids_bus25 = new int[]{R.id.station_25_1, R.id.station_25_2, R.id.station_25_3, R.id.station_25_4, R.id.station_25_5, R.id.station_25_6, R.id.station_25_7, R.id.station_25_8, R.id.station_25_9, R.id.station_25_10};
-
         ids_bus27 = new int[]{R.id.station_27_1, R.id.station_27_2, R.id.station_27_3, R.id.station_27_4, R.id.station_27_5, R.id.station_27_6, R.id.station_27_7};
 
         super.onCreate(savedInstanceState);
@@ -215,7 +210,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         car = findViewById(R.id.car);
         walk = findViewById(R.id.walk);
         FloatingActionButton floatingActionButton = findViewById(R.id.lignes);
-
         mean_walk = findViewById(R.id.mean_walk);
         mean_tram = findViewById(R.id.mean_tramway);
         mean_bus = findViewById(R.id.mean_bus);
@@ -232,7 +226,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         scroll_steps = findViewById(R.id.scroll_steps);
         linear_steps = findViewById(R.id.linear_steps);
         close_steps = findViewById(R.id.close_steps);
-
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
         Animation anim = new AlphaAnimation(0.8f, 1.0f);
@@ -369,6 +362,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Animation toRight = AnimationUtils.loadAnimation(this, R.anim.horizental_to_right);
         Animation toTop = AnimationUtils.loadAnimation(this, R.anim.vertical_to_top);
         Animation toBottom = AnimationUtils.loadAnimation(this, R.anim.vertical_to_bottom);
+
         final int[] fab_click = {0};
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1591,41 +1585,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         SubMenu ligne25 = busSubMenu.addSubMenu(R.id.bus_stations_25, R.id.bus_stations_25, 1, "Ligne 25");
         SubMenu ligne27 = busSubMenu.addSubMenu(R.id.bus_stations_27, R.id.bus_stations_27, 1, "Ligne 27");
 
-        for (int i = 0; i < stationsTramway.size(); i++) {
+        for (int i = 0; i < stationsTramway.size(); i++)
             tramwaySubMenu.add(R.id.tramway_stations, ids_tramway[i], 1, stationsTramway.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A03_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne3.add(R.id.bus_stations_3, ids_bus3[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A03bis_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne3bis.add(R.id.bus_stations_3_bis, ids_bus3bis[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A11_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne11.add(R.id.bus_stations_11, ids_bus11[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A16_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne16.add(R.id.bus_stations_16, ids_bus16[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A17_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne17.add(R.id.bus_stations_17, ids_bus17[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A22_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne22.add(R.id.bus_stations_22, ids_bus22[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A25_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne25.add(R.id.bus_stations_25, ids_bus25[i], 1, ligne.get(i).nomFr);
-        }
+
         ligne = searchBusStationByNumber("A27_");
-        for (int i = 0; i < ligne.size(); i++) {
+        for (int i = 0; i < ligne.size(); i++)
             ligne27.add(R.id.bus_stations_27, ids_bus27[i], 1, ligne.get(i).nomFr);
-        }
+
 
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.stations, menu);
@@ -1640,104 +1634,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             i = item.getItemId();
             verify = 1;
             parcours = 0;
-            while (verify != 0 && parcours < stationsTramway.size()) {
+            while (verify != 0 && parcours < stationsTramway.size())
                 if (i == ids_tramway[parcours]) {
                     addMarker(myMap, stationsTramway.get(parcours).coordonnees, stationsTramway.get(parcours).nomFr, "tramway");
                     verify = 0;
-                } else {
+                } else
                     parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_3) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus3.size()) {
-                if (item.getItemId() == ids_bus3[parcours]) {
-                    addMarker(myMap, stationsBus3.get(parcours).coordonnees, stationsBus3.get(parcours).nomFr, "A03");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_3_bis) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus3bis.size()) {
-                if (item.getItemId() == ids_bus3bis[parcours]) {
-                    addMarker(myMap, stationsBus3bis.get(parcours).coordonnees, stationsBus3bis.get(parcours).nomFr, "A03");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_11) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus11.size()) {
-                if (item.getItemId() == ids_bus11[parcours]) {
-                    addMarker(myMap, stationsBus11.get(parcours).coordonnees, stationsBus11.get(parcours).nomFr, "A11");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_16) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus16.size()) {
-                if (item.getItemId() == ids_bus16[parcours]) {
-                    addMarker(myMap, stationsBus16.get(parcours).coordonnees, stationsBus16.get(parcours).nomFr, "A16");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_17) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus17.size()) {
-                if (item.getItemId() == ids_bus17[parcours]) {
-                    addMarker(myMap, stationsBus17.get(parcours).coordonnees, stationsBus17.get(parcours).nomFr, "A17");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_22) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus22.size()) {
-                if (item.getItemId() == ids_bus22[parcours]) {
-                    addMarker(myMap, stationsBus22.get(parcours).coordonnees, stationsBus22.get(parcours).nomFr, "A22");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_25) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus25.size()) {
-                if (item.getItemId() == ids_bus25[parcours]) {
-                    addMarker(myMap, stationsBus25.get(parcours).coordonnees, stationsBus25.get(parcours).nomFr, "A25");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
-            }
-        } else if (item.getGroupId() == R.id.bus_stations_27) {
-            verify = 1;
-            parcours = 0;
-            while (verify != 0 && parcours < stationsBus27.size()) {
-                if (item.getItemId() == ids_bus27[parcours]) {
-                    addMarker(myMap, stationsBus27.get(parcours).coordonnees, stationsBus27.get(parcours).nomFr, "A25");
-                    verify = 0;
-                } else {
-                    parcours++;
-                }
+
+
+        }
+        //
+        else if (item.getGroupId() == R.id.bus_stations_3) ItemsMenuBus(item, stationsBus, ids_bus3);
+        else if (item.getGroupId() == R.id.bus_stations_3_bis) ItemsMenuBus(item, stationsBus3bis, ids_bus3bis);
+        else if (item.getGroupId() == R.id.bus_stations_11) ItemsMenuBus(item, stationsBus11, ids_bus11);
+        else if (item.getGroupId() == R.id.bus_stations_16)
+            ItemsMenuBus(item, stationsBus16, ids_bus16);
+        else if (item.getGroupId() == R.id.bus_stations_17)
+            ItemsMenuBus(item, stationsBus17, ids_bus17);
+        else if (item.getGroupId() == R.id.bus_stations_22)
+            ItemsMenuBus(item, stationsBus22, ids_bus22);
+        else if (item.getGroupId() == R.id.bus_stations_25)
+            ItemsMenuBus(item, stationsBus25, ids_bus25);
+        else if (item.getGroupId() == R.id.bus_stations_27)
+            ItemsMenuBus(item, stationsBus25, ids_bus27);
+        return super.onOptionsItemSelected(item);
+    }
+
+    //
+    void ItemsMenuBus(MenuItem item, ArrayList<Station> list, int[] ids) {
+        int verify = 1;
+        int parcours = 0;
+        while (verify != 0 && parcours < list.size()) {
+            if (item.getItemId() == ids[parcours]) {
+                addMarker(myMap, list.get(parcours).coordonnees, list.get(parcours).nomFr + " " + removeFromStart(list.get(parcours).numero), removeFromStart(list.get(parcours).numero));
+                verify = 0;
+            } else {
+                parcours++;
             }
         }
-        return super.onOptionsItemSelected(item);
     }
 
     //Get current location
@@ -1946,7 +1880,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         myMap.invalidate();
 
     }
-
 
     //Adding Overlays
     private void addStationsTramway() {
