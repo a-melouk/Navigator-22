@@ -27,7 +27,37 @@ public class Station {
         this.coordonnees = coordonnees;
     }
 
+    public String getType() {
+        return type;
+    }
 
+    public String getNomFr() {
+        return nomFr;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public GeoPoint getCoordonnees() {
+        return coordonnees;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setNomFr(String nomFr) {
+        this.nomFr = nomFr;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public void setCoordonnees(GeoPoint coordonnees) {
+        this.coordonnees = coordonnees;
+    }
 
     @Override
     public boolean equals(Object o) {

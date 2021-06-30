@@ -16,7 +16,6 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     private static DbHelper mInstance = null;
-    private final Context mCxt;
 
     private static final String TABLE_CHEMIN_SUB = "chemin_sub";
     private static final String TABLE_CHEMIN_BUS = "chemin_bus";
@@ -67,6 +66,7 @@ public class DbHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_CheminSub = "CREATE TABLE "
             + TABLE_CHEMIN_SUB + "("
             + COLUMN_LATITUDE + " REAL ,"
+//            + COLUMN_LONGITUDE + " REAL "
             + COLUMN_LONGITUDE + " REAL ,"
             + "PRIMARY KEY(" + COLUMN_LATITUDE + "," + COLUMN_LONGITUDE + ")"
             + ")";
@@ -106,7 +106,6 @@ public class DbHelper extends SQLiteOpenHelper {
 
     private DbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        this.mCxt = context;
     }
 
     @Override
