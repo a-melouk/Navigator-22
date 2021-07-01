@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:ignore="ContentDescription,HardcodedText">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -29,24 +29,21 @@
                     android:layout_height="0dp"
                     android:queryHint="Search.."
                     android:searchIcon="@drawable/icon_search"
-                    app:layout_constraintBottom_toTopOf="@id/horGuidelin95"
-                    app:layout_constraintEnd_toEndOf="@id/verGuidelin100"
-                    app:layout_constraintStart_toStartOf="@id/verGuidelin0"
-                    app:layout_constraintTop_toTopOf="@id/horGuidelin5"
-                    app:theme="@style/SearchViewStyle"
-
-
-                    />
+                    app:layout_constraintBottom_toTopOf="@id/horGuideline95"
+                    app:layout_constraintEnd_toEndOf="@id/verGuideline100"
+                    app:layout_constraintStart_toStartOf="@id/verGuideline0"
+                    app:layout_constraintTop_toTopOf="@id/horGuideline5"
+                    app:theme="@style/SearchViewStyle"/>
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/horGuidelin5"
+                    android:id="@+id/horGuideline5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     app:layout_constraintGuide_percent="0.05" />
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/horGuidelin95"
+                    android:id="@+id/horGuideline95"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -54,27 +51,15 @@
 
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/verGuidelin0"
+                    android:id="@+id/verGuideline0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="0.0" />
 
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/verGuidelin90"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.9" />
-                <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/verGuidelin95"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.95" />
 
                 <androidx.constraintlayout.widget.Guideline
-                    android:id="@+id/verGuidelin100"
+                    android:id="@+id/verGuideline100"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"

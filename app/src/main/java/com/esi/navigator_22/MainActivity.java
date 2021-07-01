@@ -797,6 +797,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                 path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
                 cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
+                ArrayList<String> pathPoints = new ArrayList<>();
+                for (int i = 0; i < path.size(); i++) pathPoints.add(path.get(i).name);
+//                int money = split(pathPoints);
+                Log.d("YMCMB", split(pathPoints) + "");
                 for (int k = 1; k < path.size(); k++)
                     for (int i = 0; i < stationsTramway.size(); i++)
                         if (path.get(k).name.equals(stationsTramway.get(i).numero))
@@ -859,6 +863,66 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             result.add(stationsTramway.get(i));
             } else
                 Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
+        }
+        //
+        else if (criteria.equals("money")) {
+            //Initialisation du graphe avec {tous les sommets = stations de tramway} et {les arêtes entre chaque deux stations}
+            for (int i = 0; i < stationsTramway.size(); i++)
+                g.addVertex(stationsTramway.get(i).numero);
+            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
+                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 0);
+            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
+
+            //Si Source est Current Location
+            if (srcNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(current, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            //Si Source = Custom marker on map
+            if (srcNumber.toLowerCase().equals("source")) {
+                g.addVertex(source);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(source, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            //Si Destination est Current Location
+            if (dstNumber.toLowerCase().equals("current")) {
+                g.addVertex(current);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(current, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            //Si Destination = Custom marker on map
+            if (dstNumber.toLowerCase().equals("destination")) {
+                g.addVertex(destination);
+                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
+                    distance = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
+                    g.addEdge(destination, g.getVertices().get(compteur), distance);
+                }
+            }
+
+            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+
+                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
+                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
+                for (int k = 1; k < path.size(); k++)
+                    for (int i = 0; i < stationsTramway.size(); i++)
+                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
+                            result.add(stationsTramway.get(i));
+            } else
+                Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
+            ArrayList<String> pathPoints = new ArrayList<>();
+            for (int i = 0; i < path.size(); i++) pathPoints.add(path.get(i).name);
+//                int money = split(pathPoints);
+            Log.d("YMCMB", split(pathPoints) + "");
         }
         return result;
     }
@@ -1163,7 +1227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (int i = 0; i < g.getVertices().size(); i++)
             for (int j = 0; j < list.size() - 1; j++)
                 if (g.getVertices().get(i).name.equals(list.get(j).numero))
-                    if (Math.abs(removeAfter(g.getVertices().get(i).name) - removeAfter(list.get(j + 1).numero)) == 1)
+                    if (Math.abs(removeAfterDash(g.getVertices().get(i).name) - removeAfterDash(list.get(j + 1).numero)) == 1)
                         g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), weight);
     }
 
@@ -2287,11 +2351,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    public int removeAfter(String a) {
-        int res;
-        String b = a.substring(a.indexOf("_") + 1);
-        res = Integer.parseInt(b);
-        return res;
+    public int split(ArrayList<String> path) {
+        String temp1, temp2;
+        int cost = 0;
+        if (!path.get(0).contains("A")) cost += 30;
+        else if (path.get(0).contains("A")) cost += 15;
+        for (int i = 0; i < path.size() - 2; i++) {
+
+            //Entre Tramway et Tramway
+            if (!(path.get(i).contains("A")) && !(path.get(i + 1).contains("A"))) {
+                cost += 0;
+//                System.out.println(path.get(i) + ", " + path.get(i + 1) + ", " + cost);
+            }
+            //Entre Tramway et Bus
+            else if (!(path.get(i).contains("A")) && path.get(i + 1).contains("A")) {
+                cost += 15;
+//                System.out.println(path.get(i) + ", " + path.get(i + 1) + ", " + cost);
+            }
+            //Entre Bus et Tramway
+            else if (path.get(i).contains("A") && !(path.get(i + 1).contains("A"))) {
+                cost += 30;
+//                System.out.println(path.get(i) + ", " + path.get(i + 1) + ", " + cost);
+            }
+            //Entre Bus et Bus
+            else if (path.get(i).contains("A") && path.get(i + 1).contains("A")) {
+                temp1 = removeBeforeDash(path.get(i));
+                temp2 = removeBeforeDash(path.get(i + 1));
+                if (!temp1.equals(temp2)) cost += 15;
+//                System.out.println(path.get(i) + ", " + path.get(i + 1) + ", " + cost);
+            }
+        }
+        return cost;
+    }
+
+    public int removeAfterDash(String a) {
+        return Integer.parseInt(a.substring(a.indexOf("_") + 1));
+    }
+
+    public String removeBeforeDash(String a) {
+        return a.substring(0, a.indexOf("_"));
     }
 
     public String removeFromStart(String a) {

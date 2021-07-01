@@ -4,18 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="5dp"
+    tools:ignore="ContentDescription,HardcodedText"
     android:background="@color/primary"
     tools:context=".AllNearTramwayStationsActivity">
 
-<!--    <TextView-->
-<!--        android:id="@+id/nom"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentLeft="true"-->
-<!--        android:paddingLeft="5dp"-->
-<!--        android:text="Nom de la station"-->
-<!--        android:textSize="20dp"-->
-<!--        android:textStyle="bold"/>-->
 
     <TextView
         android:id="@+id/whileLoading"
@@ -24,7 +16,7 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:text="Loading.."
-        android:textSize="25dp"
+        android:textSize="25sp"
         android:visibility="visible" />
 
 
