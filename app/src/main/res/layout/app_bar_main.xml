@@ -33,7 +33,7 @@
                     app:layout_constraintEnd_toEndOf="@id/verGuideline100"
                     app:layout_constraintStart_toStartOf="@id/verGuideline0"
                     app:layout_constraintTop_toTopOf="@id/horGuideline5"
-                    app:theme="@style/SearchViewStyle"/>
+                    app:theme="@style/SearchViewStyle" />
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/horGuideline5"
@@ -49,14 +49,12 @@
                     android:orientation="horizontal"
                     app:layout_constraintGuide_percent="0.95" />
 
-
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/verGuideline0"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="0.0" />
-
 
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/verGuideline100"

@@ -5,10 +5,15 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
@@ -47,7 +52,7 @@ public class NthTramwayStationsActivity extends AppCompatActivity {
 //        setContentView(R.layout.activity_subway_stations);
         ProgressDialog barProgressDialog = new ProgressDialog(this);
         barProgressDialog.setTitle("Recupérations des 7 stations les plus proches ...");
-        barProgressDialog.setMessage("Download in progress ...");
+        barProgressDialog.setMessage("En cours ...");
         barProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(7);
@@ -95,6 +100,8 @@ public class NthTramwayStationsActivity extends AppCompatActivity {
             });
         });
         t1.start();
+
+
     }
 
     private void sort(ArrayList<StationDetails> plusProches, String criteria) {
