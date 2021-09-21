@@ -354,8 +354,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         floatingActionButton.setOnClickListener(v -> {
             if (fab_click[0] == 0) {
                 floatingActionButton.startAnimation(rotateOpen);
-                menu_linear.setVisibility(View.VISIBLE);
                 menu_linear.startAnimation(toLeft);
+
+
                 tramway.setVisibility(View.VISIBLE);
                 bus3.setVisibility(View.VISIBLE);
                 bus11.setVisibility(View.VISIBLE);
@@ -364,37 +365,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bus22.setVisibility(View.VISIBLE);
                 bus25.setVisibility(View.VISIBLE);
                 bus27.setVisibility(View.VISIBLE);
-                tramway.startAnimation(toLeft);
-                bus3.startAnimation(toLeft);
-                bus11.startAnimation(toLeft);
-                bus16.startAnimation(toLeft);
-                bus17.startAnimation(toLeft);
-                bus22.startAnimation(toLeft);
-                bus25.startAnimation(toLeft);
-                bus27.startAnimation(toLeft);
+                menu_linear.setVisibility(View.VISIBLE);
                 fab_click[0]++;
             }
             //
             else if (fab_click[0] == 1) {
                 floatingActionButton.startAnimation(rotateClose);
-                menu_linear.setVisibility(View.INVISIBLE);
                 menu_linear.startAnimation(toRight);
-                tramway.setVisibility(View.INVISIBLE);
-                bus3.setVisibility(View.INVISIBLE);
-                bus11.setVisibility(View.INVISIBLE);
-                bus16.setVisibility(View.INVISIBLE);
-                bus17.setVisibility(View.INVISIBLE);
-                bus22.setVisibility(View.INVISIBLE);
-                bus25.setVisibility(View.INVISIBLE);
-                bus27.setVisibility(View.INVISIBLE);
-                tramway.startAnimation(toRight);
-                bus3.startAnimation(toRight);
-                bus11.startAnimation(toRight);
-                bus16.startAnimation(toRight);
-                bus17.startAnimation(toRight);
-                bus22.startAnimation(toRight);
-                bus25.startAnimation(toRight);
-                bus27.startAnimation(toRight);
+
+
+                tramway.setVisibility(View.GONE);
+                bus3.setVisibility(View.GONE);
+                bus11.setVisibility(View.GONE);
+                bus16.setVisibility(View.GONE);
+                bus17.setVisibility(View.GONE);
+                bus22.setVisibility(View.GONE);
+                bus25.setVisibility(View.GONE);
+                bus27.setVisibility(View.GONE);
+                menu_linear.setVisibility(View.GONE);
                 fab_click[0]--;
             }
         });
