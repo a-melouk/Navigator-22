@@ -683,9 +683,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setUpList();
         initSearch();
 
-        for (int i=0; i<allStations.size();i++) {
-            Log.d("Les stations","Khrat -'"+allStations.get(i)+"'"+"\n");
-        }
     }
 
     public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
@@ -920,7 +917,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ArrayList<Station> result = new ArrayList<>();
         if (criteria.equals("time")) {
 
-            //Initialisation
+            /*//Initialisation
             for (int i = 0; i < stationsBus.size(); i++)
                 g.addVertex(stationsBus.get(i).numero);
 
@@ -968,9 +965,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addVertex(destination);
                 for (int compteur = 0; compteur < stationsBus.size(); compteur++)
                     g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchTime(dst, stationsBus.get(compteur).coordonnees) * 60));
-            }
+            }*/
 
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
+/*            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                 path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
                 cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
                 Log.d("Current", "2- " + srcNumber + " | " + dstNumber);
@@ -982,12 +979,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } else {
                 Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
                 Log.d("Current", "3- " + srcNumber + " | " + dstNumber);
-            }
+            }*/
         }
         //
         else if (criteria.equals("distance")) {
             //Initialisation
-            for (int i = 0; i < stationsBus.size(); i++)
+            /*for (int i = 0; i < stationsBus.size(); i++)
                 g.addVertex(stationsBus.get(i).numero);
 
             for (int compteur = 0; compteur < allStations.size(); compteur++)
@@ -1033,7 +1030,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addVertex(destination);
                 for (int compteur = 0; compteur < stationsBus.size(); compteur++)
                     g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchDistance(dst, stationsBus.get(compteur).coordonnees) * 1000));
-            }
+            }*/
 
             if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                 path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
@@ -1061,7 +1058,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ArrayList<Station> result = new ArrayList<>();
 
         if (criteria.equals("time")) {
-            for (int i = 0; i < allStations.size(); i++)
+/*            for (int i = 0; i < allStations.size(); i++)
                 g.addVertex(allStations.get(i).numero);
             for (int compteur = 0; compteur < allStations.size(); compteur++)
                 for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
@@ -1124,7 +1121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 g.addVertex(destination);
                 for (int compteur = 0; compteur < allStations.size(); compteur++)
                     g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchTime(dst, allStations.get(compteur).coordonnees) * 60));
-            }
+            }*/
 
             if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
                 path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
@@ -1138,7 +1135,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (criteria.equals("distance")) {
-            for (int i = 0; i < allStations.size(); i++)
+            /*for (int i = 0; i < allStations.size(); i++)
                 g.addVertex(allStations.get(i).numero);
 
             for (int compteur = 0; compteur < allStations.size(); compteur++)
@@ -1209,19 +1206,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (int i = 0; i < allStations.size(); i++)
                         if (path.get(k).name.equals(allStations.get(i).numero))
                             result.add(allStations.get(i));
-            }
+            }*/
 
         }
         return result;
     }
 
-    void addBusNavigation(ArrayList<Station> list, int weight) {
+    /*void addBusNavigation(ArrayList<Station> list, int weight) {
         for (int i = 0; i < g.getVertices().size(); i++)
             for (int j = 0; j < list.size() - 1; j++)
                 if (g.getVertices().get(i).name.equals(list.get(j).numero))
                     if (Math.abs(removeAfterDash(g.getVertices().get(i).name) - removeAfterDash(list.get(j + 1).numero)) == 1)
                         g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), weight);
-    }
+    }*/
 
     //Menu Navigation
     private void setNavigationViewListener() {
