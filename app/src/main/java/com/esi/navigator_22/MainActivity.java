@@ -682,6 +682,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         setUpList();
         initSearch();
+
+        for (int i=0; i<allStations.size();i++) {
+            Log.d("Les stations","Khrat -'"+allStations.get(i)+"'"+"\n");
+        }
     }
 
     public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
@@ -1152,20 +1156,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     int diff = sourceName - targetName;
                     for (int j = 0; j < stationsTramway.size() - 1; j++)
                         if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                            temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 4));
+                            temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 20));
                 }
 
             for (int i = 0; i < temp.size(); i++)
                 g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
 
-            addBusNavigation(stationsBus3, 4);
-            addBusNavigation(stationsBus3bis, 4);
-            addBusNavigation(stationsBus11, 4);
-            addBusNavigation(stationsBus16, 4);
-            addBusNavigation(stationsBus17, 4);
-            addBusNavigation(stationsBus22, 4);
-            addBusNavigation(stationsBus25, 4);
-            addBusNavigation(stationsBus27, 4);
+            addBusNavigation(stationsBus3, 20);
+            addBusNavigation(stationsBus3bis, 20);
+            addBusNavigation(stationsBus11, 20);
+            addBusNavigation(stationsBus16, 20);
+            addBusNavigation(stationsBus17, 20);
+            addBusNavigation(stationsBus22, 20);
+            addBusNavigation(stationsBus25, 20);
+            addBusNavigation(stationsBus27, 20);
 
 
             //Si Source est Current Location
