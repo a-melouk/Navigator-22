@@ -55,6 +55,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -92,13 +93,14 @@ import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String adresse = "http://192.168.1.8:3000/";
+    String adresse = "http://192.168.1.4:3002/";
     //    String adresse = "https://routing22.herokuapp.com/";
     String urlStations = adresse + "stations_sba";
     String urlRouteTramway = adresse + "subway";
     String urlRouteBus = adresse + "bus";
     String urlCorrespondance = adresse + "correspondance";
     String urlMatrice = adresse + "matrice";
+    String urlBestRoute = adresse + "getbeststation4/merges/Sidi%20Lahcene%201&A11_11/Sidi%20Brahim,Terminus%20A22&A22_07";
     static String graphhopperkey = "9590df1e-f158-492f-a5cb-d3e6ca11760f";
 
     private String myResponse;
@@ -352,6 +354,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         final int[] fab_click = {0};
         floatingActionButton.setOnClickListener(v -> {
+            getBestRoute();
             if (fab_click[0] == 0) {
                 floatingActionButton.startAnimation(rotateOpen);
                 menu_linear.startAnimation(toLeft);
@@ -390,6 +393,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getLocation();
             myMap.getController().setZoom(16.0);
             myMap.getController().setCenter(currentLocation);
+            Log.d("TimeToooo1", java.util.Calendar.getInstance().getTime() + "");
+
+
         });
         tramway.setOnClickListener(v -> {
             int i = tramway_click;
@@ -637,8 +643,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navigation(srcCoord, dstCoord, "All", "distance");
 
 
-
-
         });
         close_steps.setOnClickListener(v -> scroll_steps.setVisibility(View.INVISIBLE));
         close.setOnClickListener(v -> {
@@ -676,12 +680,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Button login;
         login = findViewById(R.id.login);
         login.setOnClickListener(v -> {
-            Log.d("AllTheWays","salam");
+            Log.d("AllTheWays", "salam");
         });
 
 
         setUpList();
         initSearch();
+//        getBestRoute();
+/*        Polyline point = new Polyline();
+        ArrayList<GeoPoint> test = new ArrayList<>();
+        test.add(new GeoPoint(35.19067097077694,-0.6345210271795977));
+        test.add(new GeoPoint(35.19067097077694,-0.6345210271795977));
+
+        point.setWidth(10);
+        point.setColor(Color.rgb(255, 0, 0));
+        point.setDensityMultiplier(0.5f);
+        point.setPoints(test);
+        myMap.getOverlays().add(point);
+        myMap.invalidate();*/
+
 
     }
 
@@ -1647,6 +1664,109 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    private void getRoute(Response response) throws IOException {
+        Polyline a = new Polyline();
+        myResponse = Objects.requireNonNull(response.body()).string();
+        GeoPoint temp = new GeoPoint(0.0, 0.0);
+        Log.d("theBestRoute", myResponse);
+        JSONArray jsonarray = null;
+        try {
+            jsonarray = new JSONArray(myResponse);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
+            ArrayList<GeoPoint> listPoly = new ArrayList();
+            ArrayList<String> listStationsFoot = new ArrayList();
+            ArrayList<String> listStationVehicle = new ArrayList();
+            JSONObject jsonobject;
+            try {
+                jsonobject = jsonarray.getJSONObject(i);
+                //Vehicle
+                JSONArray vehicle = jsonobject.getJSONArray("vehicle");
+                for (int j = 0; j < Objects.requireNonNull(vehicle).length(); j++) {
+                    JSONObject obj = vehicle.getJSONObject(j);
+                    //poly
+                    JSONArray poly = obj.getJSONArray("poly");
+                    for (int l = 0; l < Objects.requireNonNull(poly).length(); l++) {
+                        JSONObject obj2 = poly.getJSONObject(l);
+                        JSONArray coordinates = obj2.getJSONArray("coordinates");
+                        Log.d("Timetoo11 " + l, coordinates.toString());
+                        for (int k = 0; k < Objects.requireNonNull(coordinates).length(); k++) {
+                            JSONArray obj3 = coordinates.getJSONArray(k);
+                            temp = new GeoPoint(Double.parseDouble(obj3.toString().substring(obj3.toString().indexOf(",") + 1, obj3.toString().length() - 1)), Double.parseDouble(obj3.toString().substring(1, obj3.toString().indexOf(","))));
+                            listPoly.add(temp);
+                            Log.d("Timetoo12", listPoly.size() + "");
+                        }
+                        Log.d("Timetoo13" + j, poly.toString());
+                        a = new Polyline();
+                        a.setWidth(10);
+                        a.setColor(Color.rgb(0, 0, 0));
+                        a.setDensityMultiplier(0.5f);
+                        a.setPoints(listPoly);
+                        myMap.getOverlays().add(a);
+                        listPoly.clear();
+                        myMap.invalidate();
+                    }
+                    //stations
+                    JSONArray stations = obj.getJSONArray("stations");
+                    for (int l = 0; l < Objects.requireNonNull(stations).length(); l++) {
+                        JSONObject obj2 = stations.getJSONObject(l);
+                        String num = obj2.getString("numero");
+                        Log.d("Timetoo14" + l, num);
+                        listStationVehicle.add(num);
+                    }
+                }
+                //foot
+                JSONArray foot = jsonobject.getJSONArray("foot");
+                for (int j = 0; j < Objects.requireNonNull(foot).length(); j++) {
+                    JSONObject obj = foot.getJSONObject(j);
+
+                    //poly_foot
+                    JSONObject poly_foot = obj.getJSONObject("poly_foot");
+                    //coordinates
+                    JSONArray coordinates = poly_foot.getJSONArray("coordinates");
+                    for (int k = 0; k < Objects.requireNonNull(coordinates).length(); k++) {
+                        JSONArray coordinate = coordinates.getJSONArray(k);
+                        temp = new GeoPoint(Double.parseDouble(coordinate.toString().substring(coordinate.toString().indexOf(",") + 1, coordinate.toString().length() - 1)), Double.parseDouble(coordinate.toString().substring(1, coordinate.toString().indexOf(","))));
+                        listPoly.add(temp);
+                        Log.d("Timetoo18", listPoly.size() + "");
+                    }
+                    a = new Polyline();
+                    a.setWidth(10);
+                    a.setColor(Color.rgb(255, 0, 0));
+                    a.setDensityMultiplier(0.5f);
+                    a.setPoints(listPoly);
+                    myMap.getOverlays().add(a);
+                    listPoly.clear();
+                    myMap.invalidate();
+
+                    //stations
+                    String from = obj.getString("num_from");
+                    String to = obj.getString("num_to");
+                    listStationsFoot.add(from);
+                    listStationsFoot.add(to);
+                }
+                for (int lm = 0; lm < listStationVehicle.size(); lm++)
+                    Log.d("TimetooStationVehicle", listStationVehicle.get(lm));
+                for (int lm = 0; lm < listStationsFoot.size(); lm++)
+                    Log.d("TimetooStationFoot", listStationsFoot.get(lm));
+                for (int s1 = 0; s1 < allStations.size(); s1++) {
+                    for (int s2 = 0; s2 < listStationVehicle.size(); s2++) {
+                        if (allStations.get(s1).numero.equals(listStationVehicle.get(s2)))
+                            if (allStations.get(s1).type.equals("tramway"))
+                                addStationTramway(myMap, allStations.get(s1).coordonnees, allStations.get(s1).nomFr);
+                            else
+                                addStationBus(myMap, allStations.get(s1).coordonnees, allStations.get(s1).nomFr, allStations.get(s1).numero);
+                    }
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private void insertAllMatrice(Response response) throws IOException {
         myResponse = Objects.requireNonNull(response.body()).string();
         GeoPoint p1 = new GeoPoint(0.0, 0.0);
@@ -2314,6 +2434,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     insertAllMatrice(response);
+                }
+            }
+        });
+    }
+
+    private void getBestRoute() {
+        Request request = new Request.Builder().url(urlBestRoute).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    getRoute(response);
+                    Log.d("TimeToooo2", java.util.Calendar.getInstance().getTime() + "");
                 }
             }
         });
