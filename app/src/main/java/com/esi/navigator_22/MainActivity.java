@@ -44,7 +44,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.esi.navigator_22.dijkstra.Edge;
 import com.esi.navigator_22.dijkstra.Graph;
 import com.esi.navigator_22.dijkstra.Vertex;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -55,7 +54,6 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.osmdroid.bonuspack.kml.KmlDocument;
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -131,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     GeoPoint srcCoord = new GeoPoint(0.0, 0.0);
     GeoPoint dstCoord = new GeoPoint(0.0, 0.0);
     String srcNumber = "", dstNumber = "";
+    String srcName = "", dstName = "";
+    Station srcStation = new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0));
+    Station dstStation = new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0));
     GeoPoint point = new GeoPoint(0.0, 0.0);
 
     DbHelper database = DbHelper.getInstance(this);
@@ -354,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         final int[] fab_click = {0};
         floatingActionButton.setOnClickListener(v -> {
-            getBestRoute();
+//            getBestRoute(urlBestRoute);
             if (fab_click[0] == 0) {
                 floatingActionButton.startAnimation(rotateOpen);
                 menu_linear.startAnimation(toLeft);
@@ -630,17 +631,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             if (mean_walk.isSelected())
                 fetchRouteByMean(srcCoord, dstCoord, "walk");
-            else if (mean_tram.isSelected())
-                navigation(srcCoord, dstCoord, "tramway", "time");
-            else if (mean_bus.isSelected())
-//                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
-                navigation(srcCoord, dstCoord, "buses", "time");
-            else if (mean_car.isSelected())
-                fetchRouteByMean(srcCoord, dstCoord, "car");
+//            else if (mean_tram.isSelected())
+//                navigation(srcCoord, dstCoord, "tramway", "time");
+//            else if (mean_bus.isSelected())
+////                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
+//                navigation(srcCoord, dstCoord, "buses", "time");
+//            else if (mean_car.isSelected())
+//                fetchRouteByMean(srcCoord, dstCoord, "car");
             else if (the_best_time.isSelected())
-                navigation(srcCoord, dstCoord, "All", "time");
-            else if (the_best_distance.isSelected())
-                navigation(srcCoord, dstCoord, "All", "distance");
+                navigation(srcStation, dstStation, "All", "time");
+//            else if (the_best_distance.isSelected())
+//                navigation(srcCoord, dstCoord, "All", "distance");
 
 
         });
@@ -702,25 +703,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    public void navigation(GeoPoint src, GeoPoint dst, String mean, String criteria) {
+    public void navigation(Station src, Station dst, String mean, String criteria) {
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
-        if (src.equals(dst))
+        if (src.coordonnees.equals(dst.coordonnees))
             Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_SHORT).show();
         else {
             if (criteria.equals("time")) {
+                if (mean.equals("All")) {
+                    getBestRoute(adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    Log.d("TheURL",adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                }
+            }
+/*            if (criteria.equals("time")) {
                 if (mean.toLowerCase().equals("tramway"))
                     result = tramwayNavigation(src, dst, "time");
                 else if (mean.equals("buses")) result = busesNavigation(src, dst, "time");
                 else if (mean.equals("All")) result = allNavigation(src, dst, "time");
             }
             //
-            else if (criteria.equals("distance")) {
+            *//*else if (criteria.equals("distance")) {
                 if (mean.toLowerCase().equals("tramway"))
                     result = tramwayNavigation(src, dst, "distance");
                 else if (mean.equals("buses")) result = busesNavigation(src, dst, "distance");
                 else if (mean.equals("All")) result = allNavigation(src, dst, "distance");
-            }
+            }*//*
 
             if (result.size() > 0) {
 
@@ -787,7 +794,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             else {
 //            fetchRoute(src, dst, true);
                 Log.d("Error", "No possible way with public transport");
-            }
+            }*/
 
         }
     }
@@ -1380,7 +1387,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     o.coordonnees.setLongitude(markerSource.getPosition().getLongitude());
                                     myMap.getOverlays().add(markerSource);
                                     srcCoord = markerSource.getPosition();
-                                    srcNumber = o.numero;
+                                    srcNumber = "0";
+                                    srcName = "source";
+
+                                    srcStation.coordonnees.setLatitude(markerSource.getPosition().getLatitude());
+                                    srcStation.coordonnees.setLongitude(markerSource.getPosition().getLongitude());
+                                    srcStation.numero = "0";
+                                    srcStation.nomFr = "source";
+
                                     tempSource[0].setVisible(false);
                                     ok_marker.setVisibility(View.INVISIBLE);
                                 });
@@ -1393,8 +1407,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         });
                     } else {
-                        srcCoord = o.coordonnees;
-                        srcNumber = o.numero;
+                        srcStation.coordonnees.setLatitude(o.coordonnees.getLatitude());
+                        srcStation.coordonnees.setLongitude(o.coordonnees.getLongitude());
+                        srcStation.numero = o.numero;
+                        srcStation.nomFr = o.nomFr;
                     }
                     pointSource.setQuery(o.nomFr, true);
                 });
@@ -1462,7 +1478,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     o.coordonnees.setLongitude(markerDestination.getPosition().getLongitude());
                                     myMap.getOverlays().add(markerDestination);
                                     dstCoord = markerDestination.getPosition();
-                                    dstNumber = o.numero;
+                                    dstNumber = "0";
+                                    dstName = "target";
+
+                                    dstStation.coordonnees.setLatitude(markerDestination.getPosition().getLatitude());
+                                    dstStation.coordonnees.setLongitude(markerDestination.getPosition().getLongitude());
+                                    dstStation.numero = "0";
+                                    dstStation.nomFr = "target";
+
                                     temp_destination[0].setVisible(false);
                                     ok_marker.setVisibility(View.INVISIBLE);
                                 });
@@ -1475,8 +1498,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         });
                     } else {
-                        dstCoord = o.coordonnees;
-                        dstNumber = o.numero;
+                        dstStation.coordonnees.setLatitude(o.coordonnees.getLatitude());
+                        dstStation.coordonnees.setLongitude(o.coordonnees.getLongitude());
+                        dstStation.numero = o.numero;
+                        dstStation.nomFr = o.nomFr;
                     }
                     pointDestination.setQuery(o.nomFr, true);
 
@@ -1632,38 +1657,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mLocationOverlay.disableFollowLocation();
     }
 
-    //Populating the database
-    private void insertAllStations(Response response) throws IOException {
-        myResponse = Objects.requireNonNull(response.body()).string();
-        JSONArray jsonarray = null;
-        try {
-            jsonarray = new JSONArray(myResponse);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
-            JSONObject jsonobject = null;
-            try {
-                jsonobject = jsonarray.getJSONObject(i);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            try {
-                assert jsonobject != null;
-                station.nomFr = jsonobject.getString("nomFr");
-                station.type = jsonobject.getString("type");
-                station.numero = jsonobject.getString("numero");
-                point.setLatitude(jsonobject.getDouble("latitude"));
-                point.setLongitude(jsonobject.getDouble("longitude"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            station.coordonnees = point;
-            Log.d("Insertion_Station", station.toString());
-            database.addStation(station);
-        }
-    }
-
+    //Get best merged route
     private void getRoute(Response response) throws IOException {
         Polyline a = new Polyline();
         myResponse = Objects.requireNonNull(response.body()).string();
@@ -1764,6 +1758,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    //Populating the database
+    private void insertAllStations(Response response) throws IOException {
+        myResponse = Objects.requireNonNull(response.body()).string();
+        JSONArray jsonarray = null;
+        try {
+            jsonarray = new JSONArray(myResponse);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
+            JSONObject jsonobject = null;
+            try {
+                jsonobject = jsonarray.getJSONObject(i);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                assert jsonobject != null;
+                station.nomFr = jsonobject.getString("nomFr");
+                station.type = jsonobject.getString("type");
+                station.numero = jsonobject.getString("numero");
+                point.setLatitude(jsonobject.getDouble("latitude"));
+                point.setLongitude(jsonobject.getDouble("longitude"));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            station.coordonnees = point;
+            Log.d("Insertion_Station", station.toString());
+            database.addStation(station);
         }
     }
 
@@ -2439,8 +2465,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void getBestRoute() {
-        Request request = new Request.Builder().url(urlBestRoute).build();
+    private void getBestRoute(String urlMerge) {
+        Request request = new Request.Builder().url(urlMerge).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
