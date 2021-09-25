@@ -121,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout linear_steps;
     ImageView close_steps;
     NavigationView navigationView;
+    TextView from_to,walk_duration,total_duration;
 
     Station station = new Station();
     MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), 0.0, 0.0);
@@ -652,6 +653,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationSource.setVisibility(View.INVISIBLE);
         });
 
+        from_to = findViewById(R.id.from_to);
+        walk_duration = findViewById(R.id.walk_duration);
+        total_duration = findViewById(R.id.total_duration);
+
         LinearLayout mBottomSheetLayout;
         BottomSheetBehavior sheetBehavior;
         ImageView header_Arrow_Image;
@@ -660,11 +665,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         header_Arrow_Image = findViewById(R.id.bottom_sheet_arrow);
         header_Arrow_Image.setOnClickListener(v -> {
 
-            if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+            if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED)
                 sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-            } else {
+            else
                 sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-            }
+
 
         });
         sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -678,14 +683,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 header_Arrow_Image.setRotation(slideOffset * 180);
             }
         });
-        Button login;
-        login = findViewById(R.id.login);
-        login.setOnClickListener(v -> {
-            Log.d("AllTheWays", "salam");
-        });
 
         setUpList();
         initSearch();
+
     }
 
     public void navigation(Station src, Station dst, String mean, String criteria) {
@@ -700,7 +701,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     Log.d("TheURL", adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                 }
             }
-
         }
     }
 
@@ -1609,6 +1609,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         listStationsVehicle.add(num);
                     }
                 }
+                //duration_foot
+                double duration_foot = jsonobject.getDouble("duration_foot");
+                double duration_all = jsonobject.getDouble("duration_all");
+                walk_duration.setText(Math.round(duration_foot)+" secondes");
+                total_duration.setText(Math.round(duration_all)+" secondes");
+                Log.d("Khrat",srcStation+" | "+dstStation);
+//                from_to.setText(srcName+" to "+dstName);
+
+
                 //foot
                 JSONArray foot = jsonobject.getJSONArray("foot");
                 for (int j = 0; j < Objects.requireNonNull(foot).length(); j++) {

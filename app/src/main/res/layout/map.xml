@@ -341,15 +341,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:behavior_hideable="false"
-            app:behavior_peekHeight="80dp"
+            app:behavior_peekHeight="180dp"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
-            app:layout_constraintBottom_toBottomOf="@+id/map">
+
+            >
 
             <LinearLayout
                 android:id="@+id/bottom_sheet_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/purple_500"
+                android:background="@color/primary"
                 android:orientation="horizontal">
 
                 <TextView
@@ -357,10 +358,11 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     android:fontFamily="serif"
-                    android:padding="24dp"
-                    android:text="Welcome Back. Please Login"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp" />
+                    android:padding="8dp"
+                    android:text="Travel details"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/bottom_sheet_arrow"
@@ -374,7 +376,14 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/teal_200">
+                android:background="@color/white">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horGuideline933"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.72" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -382,23 +391,22 @@
                     android:filterTouchesWhenObscured="false"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    app:layout_constraintBottom_toTopOf="@id/horGuideline933">
 
                     <TextView
+                        android:id="@+id/from_to"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="serif"
                         android:gravity="center_horizontal"
-                        android:text="login"
-                        android:textSize="36sp" />
+                        android:text="From ... To "
+                        android:textColor="@color/black"
+                        android:textSize="24sp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="4dp"
                         android:orientation="horizontal"
                         android:padding="10dp">
 
@@ -407,18 +415,20 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="serif"
-                            android:text="username"
-                            android:textColor="@color/purple_500"
-                            android:textSize="24sp" />
+                            android:text="Total walk duration"
+                            android:textColor="@color/black"
+                            android:textSize="23sp" />
 
-                        <EditText
+                        <TextView
+                            android:id="@+id/walk_duration"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:ems="10"
                             android:fontFamily="serif"
-                            android:hint="enter_email_address"
-                            android:inputType="textEmailAddress" />
+                            android:text="66 minutes"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/black"
+                            android:textSize="15sp" />
 
                     </LinearLayout>
 
@@ -433,30 +443,20 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="serif"
-                            android:text="password"
-                            android:textColor="@color/purple_500"
-                            android:textSize="24sp" />
+                            android:text="Total travel duration"
+                            android:textColor="@color/black"
+                            android:textSize="23sp" />
 
-                        <EditText
+                        <TextView
+                            android:id="@+id/total_duration"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:ems="10"
                             android:fontFamily="serif"
-                            android:hint="enter_password"
-                            android:inputType="textPassword" />
-
-                        <Button
-                            android:id="@+id/login"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginBottom="50dp"
-                            android:backgroundTint="@color/purple_500"
-                            android:fontFamily="serif"
-                            android:text="login"
-                            android:textColor="#FFFFFF"
-                            android:textSize="18sp" />
+                            android:text="Total duration"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/black"
+                            android:textSize="15sp" />
                     </LinearLayout>
 
                 </LinearLayout>
