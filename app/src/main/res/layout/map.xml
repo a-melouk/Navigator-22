@@ -203,7 +203,6 @@
         app:layout_constraintStart_toStartOf="@id/verGuideline80"
         app:maxImageSize="32dp" />
 
-
     <RelativeLayout
         android:id="@+id/menu_linear"
         android:layout_width="90dp"
@@ -341,7 +340,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:behavior_hideable="false"
-            app:behavior_peekHeight="180dp"
+            app:behavior_peekHeight="80dp"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
 
             >
@@ -350,30 +349,35 @@
                 android:id="@+id/bottom_sheet_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/primary"
+                android:background="@drawable/background_primary"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
+                    android:layout_weight="1"
                     android:fontFamily="serif"
+                    android:gravity="center_horizontal"
                     android:padding="8dp"
                     android:text="Travel details"
+                    android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/bottom_sheet_arrow"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    app:srcCompat="@drawable/icon_ok" />
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_margin="2dp"
+                    app:srcCompat="@drawable/icon_more" />
+
+
             </LinearLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@color/white">
@@ -386,8 +390,10 @@
                     app:layout_constraintGuide_percent="0.72" />
 
                 <LinearLayout
+                    android:id="@+id/linear_durations"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@drawable/background_white_primary_5dp"
                     android:filterTouchesWhenObscured="false"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
@@ -404,6 +410,7 @@
                         android:textSize="24sp" />
 
                     <LinearLayout
+                        android:id="@+id/linear_walk"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -433,6 +440,7 @@
                     </LinearLayout>
 
                     <LinearLayout
+                        android:id="@+id/linear_total"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
@@ -463,6 +471,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 
     <RelativeLayout
         android:layout_width="match_parent"

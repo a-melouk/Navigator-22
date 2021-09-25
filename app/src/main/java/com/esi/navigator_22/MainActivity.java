@@ -39,6 +39,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
@@ -121,7 +122,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     LinearLayout linear_steps;
     ImageView close_steps;
     NavigationView navigationView;
-    TextView from_to,walk_duration,total_duration;
+    TextView from_to, walk_duration, total_duration;
+    LinearLayout mBottomSheetLayout;
 
     Station station = new Station();
     MatriceLine ligne = new MatriceLine(new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), new Station("type", "nom", "numero", new GeoPoint(0.0, 0.0)), 0.0, 0.0);
@@ -159,6 +161,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     double minZ = 13.0;
     double maxZ = 19.0;
     double distanceTo, timeTo;
+    double duration_foot=0.0,duration_all=0.0;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     int[] ids_tramway = new int[22];
@@ -620,6 +623,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getLocation();
             addSource(srcCoord, "Source");
             addDestination(dstCoord, "Destination");
+
             /*
             fetchRouteByMean(srcCoord, dstCoord, "walk");
             navigation(srcCoord, dstCoord, "tramway", "time");
@@ -651,18 +655,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationSearchViews.setVisibility(View.INVISIBLE);
             navigationDestination.setVisibility(View.INVISIBLE);
             navigationSource.setVisibility(View.INVISIBLE);
+            mBottomSheetLayout.setVisibility(View.INVISIBLE);
         });
 
+        ConstraintLayout constraint;
+
+        LinearLayout linear_durations, linear_walk, linear_total;
+
+        ImageView header_Arrow_Image;
+        BottomSheetBehavior sheetBehavior;
+
+
+        constraint = findViewById(R.id.constraint);
+        linear_durations = findViewById(R.id.linear_durations);
+        linear_walk = findViewById(R.id.linear_walk);
+        linear_total = findViewById(R.id.linear_total);
         from_to = findViewById(R.id.from_to);
         walk_duration = findViewById(R.id.walk_duration);
         total_duration = findViewById(R.id.total_duration);
 
-        LinearLayout mBottomSheetLayout;
-        BottomSheetBehavior sheetBehavior;
-        ImageView header_Arrow_Image;
         mBottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
         sheetBehavior = BottomSheetBehavior.from(mBottomSheetLayout);
         header_Arrow_Image = findViewById(R.id.bottom_sheet_arrow);
+        mBottomSheetLayout.setVisibility(View.INVISIBLE);
         header_Arrow_Image.setOnClickListener(v -> {
 
             if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED)
@@ -690,6 +705,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void navigation(Station src, Station dst, String mean, String criteria) {
+
         path = new ArrayList<>();
         ArrayList<Station> result = new ArrayList<>();
         if (src.coordonnees.equals(dst.coordonnees))
@@ -702,6 +718,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
+
+
     }
 
     ArrayList<Station> tramwayNavigation(GeoPoint src, GeoPoint dst, String criteria) {
@@ -1558,6 +1576,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void getRoute(Response response) throws IOException {
         Polyline a = new Polyline();
         myResponse = Objects.requireNonNull(response.body()).string();
+        Log.d("TimeToooo12", java.util.Calendar.getInstance().getTime() + "");
         GeoPoint temp = new GeoPoint(0.0, 0.0);
         Log.d("theBestRoute", myResponse);
         JSONArray jsonarray = null;
@@ -1610,12 +1629,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 //duration_foot
-                double duration_foot = jsonobject.getDouble("duration_foot");
-                double duration_all = jsonobject.getDouble("duration_all");
-                walk_duration.setText(Math.round(duration_foot)+" secondes");
-                total_duration.setText(Math.round(duration_all)+" secondes");
-                Log.d("Khrat",srcStation+" | "+dstStation);
-//                from_to.setText(srcName+" to "+dstName);
+                duration_foot = jsonobject.getDouble("duration_foot");
+                duration_all = jsonobject.getDouble("duration_all");
 
 
                 //foot
@@ -1656,10 +1671,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (fromNumtoStation(to).type.equals("tramway"))
                             f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration);
                         else if (fromNumtoStation(to).type.equals("bus"))
-                            f.setTitle("From " + fromNumtoStation(from).nomFr +" of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
                     } else if (fromNumtoStation(from).type.equals("bus")) {
                         if (fromNumtoStation(to).type.equals("tramway"))
-                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr +" of Tramway"+ "\n" + "Walk : " + duration);
+                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
                         else if (fromNumtoStation(to).type.equals("bus"))
                             f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
                     }
@@ -1674,33 +1689,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             listStationsVehicle.remove(c);
 
 
-
                 for (int c = 0; c < listStationsVehicle.size(); c++) {
                     addStationsMarker(myMap, fromNumtoStation(listStationsVehicle.get(c)));
-                    Log.d("TimetooListPath",fromNumtoStation(listStationsVehicle.get(c)).toString());
+                    Log.d("TimetooListPath", fromNumtoStation(listStationsVehicle.get(c)).toString());
                 }
-
-//                for (int lm = 0; lm < listStationsVehicle.size(); lm++)
-//                    Log.d("TimetooStationVehicle", listStationsVehicle.get(lm));
-//                for (int lm = 0; lm < listStationsFootFrom.size(); lm++)
-//                    Log.d("TimetooStationFoot", listStationsFootFrom.get(lm).toString());
-
-//                for (int s1 = 0; s1 < listStationsFoot.size(); s1++)
-//                    for (int s2 = 0; s2 < listStationsVehicle.size(); s2++)
-//                        if (listStationsFoot.get(s1).equals(listStationsVehicle.get(s2)))
-//                            listStationsVehicle.remove(listStationsVehicle.get(s2));
-
-/*                for (int s1 = 0; s1 < allStations.size(); s1++) {
-                    for (int s2 = 0; s2 < listStationsFoot.size(); s2++) {
-                        if (allStations.get(s1).numero.equals(listStationsFoot.get(s2)))
-                            addStationsMarker(myMap, allStations.get(s1));
-                    }
-                }*/
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        Log.d("TimeToooo13", java.util.Calendar.getInstance().getTime() + "");
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mBottomSheetLayout.setVisibility(View.VISIBLE);
+                from_to.setText(srcStation.nomFr+" to "+dstStation.nomFr);
+                walk_duration.setText(duration_foot+"");
+                total_duration.setText(duration_all+"");
+            }
+        });
     }
 
     private Station fromNumtoStation(String numero) {
@@ -2469,7 +2477,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     getRoute(response);
-                    Log.d("TimeToooo2", java.util.Calendar.getInstance().getTime() + "");
+                    Log.d("TimeToooo11", java.util.Calendar.getInstance().getTime() + "");
                 }
             }
         });

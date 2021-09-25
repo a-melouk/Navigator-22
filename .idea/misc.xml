@@ -3,6 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/drawable/background_primary.xml" value="0.11481481481481481" />
+        <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/drawable/background_white_primary_15dp.xml" value="0.11481481481481481" />
+        <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/drawable/background_white_primary_5dp.xml" value="0.11481481481481481" />
+        <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/drawable/icon_more.xml" value="0.3769230769230769" />
         <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/layout/activity_main.xml" value="0.17831813576494426" />
         <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/layout/activity_tramway_stations.xml" value="0.17831813576494426" />
         <entry key="..\:/Users/abdou/AndroidStudioProjects/Navigator22/app/src/main/res/layout/app_bar_main.xml" value="0.17831813576494426" />
