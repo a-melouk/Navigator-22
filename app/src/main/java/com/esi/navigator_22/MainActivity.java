@@ -684,23 +684,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("AllTheWays", "salam");
         });
 
-
         setUpList();
         initSearch();
-//        getBestRoute();
-/*        Polyline point = new Polyline();
-        ArrayList<GeoPoint> test = new ArrayList<>();
-        test.add(new GeoPoint(35.19067097077694,-0.6345210271795977));
-        test.add(new GeoPoint(35.19067097077694,-0.6345210271795977));
-
-        point.setWidth(10);
-        point.setColor(Color.rgb(255, 0, 0));
-        point.setDensityMultiplier(0.5f);
-        point.setPoints(test);
-        myMap.getOverlays().add(point);
-        myMap.invalidate();*/
-
-
     }
 
     public void navigation(Station src, Station dst, String mean, String criteria) {
@@ -712,89 +697,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (criteria.equals("time")) {
                 if (mean.equals("All")) {
                     getBestRoute(adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-                    Log.d("TheURL",adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    Log.d("TheURL", adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                 }
             }
-/*            if (criteria.equals("time")) {
-                if (mean.toLowerCase().equals("tramway"))
-                    result = tramwayNavigation(src, dst, "time");
-                else if (mean.equals("buses")) result = busesNavigation(src, dst, "time");
-                else if (mean.equals("All")) result = allNavigation(src, dst, "time");
-            }
-            //
-            *//*else if (criteria.equals("distance")) {
-                if (mean.toLowerCase().equals("tramway"))
-                    result = tramwayNavigation(src, dst, "distance");
-                else if (mean.equals("buses")) result = busesNavigation(src, dst, "distance");
-                else if (mean.equals("All")) result = allNavigation(src, dst, "distance");
-            }*//*
-
-            if (result.size() > 0) {
-
-                if (mean.equals("tramway")) {
-                    Log.d("Navigation_Tramway_URL", adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                            result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                    getBestRoute(
-                            adresse + "result/tram/" + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                    result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 253, 127, 44);
-                }
-                //
-                else if (result.get(0).type.equals("bus"))
-                    if (mean.equals(removeFromStart(result.get(0).numero))) {
-                        getBestRoute(
-                                adresse + "result/" + result.get(0).numero + "/"
-                                        + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                        result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude(), 59, 136, 195);
-                        Log.d("Navigation_Bus_URL", adresse + "result/" + result.get(0).numero + "/"
-                                + result.get(0).coordonnees.getLatitude() + "/" + result.get(0).coordonnees.getLongitude() + "/" +
-                                result.get(result.size() - 1).coordonnees.getLatitude() + "/" + result.get(result.size() - 1).coordonnees.getLongitude());
-                    } else if (mean.equals("buses")) {
-
-                    } else if (mean.equals("All")) {
-
-                    }
-//            fetchRoute(src, result.get(0).coordonnees, true);
-//            fetchRoute(dst, result.get(result.size() - 1).coordonnees, true);
-//            addSource(src, "From current location to \n" + result.get(0).nomFr + ":\n" + (int) Math.round(g.cost(g, source, path.get(1))));
-
-                //1ère station to Size()-1
-                for (int i = 0; i < result.size() - 1; i++) {
-                    if (result.get(i).type.equals("tramway")) {
-                        addPin(result.get(i).coordonnees, result.get(i).nomFr + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "tramway");
-
-                    } else
-                        addPin(result.get(i).coordonnees, result.get(i).nomFr + ", " + removeFromStart(result.get(i).numero) + " to \n" + result.get(i + 1).nomFr + ":\n" + (int) Math.round(g.cost(g, path.get(i + 1), path.get(i + 2))), "bus");
-                }
-                linear_steps.removeAllViewsInLayout();
-                View card = View.inflate(this, R.layout.card_view, null);
-                TextView criteria_text = card.findViewById(R.id.criteria);
-                criteria_text.setText("Distance");
-                TextView weight_text = card.findViewById(R.id.weight);
-                weight_text.setText(cost + "");
-                linear_steps.addView(card);
-                linear_steps.setVisibility(View.VISIBLE);
-
-
-                if (result.get(result.size() - 1).type.equals("tramway"))
-                    addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "tramway");
-                else
-                    addPin(result.get(result.size() - 1).coordonnees, result.get(0).nomFr + " to \n" + result.get(result.size() - 1).nomFr + ":\n" + cost + " minutes", "bus");
-//                Log.d("AllTheWays", cost+" ");
-
-                //Dernière station to Destination
-//            if (result.get(result.size() - 1).type.equals("tramway"))
-//                addPin(result.get(result.size() - 1).coordonnees, result.get(result.size() - 1).nomFr + " to \n" + path.get(path.size() - 1).name + ":\n" +
-//                        (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "tramway");
-//            else
-//                addPin(result.get(result.size() - 1).coordonnees, path.get(path.size() - 2).name + " to \n" + path.get(path.size() - 1).name + ":\n" +
-//                        (int) Math.round(g.cost(g, path.get(path.size() - 2), path.get(path.size() - 1))), "bus");
-//            addDestination(dst, "From current to destination: " + "\n" + (int) Math.round(cost / 60) + "minutes");
-            }
-            //
-            else {
-//            fetchRoute(src, dst, true);
-                Log.d("Error", "No possible way with public transport");
-            }*/
 
         }
     }
@@ -1236,14 +1141,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return result;
     }
 
-    /*void addBusNavigation(ArrayList<Station> list, int weight) {
-        for (int i = 0; i < g.getVertices().size(); i++)
-            for (int j = 0; j < list.size() - 1; j++)
-                if (g.getVertices().get(i).name.equals(list.get(j).numero))
-                    if (Math.abs(removeAfterDash(g.getVertices().get(i).name) - removeAfterDash(list.get(j + 1).numero)) == 1)
-                        g.addEdge(g.getVertices().get(i), g.getVertices().get(i + 1), weight);
-    }*/
-
     //Menu Navigation
     private void setNavigationViewListener() {
         navigationView = findViewById(R.id.navigation_view);
@@ -1671,8 +1568,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
             ArrayList<GeoPoint> listPoly = new ArrayList();
-            ArrayList<String> listStationsFoot = new ArrayList();
-            ArrayList<String> listStationVehicle = new ArrayList();
+            ArrayList<Station> listStationsFootFrom = new ArrayList();
+            ArrayList<String> listStationsVehicle = new ArrayList();
             JSONObject jsonobject;
             try {
                 jsonobject = jsonarray.getJSONObject(i);
@@ -1707,8 +1604,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (int l = 0; l < Objects.requireNonNull(stations).length(); l++) {
                         JSONObject obj2 = stations.getJSONObject(l);
                         String num = obj2.getString("numero");
+                        Log.d("Timetoo25Path", num + " " + fromNumtoStation(num).nomFr);
                         Log.d("Timetoo14" + l, num);
-                        listStationVehicle.add(num);
+                        listStationsVehicle.add(num);
                     }
                 }
                 //foot
@@ -1737,28 +1635,113 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     //stations
                     String from = obj.getString("num_from");
+                    Log.d("Timetoo25From", from + " " + fromNumtoStation(from).nomFr);
                     String to = obj.getString("num_to");
-                    listStationsFoot.add(from);
-                    listStationsFoot.add(to);
-                }
-                for (int lm = 0; lm < listStationVehicle.size(); lm++)
-                    Log.d("TimetooStationVehicle", listStationVehicle.get(lm));
-                for (int lm = 0; lm < listStationsFoot.size(); lm++)
-                    Log.d("TimetooStationFoot", listStationsFoot.get(lm));
-                for (int s1 = 0; s1 < allStations.size(); s1++) {
-                    for (int s2 = 0; s2 < listStationVehicle.size(); s2++) {
-                        if (allStations.get(s1).numero.equals(listStationVehicle.get(s2)))
-                            if (allStations.get(s1).type.equals("tramway"))
-                                addStationTramway(myMap, allStations.get(s1).coordonnees, allStations.get(s1).nomFr);
-                            else
-                                addStationBus(myMap, allStations.get(s1).coordonnees, allStations.get(s1).nomFr, allStations.get(s1).numero);
+                    Log.d("Timetoo25To", to + " " + fromNumtoStation(to).nomFr);
+                    Double duration = obj.getDouble("duration");
+
+                    listStationsFootFrom.add(fromNumtoStation(from));
+                    Marker f = new Marker(myMap);
+                    f.setPosition(fromNumtoStation(from).coordonnees);
+                    if (fromNumtoStation(from).type.equals("tramway")) {
+                        if (fromNumtoStation(to).type.equals("tramway"))
+                            f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration);
+                        else if (fromNumtoStation(to).type.equals("bus"))
+                            f.setTitle("From " + fromNumtoStation(from).nomFr +" of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                    } else if (fromNumtoStation(from).type.equals("bus")) {
+                        if (fromNumtoStation(to).type.equals("tramway"))
+                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr +" of Tramway"+ "\n" + "Walk : " + duration);
+                        else if (fromNumtoStation(to).type.equals("bus"))
+                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
                     }
+                    myMap.getOverlays().add(f);
+                    myMap.invalidate();
+
                 }
+
+                for (int c = 0; c < listStationsVehicle.size(); c++)
+                    for (int d = 0; d < listStationsFootFrom.size(); d++)
+                        if (listStationsVehicle.get(c).equals(listStationsFootFrom.get(d).numero))
+                            listStationsVehicle.remove(c);
+
+
+
+                for (int c = 0; c < listStationsVehicle.size(); c++) {
+                    addStationsMarker(myMap, fromNumtoStation(listStationsVehicle.get(c)));
+                    Log.d("TimetooListPath",fromNumtoStation(listStationsVehicle.get(c)).toString());
+                }
+
+//                for (int lm = 0; lm < listStationsVehicle.size(); lm++)
+//                    Log.d("TimetooStationVehicle", listStationsVehicle.get(lm));
+//                for (int lm = 0; lm < listStationsFootFrom.size(); lm++)
+//                    Log.d("TimetooStationFoot", listStationsFootFrom.get(lm).toString());
+
+//                for (int s1 = 0; s1 < listStationsFoot.size(); s1++)
+//                    for (int s2 = 0; s2 < listStationsVehicle.size(); s2++)
+//                        if (listStationsFoot.get(s1).equals(listStationsVehicle.get(s2)))
+//                            listStationsVehicle.remove(listStationsVehicle.get(s2));
+
+/*                for (int s1 = 0; s1 < allStations.size(); s1++) {
+                    for (int s2 = 0; s2 < listStationsFoot.size(); s2++) {
+                        if (allStations.get(s1).numero.equals(listStationsFoot.get(s2)))
+                            addStationsMarker(myMap, allStations.get(s1));
+                    }
+                }*/
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private Station fromNumtoStation(String numero) {
+        Station a = new Station();
+        for (int i = 0; i < allStations.size(); i++)
+            if (allStations.get(i).numero.equals(numero))
+                a = allStations.get(i);
+        return a;
+    }
+
+    private void addStationsMarker(MapView mapMarker, Station station) {
+        Marker marker = new Marker(mapMarker);
+        marker.setPosition(station.coordonnees);
+        marker.setAnchor(ANCHOR_CENTER, ANCHOR_BOTTOM);
+        marker.setAlpha(0.8f);
+        marker.setTitle(station.nomFr);
+        marker.setPanToView(true);
+
+        if (station.type.equals("tramway"))
+            marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_tramway));
+        else if (station.type.equals("bus")) {
+            switch (removeFromStart(station.numero)) {
+                case "A03":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_03));
+                    break;
+                case "A11":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_11));
+                    break;
+                case "A16":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_16));
+                    break;
+                case "A17":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_17));
+                    break;
+                case "A22":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_22));
+                    break;
+                case "A25":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_25));
+                    break;
+                case "A27":
+                    marker.setIcon(ContextCompat.getDrawable(getApplicationContext(), R.drawable.pin_bus_27));
+                    break;
+            }
+        }
+
+
+        mapMarker.invalidate();
+        mapMarker.getOverlays().add(marker);
+        customOverlays.add(customOverlays.size(), new CustomOverlay("bestroute", marker));
     }
 
     //Populating the database
