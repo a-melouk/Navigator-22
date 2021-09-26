@@ -731,21 +731,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        }
         else {
             if (criteria.equals("time")) {
-                if (mean.equals("tramway")) {
-                    getBestRoute(adresse + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                    Log.d("TheURLTram", "http://localhost:3002/" + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                } else if (mean.equals("buses")) {
-                    getBestRoute(adresse + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                    Log.d("TheURLBus", "http://localhost:3002/" + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                } else if (mean.equals("All")) {
-                    getBestRoute(adresse + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                    Log.d("TheURLAll", "http://localhost:3002/" + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                //
+                Log.d("TheURL54", srcStation.type + " | " + dstStation.type);
+                //
+                if (((srcStation.type.equals("bus") || srcStation.type.equals("tramway")) && ((dstStation.type.equals("bus")) || dstStation.type.equals("tramway")))) {
+                    //
+                    if (mean.equals("tramway")) {
+                        getBestRoute(adresse + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                        Log.d("TheURLTram", "http://localhost:3002/" + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    } else if (mean.equals("buses")) {
+                        getBestRoute(adresse + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                        Log.d("TheURLBus", "http://localhost:3002/" + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    } else if (mean.equals("All")) {
+                        getBestRoute(adresse + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                        Log.d("TheURLAll", "http://localhost:3002/" + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    }
+                    //
+                } else {
+                    //
+                    if (mean.equals("tramway")) {
+                        getBestRoute(adresse + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                        Log.d("TheURLTram", "http://localhost:3002/" + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                    } else if (mean.equals("buses")) {
+                        getBestRoute(adresse + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                        Log.d("TheURLBus", "http://localhost:3002/" + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                    } else if (mean.equals("All")) {
+                        getBestRoute(adresse + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                        Log.d("TheURLAll", "http://localhost:3002/" + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                    }
+                    //
                 }
+
             }
         }
 
 
     }
+
 
     ArrayList<Station> tramwayNavigation(GeoPoint src, GeoPoint dst, String criteria) {
         g.edges.clear();
@@ -1352,6 +1374,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         srcStation.coordonnees.setLongitude(o.coordonnees.getLongitude());
                         srcStation.numero = o.numero;
                         srcStation.nomFr = o.nomFr;
+                        srcStation.type = o.type;
                     }
                     pointSource.setQuery(o.nomFr, true);
                 });
@@ -1742,9 +1765,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             else if (fromNumtoStation(to).type.equals("source"))
                                 f.setTitle("From Your Position to Source" + "\n" + "Walk : " + duration);
 //                            else if (fromNumtoStation(to).type.equals("current")) ;
-                        }
-
-                        else if (fromNumtoStation(from).type.equals("source")) {
+                        } else if (fromNumtoStation(from).type.equals("source")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
                                 f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
                             else if (fromNumtoStation(to).type.equals("bus"))
@@ -1755,9 +1776,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 f.setTitle("From Source to Source" + "\n" + "Walk : " + duration);
                             else if (fromNumtoStation(to).type.equals("current"))
                                 f.setTitle("From Source to Your Position" + "\n" + "Walk : " + duration);
-                        }
-
-                        else if (fromNumtoStation(from).type.equals("destination")) {
+                        } else if (fromNumtoStation(from).type.equals("destination")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
                                 f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
                             else if (fromNumtoStation(to).type.equals("bus"))
