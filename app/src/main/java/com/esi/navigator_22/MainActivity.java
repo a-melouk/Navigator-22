@@ -81,6 +81,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -92,7 +93,7 @@ import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
 import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-    String adresse = "http://192.168.1.4:3002/";
+    String adresse = "http://192.168.43.119:3002/";
     //    String adresse = "https://routing22.herokuapp.com/";
     String urlStations = adresse + "stations_sba";
     String urlRouteTramway = adresse + "subway";
@@ -161,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     double minZ = 13.0;
     double maxZ = 19.0;
     double distanceTo, timeTo;
-    double duration_foot=0.0,duration_all=0.0;
+    double duration_foot = 0.0, duration_all = 0.0;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     int[] ids_tramway = new int[22];
@@ -176,7 +177,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     int bus3_click = 1, bus11_click = 1, bus16_click = 1, bus17_click = 1, bus22_click = 1, bus25_click = 1, bus27_click = 1, tramway_click = 1;
 
     ArrayAdapter<String> arrayAdapter;
-    OkHttpClient client = new OkHttpClient();
+    OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
+            .writeTimeout(5, TimeUnit.MINUTES) // write timeout
+            .readTimeout(5, TimeUnit.MINUTES) // read timeout
+            .build();
     Graph g = new Graph();
     Vertex current;
     Vertex source;
@@ -636,13 +641,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             if (mean_walk.isSelected())
                 fetchRouteByMean(srcCoord, dstCoord, "walk");
-//            else if (mean_tram.isSelected())
-//                navigation(srcCoord, dstCoord, "tramway", "time");
-//            else if (mean_bus.isSelected())
-////                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
-//                navigation(srcCoord, dstCoord, "buses", "time");
-//            else if (mean_car.isSelected())
-//                fetchRouteByMean(srcCoord, dstCoord, "car");
+            else if (mean_tram.isSelected())
+                navigation(srcStation, dstStation, "tramway", "time");
+            else if (mean_bus.isSelected())
+//                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
+                navigation(srcStation, dstStation, "buses", "time");
+            else if (mean_car.isSelected())
+                fetchRouteByMean(srcCoord, dstCoord, "car");
             else if (the_best_time.isSelected())
                 navigation(srcStation, dstStation, "All", "time");
 //            else if (the_best_distance.isSelected())
@@ -712,9 +717,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_SHORT).show();
         else {
             if (criteria.equals("time")) {
-                if (mean.equals("All")) {
-                    getBestRoute(adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-                    Log.d("TheURL", adresse + "getbeststation4/merges/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                if (mean.equals("tramway")) {
+                    getBestRoute(adresse + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    Log.d("TheURLTram", "http://localhost:3002/" + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                } else if (mean.equals("buses")) {
+                    getBestRoute(adresse + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    Log.d("TheURLBus", "http://localhost:3002/" + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                } else if (mean.equals("All")) {
+                    getBestRoute(adresse + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                    Log.d("TheURLAll", "http://localhost:3002/" + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                 }
             }
         }
@@ -1574,11 +1585,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Get best merged route
     private void getRoute(Response response) throws IOException {
+        Log.d("theBestroute3", java.util.Calendar.getInstance().getTime() + "");
         Polyline a = new Polyline();
         myResponse = Objects.requireNonNull(response.body()).string();
-        Log.d("TimeToooo12", java.util.Calendar.getInstance().getTime() + "");
+        Log.d("theBestroute4", java.util.Calendar.getInstance().getTime() + "");
         GeoPoint temp = new GeoPoint(0.0, 0.0);
-        Log.d("theBestRoute", myResponse);
+        Log.d("theBestRoute5", myResponse);
         JSONArray jsonarray = null;
         try {
             jsonarray = new JSONArray(myResponse);
@@ -1587,7 +1599,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
             ArrayList<GeoPoint> listPoly = new ArrayList();
-            ArrayList<Station> listStationsFootFrom = new ArrayList();
+            ArrayList<Station> listStationsFootStation = new ArrayList();
+            ArrayList<String> listStationsFoot = new ArrayList();
+            ArrayList<String> listStationsFootFrom = new ArrayList();
             ArrayList<String> listStationsVehicle = new ArrayList();
             JSONObject jsonobject;
             try {
@@ -1623,8 +1637,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (int l = 0; l < Objects.requireNonNull(stations).length(); l++) {
                         JSONObject obj2 = stations.getJSONObject(l);
                         String num = obj2.getString("numero");
-                        Log.d("Timetoo25Path", num + " " + fromNumtoStation(num).nomFr);
-                        Log.d("Timetoo14" + l, num);
+                        if (num.equals("t00")) num = srcStation.numero;
+                        if (num.equals("t01")) num = dstStation.numero;
+
+//                        Log.d("Timetoo25Path", num + " " + fromNumtoStation(num).nomFr);
+//                        Log.d("Timetoo14" + l, num);
                         listStationsVehicle.add(num);
                     }
                 }
@@ -1659,34 +1676,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     //stations
                     String from = obj.getString("num_from");
-                    Log.d("Timetoo25From", from + " " + fromNumtoStation(from).nomFr);
                     String to = obj.getString("num_to");
-                    Log.d("Timetoo25To", to + " " + fromNumtoStation(to).nomFr);
+                    if (from.equals("t00")) from = srcStation.numero;
+                    if (to.equals("t01")) to = dstStation.numero;
+                    listStationsFoot.add(from);
+                    listStationsFoot.add(to);
+                    listStationsFootFrom.add(from);
                     Double duration = obj.getDouble("duration");
 
-                    listStationsFootFrom.add(fromNumtoStation(from));
                     Marker f = new Marker(myMap);
                     f.setPosition(fromNumtoStation(from).coordonnees);
-                    if (fromNumtoStation(from).type.equals("tramway")) {
-                        if (fromNumtoStation(to).type.equals("tramway"))
-                            f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration);
-                        else if (fromNumtoStation(to).type.equals("bus"))
-                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
-                    } else if (fromNumtoStation(from).type.equals("bus")) {
-                        if (fromNumtoStation(to).type.equals("tramway"))
-                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
-                        else if (fromNumtoStation(to).type.equals("bus"))
-                            f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                    if (from.equals(to)) {
+                    } else {
+                        if (fromNumtoStation(from).type.equals("tramway")) {
+                            if (fromNumtoStation(to).type.equals("tramway"))
+                                f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration);
+                            else if (fromNumtoStation(to).type.equals("bus"))
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                        } else if (fromNumtoStation(from).type.equals("bus")) {
+                            if (fromNumtoStation(to).type.equals("tramway"))
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
+                            else if (fromNumtoStation(to).type.equals("bus"))
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " To " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                        }
+                        myMap.getOverlays().add(f);
+                        myMap.invalidate();
                     }
-                    myMap.getOverlays().add(f);
-                    myMap.invalidate();
-
                 }
-
-                for (int c = 0; c < listStationsVehicle.size(); c++)
+                ArrayList<String> copy = new ArrayList<>();
+                copy.addAll(listStationsVehicle);
+                for (int c = 0; c < copy.size(); c++)
                     for (int d = 0; d < listStationsFootFrom.size(); d++)
-                        if (listStationsVehicle.get(c).equals(listStationsFootFrom.get(d).numero))
-                            listStationsVehicle.remove(c);
+                        if (copy.get(c).equals(listStationsFootFrom.get(d)))
+                            listStationsVehicle.remove(copy.get(c));
 
 
                 for (int c = 0; c < listStationsVehicle.size(); c++) {
@@ -1704,9 +1726,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void run() {
                 mBottomSheetLayout.setVisibility(View.VISIBLE);
-                from_to.setText(srcStation.nomFr+" to "+dstStation.nomFr);
-                walk_duration.setText(duration_foot+"");
-                total_duration.setText(duration_all+"");
+                from_to.setText(srcStation.nomFr + " to " + dstStation.nomFr);
+                walk_duration.setText(duration_foot + "");
+                total_duration.setText(duration_all + "");
             }
         });
     }
@@ -2466,6 +2488,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getBestRoute(String urlMerge) {
+        Log.d("theBestroute1", java.util.Calendar.getInstance().getTime() + "");
         Request request = new Request.Builder().url(urlMerge).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
@@ -2477,7 +2500,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     getRoute(response);
-                    Log.d("TimeToooo11", java.util.Calendar.getInstance().getTime() + "");
+                    Log.d("theBestroute2", java.util.Calendar.getInstance().getTime() + "");
                 }
             }
         });
