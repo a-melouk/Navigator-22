@@ -626,8 +626,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
         start.setOnClickListener(v -> {
             getLocation();
-            addSource(srcCoord, "Source");
-            addDestination(dstCoord, "Destination");
+            addSource(srcStation.coordonnees, "Source");
+            addDestination(dstStation.coordonnees, "Destination");
 
             /*
             fetchRouteByMean(srcCoord, dstCoord, "walk");
