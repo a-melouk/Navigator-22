@@ -119,9 +119,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     ImageButton close;
     Button start;
     ListView searchStations, navigationSource, navigationDestination;
-    ScrollView scroll_steps;
-    LinearLayout linear_steps;
-    ImageView close_steps;
     NavigationView navigationView;
     TextView from_to, walk_duration, total_duration;
     LinearLayout mBottomSheetLayout;
@@ -232,9 +229,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationSearchViews = findViewById(R.id.searchViews);
         drawerLayout = findViewById(R.id.nav_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        scroll_steps = findViewById(R.id.scroll_steps);
-        linear_steps = findViewById(R.id.linear_steps);
-        close_steps = findViewById(R.id.close_steps);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
 
         Animation anim = new AlphaAnimation(0.8f, 1.0f);
@@ -368,7 +362,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (fab_click[0] == 0) {
                 floatingActionButton.startAnimation(rotateOpen);
                 menu_linear.startAnimation(toLeft);
-
 
                 tramway.setVisibility(View.VISIBLE);
                 bus3.setVisibility(View.VISIBLE);
@@ -655,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         });
-        close_steps.setOnClickListener(v -> scroll_steps.setVisibility(View.INVISIBLE));
+
         close.setOnClickListener(v -> {
             navigationSearchViews.setVisibility(View.INVISIBLE);
             navigationDestination.setVisibility(View.INVISIBLE);
@@ -1234,10 +1227,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             stationSource();
             stationDestination();
         } else if (item.getItemId() == R.id.infos) {
-            Intent intent = new Intent(MainActivity.this, NthTramwayStationsActivity.class);
-            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
-            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
-            intent.putExtras(send);
+            Intent intent = new Intent(MainActivity.this, InfoActivity.class);
             MainActivity.this.startActivity(intent);
         } else {
             Log.d("Error", "MenuNavigationError");
@@ -1260,7 +1250,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public boolean onQueryTextSubmit(String query) {
 
-
                 return false;
             }
 
@@ -1279,15 +1268,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         clearMap();
                         String num = removeLastChars(o.numero, 3);
                         cheminBus = searchBusRouteByNumber(num);
-                        tracerCheminBus(cheminBus, myMap, 255, 0, 0, o.numero);
                         addStationBus(myMap, o.coordonnees, o.nomFr, o.numero);
                     } else {
                         chemin = routeTramway;
-                        tracerCheminTramway(chemin, myMap);
                         addStationTramway(myMap, o.coordonnees, o.nomFr);
                     }
                     myMap.getController().setCenter(o.coordonnees);
                     myMap.invalidate();
+                    MainActivity.this.searchStations.setVisibility(View.INVISIBLE);
+                    searchStations.setQuery(o.nomFr, true);
                 });
                 return false;
             }
