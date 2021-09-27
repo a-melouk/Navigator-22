@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     double minZ = 13.0;
     double maxZ = 19.0;
     double distanceTo, timeTo;
-    double duration_foot = 0.0, duration_all = 0.0;
+    int duration_foot = 0, duration_all = 0;
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     int[] ids_tramway = new int[22];
@@ -1233,6 +1233,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navigationSearchViews.setVisibility(View.VISIBLE);
             stationSource();
             stationDestination();
+        } else if (item.getItemId() == R.id.infos) {
+            Intent intent = new Intent(MainActivity.this, NthTramwayStationsActivity.class);
+            send.putDouble("currentLocationLatitude", currentLocation.getLatitude());
+            send.putDouble("currentLocationLongitude", currentLocation.getLongitude());
+            intent.putExtras(send);
+            MainActivity.this.startActivity(intent);
         } else {
             Log.d("Error", "MenuNavigationError");
         }
@@ -1687,8 +1693,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 //duration_foot
-                duration_foot = jsonobject.getDouble("duration_foot");
-                duration_all = jsonobject.getDouble("duration_all");
+                duration_foot = (int) Math.round(jsonobject.getDouble("duration_foot")/60);
+                duration_all = (int) Math.round(jsonobject.getDouble("duration_all")/60);
 
 
                 //foot
@@ -1723,7 +1729,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     listStationsFoot.add(from);
                     listStationsFoot.add(to);
                     listStationsFootFrom.add(from);
-                    Double duration = obj.getDouble("duration");
+                    int duration = (int) Math.round(obj.getDouble("duration")/60);
 
                     Marker f = new Marker(myMap);
                     f.setPosition(fromNumtoStation(from).coordonnees);
@@ -1732,61 +1738,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (fromNumtoStation(from).type.equals("tramway")) {
 
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration);
+                                f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Source" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Source" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Destination" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Destination" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Your Position" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Your Position" + "\n" + "Walk : " + duration+" mn");
 
                         } else if (fromNumtoStation(from).type.equals("bus")) {
 
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Source" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Source" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Destination" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Destination" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Your Position" + "\n" + "Walk : " + duration);
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Your Position" + "\n" + "Walk : " + duration+" mn");
 
                         } else if (fromNumtoStation(from).type.equals("current")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From Your Position to Destination" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Your Position to Destination" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From Your Position to Source" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Your Position to Source" + "\n" + "Walk : " + duration+" mn");
 //                            else if (fromNumtoStation(to).type.equals("current")) ;
                         } else if (fromNumtoStation(from).type.equals("source")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From Source to Destination" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Source to Destination" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From Source to Source" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Source to Source" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From Source to Your Position" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Source to Your Position" + "\n" + "Walk : " + duration+" mn");
                         } else if (fromNumtoStation(from).type.equals("destination")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration);
+                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From Destination to Destination" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Destination to Destination" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From Destination to Source" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Destination to Source" + "\n" + "Walk : " + duration+" mn");
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From Destination to Your Position" + "\n" + "Walk : " + duration);
+                                f.setTitle("From Destination to Your Position" + "\n" + "Walk : " + duration+" mn");
                         }
                         myMap.getOverlays().add(f);
                         myMap.invalidate();
@@ -1816,8 +1822,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void run() {
                 mBottomSheetLayout.setVisibility(View.VISIBLE);
                 from_to.setText(srcStation.nomFr + " to " + dstStation.nomFr);
-                walk_duration.setText(duration_foot + "");
-                total_duration.setText(duration_all + "");
+                walk_duration.setText(duration_foot + " mn");
+                total_duration.setText(duration_all + " mn");
             }
         });
     }

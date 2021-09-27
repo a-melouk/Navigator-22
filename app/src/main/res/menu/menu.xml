@@ -17,6 +17,11 @@
                 android:title="Closest subway stations" />
 
             <item
+                android:id="@+id/infos"
+                android:icon="@drawable/icon_info"
+                android:title="Infos utiles" />
+
+            <item
                 android:id="@+id/bestChoice"
                 android:icon="@drawable/icon_navigation"
                 android:title="Navigation" />

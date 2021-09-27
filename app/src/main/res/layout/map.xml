@@ -363,7 +363,7 @@
                     android:text="Travel details"
                     android:textAlignment="center"
                     android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
 
                 <ImageView
@@ -387,7 +387,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    app:layout_constraintGuide_percent="0.72" />
+                    app:layout_constraintGuide_percent="0.58" />
 
                 <LinearLayout
                     android:id="@+id/linear_durations"
@@ -397,6 +397,8 @@
                     android:filterTouchesWhenObscured="false"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
+                    android:layout_marginStart="1dp"
+                    android:layout_marginEnd="1dp"
                     app:layout_constraintBottom_toTopOf="@id/horGuideline933">
 
                     <TextView
@@ -407,15 +409,15 @@
                         android:gravity="center_horizontal"
                         android:text="From ... To "
                         android:textColor="@color/black"
-                        android:textSize="24sp" />
+                        android:textSize="15sp" />
 
                     <LinearLayout
                         android:id="@+id/linear_walk"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_marginTop="4dp"
                         android:orientation="horizontal"
-                        android:padding="10dp">
+                        android:padding="2dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -424,7 +426,7 @@
                             android:fontFamily="serif"
                             android:text="Total walk duration"
                             android:textColor="@color/black"
-                            android:textSize="23sp" />
+                            android:textSize="15sp" />
 
                         <TextView
                             android:id="@+id/walk_duration"
@@ -442,9 +444,9 @@
                     <LinearLayout
                         android:id="@+id/linear_total"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:orientation="horizontal"
-                        android:padding="10dp">
+                        android:padding="2dp">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -453,7 +455,7 @@
                             android:fontFamily="serif"
                             android:text="Total travel duration"
                             android:textColor="@color/black"
-                            android:textSize="23sp" />
+                            android:textSize="15sp" />
 
                         <TextView
                             android:id="@+id/total_duration"
