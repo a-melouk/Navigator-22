@@ -1,6 +1,10 @@
 package com.esi.navigator_22;
 
+import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
+import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
+
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,11 +17,10 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
-import android.text.Editable;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,7 +37,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,8 +53,6 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.esi.navigator_22.dijkstra.Graph;
-import com.esi.navigator_22.dijkstra.Vertex;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -95,9 +95,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static org.osmdroid.views.overlay.Marker.ANCHOR_BOTTOM;
-import static org.osmdroid.views.overlay.Marker.ANCHOR_CENTER;
-
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     String adresse = "http://192.168.43.119:3002/";
     //    String adresse = "https://routing22.herokuapp.com/";
@@ -110,6 +107,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     static String graphhopperkey = "9590df1e-f158-492f-a5cb-d3e6ca11760f";
     SharedPreferences preferences;
     SharedPreferences.Editor editor;
+    ProgressDialog barProgressDialog;
+
 
     private String myResponse;
 
@@ -167,7 +166,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     double minZ = 13.0;
     double maxZ = 19.0;
     double distanceTo, timeTo;
-    int duration_foot = 0, duration_all = 0;
+    double duration_foot = 0;
+    double duration_all = 0;
+    int durationfoot = 0, durationall = 0;
+    String unitefoot = "", uniteall = "";
     DrawerLayout drawerLayout;
     ActionBarDrawerToggle toggle;
     int[] ids_tramway = new int[22];
@@ -183,16 +185,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ArrayAdapter<String> arrayAdapter;
     OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.MINUTES) // connect timeout
+            .connectTimeout(7, TimeUnit.SECONDS) // connect timeout
             .writeTimeout(5, TimeUnit.MINUTES) // write timeout
             .readTimeout(5, TimeUnit.MINUTES) // read timeout
             .build();
-    Graph g = new Graph();
-    Vertex current;
-    Vertex source;
-    Vertex destination;
-    ArrayList<Vertex> path;
-    private double cost;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -270,6 +266,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                 @Override
                 public void onTaskComplete() {
+                    Log.d("SoutenanceMap", "Done");
                 }
 
                 @Override
@@ -404,9 +401,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             getLocation();
             myMap.getController().setZoom(16.0);
             myMap.getController().setCenter(currentLocation);
-            Log.d("TimeToooo1", java.util.Calendar.getInstance().getTime() + "");
-
-
         });
         tramway.setOnClickListener(v -> {
             int i = tramway_click;
@@ -711,549 +705,60 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         initSearch();
 
         adresse = preferences.getString("serveur", "");
-        //    String adresse = "https://routing22.herokuapp.com/";
         urlStations = adresse + "stations_sba";
         urlRouteTramway = adresse + "subway";
         urlRouteBus = adresse + "bus";
         urlCorrespondance = adresse + "correspondance";
         urlMatrice = adresse + "matrice";
-
-
-//        String newAddress = "";
-//        String ip = "192.168.1.2";
-//        String adresse2 = "http://" + ip + ":3002/";
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putString("serveur", "http://" + ip + ":3002/");
-//        editor.apply();
-//
-//        preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        String name = preferences.getString("serveur", "");
-//        if (!name.equalsIgnoreCase("")) {
-//            name = "http://" + ip + ":3002/";  /* Edit the value here*/
-//        }
-//
-//        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-//        final EditText edittext = new EditText(getApplicationContext());
-//        alert.setTitle("Configurer l'adresse IP");
-//        alert.setMessage("Saisir l'adresse IP");
-//
-//
-//        alert.setView(edittext);
-//
-//        alert.setPositiveButton("Valider", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int whichButton) {
-//                //What ever you want to do with the value
-//                Editable YouEditTextValue = edittext.getText();
-//            }
-//        });
-//
-//        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            public void onClick(DialogInterface dialog, int whichButton) {
-//                // what ever you want to do with No option.
-//            }
-//        });
-//
-//        alert.show();
+        barProgressDialog = new ProgressDialog(MainActivity.this);
+        barProgressDialog.setTitle("Recupérations du meilleur chemin ...");
+        barProgressDialog.setMessage("En cours ...");
+        barProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        barProgressDialog.setProgress(0);
+        barProgressDialog.setMax(1);
+        barProgressDialog.setCancelable(true);
 
     }
 
     public void navigation(Station src, Station dst, String mean, String criteria) {
-
-        path = new ArrayList<>();
+        Log.d("KhratAll1", barProgressDialog.getProgress() + "Progress");
+        barProgressDialog.show();
         ArrayList<Station> result = new ArrayList<>();
         if (src.coordonnees.equals(dst.coordonnees))
             Toast.makeText(getApplicationContext(), "0", Toast.LENGTH_SHORT).show();
-//        else {
-//            if (criteria.equals("time")) {
-//                if (mean.equals("tramway")) {
-//                    getBestRoute(adresse + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-//                    Log.d("TheURLTram", "http://localhost:3002/" + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-//                } else if (mean.equals("buses")) {
-//                    getBestRoute(adresse + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-//                    Log.d("TheURLBus", "http://localhost:3002/" + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-//                } else if (mean.equals("All")) {
-//                    getBestRoute(adresse + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-//                    Log.d("TheURLAll", "http://localhost:3002/" + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-//                }
-//            }
-//        }
         else {
             if (criteria.equals("time")) {
-                //
-                Log.d("TheURL54", srcStation.type + " | " + dstStation.type);
-                //
                 if (((srcStation.type.equals("bus") || srcStation.type.equals("tramway")) && ((dstStation.type.equals("bus")) || dstStation.type.equals("tramway")))) {
-                    //
+
                     if (mean.equals("tramway")) {
                         getBestRoute(adresse + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-                        Log.d("TheURLTram", "http://localhost:3002/" + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                        Log.d("SoutenanceURLTram", "http://localhost:3002/" + "beetweenstations1/tram/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                     } else if (mean.equals("buses")) {
                         getBestRoute(adresse + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-                        Log.d("TheURLBus", "http://localhost:3002/" + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+                        Log.d("SoutenanceURLBus", "http://localhost:3002/" + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                     } else if (mean.equals("All")) {
+                        Log.d("KhratAll2", barProgressDialog.getProgress() + "Progress");
                         getBestRoute(adresse + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-                        Log.d("TheURLAll", "http://localhost:3002/" + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-                        Log.d("TheURLAll", adresse + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
+
+                        Log.d("KhratAll3", barProgressDialog.getProgress() + "Progress");
+                        Log.d("SoutenanceURLAll", "http://localhost:3002/" + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                     }
-                    //
                 } else {
-                    //
                     if (mean.equals("tramway")) {
                         getBestRoute(adresse + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                        Log.d("TheURLTram", "http://localhost:3002/" + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                        Log.d("SoutenanceURLTram", "http://localhost:3002/" + "costum/tram/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
                     } else if (mean.equals("buses")) {
                         getBestRoute(adresse + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                        Log.d("TheURLBus", "http://localhost:3002/" + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                        Log.d("SoutenanceURLBus", "http://localhost:3002/" + "costum/bus/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
                     } else if (mean.equals("All")) {
                         getBestRoute(adresse + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
-                        Log.d("TheURLAll", "http://localhost:3002/" + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
+                        Log.d("SoutenanceURLAll", "http://localhost:3002/" + "costum/all/" + src.coordonnees.getLatitude() + "/" + src.coordonnees.getLongitude() + "/" + dst.coordonnees.getLatitude() + "/" + dst.coordonnees.getLongitude());
                     }
-                    //
                 }
-
             }
         }
+        Log.d("KhratAll4", barProgressDialog.getProgress() + "Progress");
 
-
-    }
-
-
-    ArrayList<Station> tramwayNavigation(GeoPoint src, GeoPoint dst, String criteria) {
-        g.edges.clear();
-        g.getVertices().clear();
-        int distance;
-        int time;
-        current = new Vertex("current");
-        source = new Vertex("source");
-        destination = new Vertex("destination");
-        ArrayList<Station> result = new ArrayList<>();
-        if (criteria.equals("time")) {
-//                                         gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-
-            //Initialisation
-            for (int i = 0; i < stationsTramway.size(); i++)
-                g.addVertex(stationsTramway.get(i).numero);
-            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), tramwayTimes[compteur]);
-            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 60);
-
-            //Si Source est Current Location
-            if (srcNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
-                    g.addEdge(current, g.getVertices().get(compteur), time);
-                }
-            }
-
-            //Si Source = Custom marker on map
-            if (srcNumber.toLowerCase().equals("source")) {
-                g.addVertex(source);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    time = (int) Math.round((fetchTime(src, stationsTramway.get(compteur).coordonnees) * 60));
-                    g.addEdge(source, g.getVertices().get(compteur), time);
-                }
-            }
-
-            //Si Destination est Current Location
-            if (dstNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    time = (int) Math.round((fetchTime(dst, stationsTramway.get(compteur).coordonnees) * 60));
-                    g.addEdge(current, g.getVertices().get(compteur), time);
-                }
-            }
-
-            //Si Destination = Custom marker on map
-            if (dstNumber.toLowerCase().equals("destination")) {
-                g.addVertex(destination);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    time = (int) Math.round((fetchTime(dst, stationsTramway.get(compteur).coordonnees) * 60));
-                    g.addEdge(destination, g.getVertices().get(compteur), time);
-                }
-            }
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                ArrayList<String> pathPoints = new ArrayList<>();
-                for (int i = 0; i < path.size(); i++) pathPoints.add(path.get(i).name);
-//                int money = price(pathPoints);
-                Log.d("AllTheWays", "Tramway time " + cost);
-                Log.d("YMCMB", price(pathPoints) + "");
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < stationsTramway.size(); i++)
-                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
-                            result.add(stationsTramway.get(i));
-            } else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
-        }
-        //
-        else if (criteria.equals("distance")) {
-            //Initialisation du graphe avec {tous les sommets = stations de tramway} et {les arêtes entre chaque deux stations}
-            for (int i = 0; i < stationsTramway.size(); i++)
-                g.addVertex(stationsTramway.get(i).numero);
-            for (int compteur = 0; compteur < stationsTramway.size() - 1; compteur++)
-                g.addEdge(g.getVertices().get(compteur), g.getVertices().get(compteur + 1), 1);
-            g.addEdge(g.getVertices().get(4), g.getVertices().get(11), 98);
-
-            //Si Source est Current Location
-            if (srcNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    distance = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
-                    g.addEdge(current, g.getVertices().get(compteur), distance);
-                }
-            }
-
-            //Si Source = Custom marker on map
-            if (srcNumber.toLowerCase().equals("source")) {
-                g.addVertex(source);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    distance = (int) Math.round((fetchDistance(src, stationsTramway.get(compteur).coordonnees) * 1000));
-                    g.addEdge(source, g.getVertices().get(compteur), distance);
-                }
-            }
-
-            //Si Destination est Current Location
-            if (dstNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    distance = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
-                    g.addEdge(current, g.getVertices().get(compteur), distance);
-                }
-            }
-
-            //Si Destination = Custom marker on map
-            if (dstNumber.toLowerCase().equals("destination")) {
-                g.addVertex(destination);
-                for (int compteur = 0; compteur < stationsTramway.size(); compteur++) {
-                    distance = (int) Math.round((fetchDistance(dst, stationsTramway.get(compteur).coordonnees) * 1000));
-                    g.addEdge(destination, g.getVertices().get(compteur), distance);
-                }
-            }
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                Log.d("AllTheWays", "Tramway distance " + cost);
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < stationsTramway.size(); i++)
-                        if (path.get(k).name.equals(stationsTramway.get(i).numero))
-                            result.add(stationsTramway.get(i));
-            } else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas du même moyen de transport", Toast.LENGTH_LONG).show();
-        }
-
-        return result;
-    }
-
-    ArrayList<Station> busesNavigation(GeoPoint src, GeoPoint dst, String criteria) {
-        g.edges.clear();
-        g.getVertices().clear();
-        int walk = 0;
-        current = new Vertex("current");
-        source = new Vertex("source");
-        destination = new Vertex("destination");
-        ArrayList<Station> result = new ArrayList<>();
-        if (criteria.equals("time")) {
-
-            /*//Initialisation
-            for (int i = 0; i < stationsBus.size(); i++)
-                g.addVertex(stationsBus.get(i).numero);
-
-            for (int compteur = 0; compteur < allStations.size(); compteur++)
-                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                    if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
-                        g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).time);
-                    }
-                    walk++;
-                    if (walk == 6441) walk = 0;
-                }
-            addBusNavigation(stationsBus3, 120);
-            addBusNavigation(stationsBus3bis, 100);
-            addBusNavigation(stationsBus11, 129);
-            addBusNavigation(stationsBus16, 113);
-            addBusNavigation(stationsBus17, 125);
-            addBusNavigation(stationsBus22, 188);
-            addBusNavigation(stationsBus25, 180);
-            addBusNavigation(stationsBus27, 270);
-
-            //Si Source est Current Location
-            if (srcNumber.toLowerCase().equals("current")) {
-                Log.d("Current", "1");
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchTime(src, stationsBus.get(compteur).coordonnees) * 60));
-            }
-
-            //Si Source = Custom marker on map
-            if (srcNumber.toLowerCase().equals("source")) {
-                g.addVertex(source);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(source, g.getVertices().get(compteur), (int) Math.round(fetchTime(src, stationsBus.get(compteur).coordonnees) * 60));
-            }
-
-            //Si Destination est Current Location
-            if (dstNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchTime(dst, stationsBus.get(compteur).coordonnees) * 60));
-            }
-
-            //Si Destination = Custom marker on map
-            if (dstNumber.toLowerCase().equals("destination")) {
-                g.addVertex(destination);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchTime(dst, stationsBus.get(compteur).coordonnees) * 60));
-            }*/
-
-/*            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                Log.d("Current", "2- " + srcNumber + " | " + dstNumber);
-                Log.d("AllTheWays", "Buses time " + cost);
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < stationsBus.size(); i++)
-                        if (path.get(k).name.equals(stationsBus.get(i).numero))
-                            result.add(stationsBus.get(i));
-            } else {
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-                Log.d("Current", "3- " + srcNumber + " | " + dstNumber);
-            }*/
-        }
-        //
-        else if (criteria.equals("distance")) {
-            //Initialisation
-            /*for (int i = 0; i < stationsBus.size(); i++)
-                g.addVertex(stationsBus.get(i).numero);
-
-            for (int compteur = 0; compteur < allStations.size(); compteur++)
-                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                    if (matrice.get(walk).stationSource.type.equals("bus") && matrice.get(walk).stationDestination.type.equals("bus")) {
-                        g.addEdge(g.getVertex(matrice.get(walk).stationSource.numero), g.getVertex(matrice.get(walk).stationDestination.numero), (int) matrice.get(walk).distance);
-                    }
-                    walk++;
-                    if (walk == 6441) walk = 0;
-                }
-            addBusNavigation(stationsBus3, 1);
-            addBusNavigation(stationsBus3bis, 1);
-            addBusNavigation(stationsBus11, 1);
-            addBusNavigation(stationsBus16, 1);
-            addBusNavigation(stationsBus17, 1);
-            addBusNavigation(stationsBus22, 1);
-            addBusNavigation(stationsBus25, 1);
-            addBusNavigation(stationsBus27, 1);
-
-            //Si Source est Current Location
-            if (srcNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchDistance(src, stationsBus.get(compteur).coordonnees) * 1000));
-            }
-
-            //Si Source = Custom marker on map
-            if (srcNumber.toLowerCase().equals("source")) {
-                g.addVertex(source);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(source, g.getVertices().get(compteur), (int) Math.round(fetchDistance(src, stationsBus.get(compteur).coordonnees) * 1000));
-            }
-
-            //Si Destination est Current Location
-            if (dstNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchDistance(dst, stationsBus.get(compteur).coordonnees) * 1000));
-            }
-
-            //Si Destination = Custom marker on map
-            if (dstNumber.toLowerCase().equals("destination")) {
-                g.addVertex(destination);
-                for (int compteur = 0; compteur < stationsBus.size(); compteur++)
-                    g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchDistance(dst, stationsBus.get(compteur).coordonnees) * 1000));
-            }*/
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                Log.d("AllTheWays", "Buses distance " + cost);
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < stationsBus.size(); i++)
-                        if (path.get(k).name.equals(stationsBus.get(i).numero))
-                            result.add(stationsBus.get(i));
-            }
-            //
-            else
-                Toast.makeText(getApplicationContext(), "Les stations sont pas de la même ligne", Toast.LENGTH_LONG).show();
-        }
-        return result;
-    }
-
-    ArrayList<Station> allNavigation(GeoPoint src, GeoPoint dst, String criteria) {
-        g.edges.clear();
-        g.getVertices().clear();
-        int walk = 0;
-        current = new Vertex("current");
-        source = new Vertex("source");
-        destination = new Vertex("destination");
-        ArrayList<Station> result = new ArrayList<>();
-
-        if (criteria.equals("time")) {
-/*            for (int i = 0; i < allStations.size(); i++)
-                g.addVertex(allStations.get(i).numero);
-            for (int compteur = 0; compteur < allStations.size(); compteur++)
-                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                    g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).time);
-                    walk++;
-                    if (walk == 6441) walk = 0;
-                }
-
-
-            ArrayList<Edge> temp = new ArrayList<>();
-            //                             gh  adn bhmd env drt  nima cmps fer  sog  adl  dji  wim  dai  hb  rad  mtr adda amr  4   jrdn sud
-            int[] tramwayTimes = new int[]{105, 94, 98, 224, 100, 100, 95, 200, 120, 110, 150, 145, 120, 122, 85, 103, 78, 87, 110, 130, 130};
-
-            for (int i = 0; i < g.edges.size(); i++)
-                if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                    int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                    int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                    int diff = sourceName - targetName;
-                    for (int j = 0; j < stationsTramway.size() - 1; j++)
-                        if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                            temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), tramwayTimes[j]));
-                }
-
-            for (int i = 0; i < temp.size(); i++)
-                g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-
-            addBusNavigation(stationsBus3, 120);
-            addBusNavigation(stationsBus3bis, 100);
-            addBusNavigation(stationsBus11, 129);
-            addBusNavigation(stationsBus16, 113);
-            addBusNavigation(stationsBus17, 125);
-            addBusNavigation(stationsBus22, 188);
-            addBusNavigation(stationsBus25, 180);
-            addBusNavigation(stationsBus27, 270);
-
-
-            //Si Source est Current Location
-            if (srcNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchTime(src, allStations.get(compteur).coordonnees) * 60));
-            }
-
-            //Si Source = Custom marker on map
-            if (srcNumber.toLowerCase().equals("source")) {
-                g.addVertex(source);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(source, g.getVertices().get(compteur), (int) Math.round(fetchTime(src, allStations.get(compteur).coordonnees) * 60));
-            }
-
-            //Si Destination est Current Location
-            if (dstNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchTime(dst, allStations.get(compteur).coordonnees) * 60));
-            }
-
-            //Si Destination = Custom marker on map
-            if (dstNumber.toLowerCase().equals("destination")) {
-                g.addVertex(destination);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchTime(dst, allStations.get(compteur).coordonnees) * 60));
-            }*/
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)) / 60);
-                Log.d("AllTheWays", "All time " + cost);
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < allStations.size(); i++)
-                        if (path.get(k).name.equals(allStations.get(i).numero))
-                            result.add(allStations.get(i));
-            }
-        }
-        //
-        else if (criteria.equals("distance")) {
-            /*for (int i = 0; i < allStations.size(); i++)
-                g.addVertex(allStations.get(i).numero);
-
-            for (int compteur = 0; compteur < allStations.size(); compteur++)
-                for (int compteur2 = compteur; compteur2 < allStations.size(); compteur2++) {
-                    g.addEdge(g.getVertex(compteur), g.getVertex(compteur2), (int) matrice.get(walk).distance);
-                    walk++;
-                    if (walk == 6441) walk = 0;
-                }
-
-            ArrayList<Edge> temp = new ArrayList<>();
-            for (int i = 0; i < g.edges.size(); i++)
-                if (isNumeric(g.edges.get(i).source.name) && isNumeric(g.edges.get(i).target.name)) {
-                    int sourceName = Integer.parseInt(g.edges.get(i).source.name);
-                    int targetName = Integer.parseInt(g.edges.get(i).target.name);
-                    int diff = sourceName - targetName;
-                    for (int j = 0; j < stationsTramway.size() - 1; j++)
-                        if (sourceName == Integer.parseInt(stationsTramway.get(j).numero) && targetName == Integer.parseInt(stationsTramway.get(j + 1).numero) && Math.abs(diff) == 1)
-                            temp.add(new Edge(g.getVertices().get(j), g.getVertices().get(j + 1), 20));
-                }
-
-            for (int i = 0; i < temp.size(); i++)
-                g.addEdge(temp.get(i).source, temp.get(i).target, (int) temp.get(i).weight);
-
-            addBusNavigation(stationsBus3, 20);
-            addBusNavigation(stationsBus3bis, 20);
-            addBusNavigation(stationsBus11, 20);
-            addBusNavigation(stationsBus16, 20);
-            addBusNavigation(stationsBus17, 20);
-            addBusNavigation(stationsBus22, 20);
-            addBusNavigation(stationsBus25, 20);
-            addBusNavigation(stationsBus27, 20);
-
-
-            //Si Source est Current Location
-            if (srcNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchDistance(src, allStations.get(compteur).coordonnees) * 1000));
-            }
-
-            //Si Source = Custom marker on map
-            if (srcNumber.toLowerCase().equals("source")) {
-                g.addVertex(source);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(source, g.getVertices().get(compteur), (int) Math.round(fetchDistance(src, allStations.get(compteur).coordonnees) * 1000));
-            }
-
-            //Si Destination est Current Location
-            if (dstNumber.toLowerCase().equals("current")) {
-                g.addVertex(current);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(current, g.getVertices().get(compteur), (int) Math.round(fetchDistance(dst, allStations.get(compteur).coordonnees) * 1000));
-            }
-
-            //Si Destination = Custom marker on map
-            if (dstNumber.toLowerCase().equals("destination")) {
-                g.addVertex(destination);
-                for (int compteur = 0; compteur < allStations.size(); compteur++)
-                    g.addEdge(destination, g.getVertices().get(compteur), (int) Math.round(fetchDistance(dst, allStations.get(compteur).coordonnees) * 1000));
-            }
-
-
-            if (g.getVertices().contains(g.getVertex(srcNumber)) && g.getVertices().contains(g.getVertex(dstNumber))) {
-                path = g.affichage(g, g.getVertex(srcNumber), g.getVertex(dstNumber));
-                cost = Math.round(g.cost(g, g.getVertex(srcNumber), g.getVertex(dstNumber)));
-                Log.d("AllTheWays", "All distance " + cost);
-                for (int k = 1; k < path.size(); k++)
-                    for (int i = 0; i < allStations.size(); i++)
-                        if (path.get(k).name.equals(allStations.get(i).numero))
-                            result.add(allStations.get(i));
-            }*/
-
-        }
-        return result;
     }
 
     //Menu Navigation
@@ -1284,49 +789,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             stationSource();
             stationDestination();
         } else if (item.getItemId() == R.id.adresse) {
-//            navigationSearchViews.setVisibility(View.VISIBLE);
-//            stationSource();
-//            stationDestination();
-//            String newAddress = "";
-//            String ip = "192.168.1.2";
-//            String adresse2 = "http://" + ip + ":3002/";
-            /*preferences = PreferenceManager.getDefaultSharedPreferences(this);
-            editor = preferences.edit();
-            editor.putString("serveur", "http://192.168.1.2:3002/");
-            editor.apply();*/
-
             preferences = PreferenceManager.getDefaultSharedPreferences(this);
             editor = preferences.edit();
-
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             final EditText edittext = new EditText(getApplicationContext());
             edittext.setText(preferences.getString("serveur", ""));
             alert.setTitle("Configurer l'adresse IP");
             alert.setMessage("Saisir l'adresse IP");
             alert.setView(edittext);
-            Log.d("TestTestTest1", preferences.getString("serveur", ""));
             alert.setPositiveButton("Valider", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    //What ever you want to do with the value
                     editor.putString("serveur", String.valueOf(edittext.getText()));
                     editor.apply();
-                    Log.d("TestTestTest2", String.valueOf(edittext.getText()));
+                    adresse = preferences.getString("serveur", "");
+                    Log.d("SoutenanceAdresseDuServeur", String.valueOf(edittext.getText()));
                 }
             });
-
-            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int whichButton) {
-                    // what ever you want to do with No option.
-                }
-            });
-
             alert.show();
-            Log.d("TestTestTest3", preferences.getString("serveur", ""));
+
         } else if (item.getItemId() == R.id.infos) {
             Intent intent = new Intent(MainActivity.this, InfoActivity.class);
             MainActivity.this.startActivity(intent);
         } else {
-            Log.d("Error", "MenuNavigationError");
+            Log.d("Soutenance", "MenuNavigationError");
         }
         return true;
     }
@@ -1345,7 +830,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchStations.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-
                 return false;
             }
 
@@ -1673,7 +1157,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    //
     void ItemsMenuBus(MenuItem item, ArrayList<Station> list, int[] ids) {
         int verify = 1;
         int parcours = 0;
@@ -1683,8 +1166,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 verify = 0;
             } else
                 parcours++;
-
-
     }
 
     //Get current location
@@ -1717,12 +1198,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     //Get best merged route
     private void getRoute(Response response) throws IOException {
-        Log.d("theBestroute3", java.util.Calendar.getInstance().getTime() + "");
+        Log.d("SoutenanceStartBestRoute", java.util.Calendar.getInstance().getTime() + "");
         Polyline a = new Polyline();
         myResponse = Objects.requireNonNull(response.body()).string();
-        Log.d("theBestroute4", java.util.Calendar.getInstance().getTime() + "");
         GeoPoint temp = new GeoPoint(0.0, 0.0);
-        Log.d("theBestRoute5", myResponse);
         JSONArray jsonarray = null;
         try {
             jsonarray = new JSONArray(myResponse);
@@ -1731,7 +1210,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         for (int i = 0; i < Objects.requireNonNull(jsonarray).length(); i++) {
             ArrayList<GeoPoint> listPoly = new ArrayList();
-            ArrayList<Station> listStationsFootStation = new ArrayList();
             ArrayList<String> listStationsFoot = new ArrayList();
             ArrayList<String> listStationsFootFrom = new ArrayList();
             ArrayList<String> listStationsVehicle = new ArrayList();
@@ -1747,14 +1225,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     for (int l = 0; l < Objects.requireNonNull(poly).length(); l++) {
                         JSONObject obj2 = poly.getJSONObject(l);
                         JSONArray coordinates = obj2.getJSONArray("coordinates");
-                        Log.d("Timetoo11 " + l, coordinates.toString());
                         for (int k = 0; k < Objects.requireNonNull(coordinates).length(); k++) {
                             JSONArray obj3 = coordinates.getJSONArray(k);
                             temp = new GeoPoint(Double.parseDouble(obj3.toString().substring(obj3.toString().indexOf(",") + 1, obj3.toString().length() - 1)), Double.parseDouble(obj3.toString().substring(1, obj3.toString().indexOf(","))));
                             listPoly.add(temp);
-                            Log.d("Timetoo12", listPoly.size() + "");
                         }
-                        Log.d("Timetoo13" + j, poly.toString());
                         a = new Polyline();
                         a.setWidth(10);
                         a.setColor(Color.rgb(0, 0, 0));
@@ -1771,15 +1246,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         String num = obj2.getString("numero");
                         if (num.equals("t00")) num = srcStation.numero;
                         if (num.equals("t01")) num = dstStation.numero;
-
-//                        Log.d("Timetoo25Path", num + " " + fromNumtoStation(num).nomFr);
-//                        Log.d("Timetoo14" + l, num);
                         listStationsVehicle.add(num);
                     }
                 }
                 //duration_foot
-                duration_foot = (int) Math.round(jsonobject.getDouble("duration_foot") / 60);
-                duration_all = (int) Math.round(jsonobject.getDouble("duration_all") / 60);
+
+                duration_foot = jsonobject.getDouble("duration_foot");
+                duration_all = jsonobject.getDouble("duration_all");
+
+                if (duration_foot < 60) {
+                    durationfoot = (int) Math.round(duration_foot);
+                    unitefoot = " secondes";
+                } else {
+                    durationfoot = (int) Math.round(duration_foot / 60);
+                    unitefoot = " minutes";
+                }
+
+                if (duration_all < 60) {
+                    durationall = (int) Math.round(duration_all);
+                    uniteall = " secondes";
+                } else {
+                    durationall = (int) Math.round(duration_all / 60);
+                    uniteall = " minutes";
+                }
 
 
                 //foot
@@ -1795,7 +1284,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         JSONArray coordinate = coordinates.getJSONArray(k);
                         temp = new GeoPoint(Double.parseDouble(coordinate.toString().substring(coordinate.toString().indexOf(",") + 1, coordinate.toString().length() - 1)), Double.parseDouble(coordinate.toString().substring(1, coordinate.toString().indexOf(","))));
                         listPoly.add(temp);
-                        Log.d("Timetoo18", listPoly.size() + "");
                     }
                     a = new Polyline();
                     a.setWidth(10);
@@ -1814,7 +1302,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     listStationsFoot.add(from);
                     listStationsFoot.add(to);
                     listStationsFootFrom.add(from);
-                    int duration = (int) Math.round(obj.getDouble("duration") / 60);
+                    double duration = obj.getDouble("duration");
+                    String unite = "";
+                    int durationBetween = 0;
+                    if (duration < 60) {
+                        durationBetween = (int) Math.round(duration);
+                        unite = " secondes";
+                    } else {
+                        durationBetween = (int) Math.round(duration / 60);
+                        unite = " minutes";
+                    }
 
                     Marker f = new Marker(myMap);
                     f.setPosition(fromNumtoStation(from).coordonnees);
@@ -1823,61 +1320,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         if (fromNumtoStation(from).type.equals("tramway")) {
 
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("Correspondance Tramway, From " + fromNumtoStation(from).nomFr + " To " + fromNumtoStation(to).nomFr + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Source" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Source" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Destination" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Destination" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Your Position" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Tramway to Your Position" + "\n" + "Walk : " + durationBetween + unite);
 
                         } else if (fromNumtoStation(from).type.equals("bus")) {
 
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Source" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Source" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Destination" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Destination" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Your Position" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From " + fromNumtoStation(from).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(from).numero) + " to Your Position" + "\n" + "Walk : " + durationBetween + unite);
 
                         } else if (fromNumtoStation(from).type.equals("current")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Your Position to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From Your Position to Destination" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Your Position to Destination" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From Your Position to Source" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Your Position to Source" + "\n" + "Walk : " + durationBetween + unite);
 //                            else if (fromNumtoStation(to).type.equals("current")) ;
                         } else if (fromNumtoStation(from).type.equals("source")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Source to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From Source to Destination" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Source to Destination" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From Source to Source" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Source to Source" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From Source to Your Position" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Source to Your Position" + "\n" + "Walk : " + durationBetween + unite);
                         } else if (fromNumtoStation(from).type.equals("destination")) {
                             if (fromNumtoStation(to).type.equals("tramway"))
-                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Tramway" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("bus"))
-                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Destination to " + fromNumtoStation(to).nomFr + " of Bus " + removeBeforeDash(fromNumtoStation(to).numero) + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("destination"))
-                                f.setTitle("From Destination to Destination" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Destination to Destination" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("source"))
-                                f.setTitle("From Destination to Source" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Destination to Source" + "\n" + "Walk : " + durationBetween + unite);
                             else if (fromNumtoStation(to).type.equals("current"))
-                                f.setTitle("From Destination to Your Position" + "\n" + "Walk : " + duration + " mn");
+                                f.setTitle("From Destination to Your Position" + "\n" + "Walk : " + durationBetween + unite);
                         }
                         myMap.getOverlays().add(f);
                         myMap.invalidate();
@@ -1891,24 +1388,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             listStationsVehicle.remove(copy.get(c));
 
 
-                for (int c = 0; c < listStationsVehicle.size(); c++) {
+                for (int c = 0; c < listStationsVehicle.size(); c++)
                     addStationsMarker(myMap, fromNumtoStation(listStationsVehicle.get(c)));
-                    Log.d("TimetooListPath", fromNumtoStation(listStationsVehicle.get(c)).toString());
-                }
+
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        Log.d("TimeToooo13", java.util.Calendar.getInstance().getTime() + "");
-
+        Log.d("SoutenanceEndBestRoute", java.util.Calendar.getInstance().getTime() + "");
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mBottomSheetLayout.setVisibility(View.VISIBLE);
                 from_to.setText(srcStation.nomFr + " to " + dstStation.nomFr);
-                walk_duration.setText(duration_foot + " mn");
-                total_duration.setText(duration_all + " mn");
+                walk_duration.setText(durationfoot + unitefoot);
+                total_duration.setText(durationall + uniteall);
             }
         });
     }
@@ -1996,7 +1491,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 e.printStackTrace();
             }
             station.coordonnees = point;
-            Log.d("Insertion_Station", station.toString());
+            Log.d("SoutenanceStationInserted", station.toString());
             database.addStation(station);
         }
     }
@@ -2495,7 +1990,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             myMap.getOverlays().add(route);
             addSource(start, road.mLength + " kilometres");
             addDestination(end, Math.round(road.mDuration / 60) + " minutes");
-            Log.d("AllTheWays", "Taxi : " + road.mLength + " km " + Math.round(road.mDuration / 60) + "mn");
         }
         //
         else if (mean.equals("walk")) {
@@ -2503,7 +1997,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             myMap.getOverlays().add(route);
             addSource(start, road.mLength + " kilometres");
             addDestination(end, Math.round(road.mDuration / 60) + " minutes");
-            Log.d("AllTheWays", "Walk : " + road.mLength + " km " + Math.round(road.mDuration / 60) + "mn");
         }
     }
 
@@ -2650,7 +2143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
                     insertAllStations(response);
-                    Log.d("Insertion_Station", "success");
+                    Log.d("SoutenanceInsertionStations", "success");
                 }
             }
         });
@@ -2674,19 +2167,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getBestRoute(String urlMerge) {
-        Log.d("theBestroute1", java.util.Calendar.getInstance().getTime() + "");
+        Handler handler = new Handler(MainActivity.this.getMainLooper());
+
         Request request = new Request.Builder().url(urlMerge).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 e.printStackTrace();
+                barProgressDialog.dismiss();
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "Erreur de connexion", Toast.LENGTH_LONG).show();
+                    }
+                });
             }
+
+//            @Override
+//            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+//                if (response.isSuccessful()) {
+//                    barProgressDialog.dismiss();
+//                    handler.post(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            Log.d("KhratHandler", barProgressDialog.getProgress()+"");
+//                            try {
+//                                Log.d("KhratHandler1", barProgressDialog.getProgress()+"");
+//                                getRoute(response);
+//                                Log.d("KhratHandler2", barProgressDialog.getProgress()+"");
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                            // whatever you want to do on the main thread
+//                        }
+//                    });
+//                    Log.d("Khrat3", java.util.Calendar.getInstance().getTime() + "");
+//                }
+//            }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
+                    Log.d("Khrat47", barProgressDialog.getProgress() + "");
+                    barProgressDialog.dismiss();
                     getRoute(response);
-                    Log.d("theBestroute2", java.util.Calendar.getInstance().getTime() + "");
                 }
             }
         });
