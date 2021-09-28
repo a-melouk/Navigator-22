@@ -1134,7 +1134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
         else if (item.getGroupId() == R.id.bus_stations_3)
-            ItemsMenuBus(item, stationsBus, ids_bus3);
+            ItemsMenuBus(item, stationsBus3, ids_bus3);
         else if (item.getGroupId() == R.id.bus_stations_3_bis)
             ItemsMenuBus(item, stationsBus3bis, ids_bus3bis);
         else if (item.getGroupId() == R.id.bus_stations_11)
