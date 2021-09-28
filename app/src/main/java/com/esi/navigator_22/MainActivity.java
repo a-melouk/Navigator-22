@@ -721,7 +721,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void navigation(Station src, Station dst, String mean, String criteria) {
-        Log.d("KhratAll1", barProgressDialog.getProgress() + "Progress");
         barProgressDialog.show();
         ArrayList<Station> result = new ArrayList<>();
         if (src.coordonnees.equals(dst.coordonnees))
@@ -737,10 +736,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         getBestRoute(adresse + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                         Log.d("SoutenanceURLBus", "http://localhost:3002/" + "beetweenstations1/bus/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                     } else if (mean.equals("All")) {
-                        Log.d("KhratAll2", barProgressDialog.getProgress() + "Progress");
                         getBestRoute(adresse + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
-
-                        Log.d("KhratAll3", barProgressDialog.getProgress() + "Progress");
                         Log.d("SoutenanceURLAll", "http://localhost:3002/" + "beetweenstations1/all/" + src.nomFr + "&" + src.numero + "/" + dst.nomFr + "&" + dst.numero);
                     }
                 } else {
@@ -757,7 +753,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
-        Log.d("KhratAll4", barProgressDialog.getProgress() + "Progress");
 
     }
 
@@ -2186,7 +2181,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    Log.d("Khrat47", barProgressDialog.getProgress() + "");
                     barProgressDialog.dismiss();
                     getRoute(response);
                 }
