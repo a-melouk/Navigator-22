@@ -2183,28 +2183,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
             }
 
-//            @Override
-//            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-//                if (response.isSuccessful()) {
-//                    barProgressDialog.dismiss();
-//                    handler.post(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            Log.d("KhratHandler", barProgressDialog.getProgress()+"");
-//                            try {
-//                                Log.d("KhratHandler1", barProgressDialog.getProgress()+"");
-//                                getRoute(response);
-//                                Log.d("KhratHandler2", barProgressDialog.getProgress()+"");
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                            // whatever you want to do on the main thread
-//                        }
-//                    });
-//                    Log.d("Khrat3", java.util.Calendar.getInstance().getTime() + "");
-//                }
-//            }
-
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if (response.isSuccessful()) {
