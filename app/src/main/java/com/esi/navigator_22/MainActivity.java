@@ -779,10 +779,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             });
             alert.show();
 
-        } else if (item.getItemId() == R.id.infos) {
-            Intent intent = new Intent(MainActivity.this, InfoActivity.class);
-            MainActivity.this.startActivity(intent);
-        } else {
+        }
+//        else if (item.getItemId() == R.id.infos) {
+//            Intent intent = new Intent(MainActivity.this, InfoActivity.class);
+//            MainActivity.this.startActivity(intent);
+//        }
+        else {
             Log.d("Soutenance", "MenuNavigationError");
         }
         return true;

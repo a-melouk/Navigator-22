@@ -416,11 +416,11 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="serif"
+                            android:paddingStart="2dp"
+                            android:paddingEnd="2dp"
                             android:text="Total walk duration"
                             android:textColor="@color/black"
                             android:textSize="15sp"
-                            android:paddingStart="2dp"
-                            android:paddingEnd="2dp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -429,9 +429,9 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="serif"
-                            android:text="66 minutes"
                             android:paddingStart="2dp"
                             android:paddingEnd="2dp"
+                            android:text="66 minutes"
                             android:textAlignment="textEnd"
                             android:textColor="@color/black"
                             android:textSize="15sp" />
@@ -442,19 +442,18 @@
                         android:id="@+id/linear_total"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal"
                         android:layout_marginBottom="2dp"
-                        >
+                        android:orientation="horizontal">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:fontFamily="serif"
-                            android:text="Total travel duration"
-                            android:textColor="@color/black"
                             android:paddingStart="2dp"
                             android:paddingEnd="2dp"
+                            android:text="Total travel duration"
+                            android:textColor="@color/black"
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
