@@ -46,8 +46,8 @@ public class AllNearTramwayStationsActivity extends AppCompatActivity {
 
 //        setContentView(R.layout.activity_subway_stations);
         ProgressDialog barProgressDialog = new ProgressDialog(this);
-        barProgressDialog.setTitle("Recupérations des stations ...");
-        barProgressDialog.setMessage("Download in progress ...");
+        barProgressDialog.setTitle("Getting the closest 7 stations ...");
+        barProgressDialog.setMessage("Progressing ...");
         barProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(MainActivity.stationsTramway.size());

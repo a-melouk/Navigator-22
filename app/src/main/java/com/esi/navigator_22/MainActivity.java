@@ -225,7 +225,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mean_bus = findViewById(R.id.mean_bus);
         mean_car = findViewById(R.id.mean_car);
         the_best_time = findViewById(R.id.the_best_time);
-        the_best_distance = findViewById(R.id.the_best_distance);
         ok_marker = findViewById(R.id.ok);
         start = findViewById(R.id.start);
         close = findViewById(R.id.close);
@@ -546,8 +545,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mean_car.setSelected(false);
             the_best_time.setSelected(false);
             the_best_time.setBackground(null);
-            the_best_distance.setBackground(null);
-            the_best_distance.setSelected(false);
         });
         mean_tram.setOnClickListener(v -> {
             mean_tram.setBackgroundResource(R.drawable.gradient_mean);
@@ -560,8 +557,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mean_car.setSelected(false);
             the_best_time.setSelected(false);
             the_best_time.setBackground(null);
-            the_best_distance.setBackground(null);
-            the_best_distance.setSelected(false);
         });
         mean_bus.setOnClickListener(v -> {
             mean_bus.setBackgroundResource(R.drawable.gradient_mean);
@@ -574,8 +569,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mean_car.setSelected(false);
             the_best_time.setSelected(false);
             the_best_time.setBackground(null);
-            the_best_distance.setBackground(null);
-            the_best_distance.setSelected(false);
         });
         mean_car.setOnClickListener(v -> {
             mean_car.setBackgroundResource(R.drawable.gradient_mean);
@@ -588,8 +581,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mean_tram.setSelected(false);
             the_best_time.setSelected(false);
             the_best_time.setBackground(null);
-            the_best_distance.setBackground(null);
-            the_best_distance.setSelected(false);
         });
         the_best_time.setOnClickListener(v -> {
             the_best_time.setBackgroundResource(R.drawable.gradient_mean);
@@ -602,23 +593,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             mean_tram.setSelected(false);
             mean_car.setSelected(false);
             mean_car.setBackground(null);
-            the_best_distance.setBackground(null);
-            the_best_distance.setSelected(false);
+
         });
-        the_best_distance.setOnClickListener(v -> {
-            the_best_distance.setBackgroundResource(R.drawable.gradient_mean);
-            the_best_distance.setSelected(true);
-            mean_tram.setBackground(null);
-            mean_bus.setBackground(null);
-            mean_walk.setBackground(null);
-            mean_walk.setSelected(false);
-            mean_bus.setSelected(false);
-            mean_tram.setSelected(false);
-            mean_car.setSelected(false);
-            mean_car.setBackground(null);
-            the_best_time.setSelected(false);
-            the_best_time.setBackground(null);
-        });
+
         start.setOnClickListener(v -> {
             getLocation();
             addSource(srcStation.coordonnees, "Source");
@@ -635,14 +612,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
              */
 
             if (mean_walk.isSelected())
-                fetchRouteByMean(srcCoord, dstCoord, "walk");
+                fetchRouteByMean(srcStation.coordonnees, dstStation.coordonnees, "walk");
             else if (mean_tram.isSelected())
                 navigation(srcStation, dstStation, "tramway", "time");
             else if (mean_bus.isSelected())
 //                    navigation(srcCoord, dstCoord, removeFromStart(srcNumber),"distance");
                 navigation(srcStation, dstStation, "buses", "time");
             else if (mean_car.isSelected())
-                fetchRouteByMean(srcCoord, dstCoord, "car");
+                fetchRouteByMean(srcStation.coordonnees, dstStation.coordonnees, "car");
             else if (the_best_time.isSelected())
                 navigation(srcStation, dstStation, "All", "time");
 //            else if (the_best_distance.isSelected())
@@ -711,8 +688,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         urlCorrespondance = adresse + "correspondance";
         urlMatrice = adresse + "matrice";
         barProgressDialog = new ProgressDialog(MainActivity.this);
-        barProgressDialog.setTitle("Recupérations du meilleur chemin ...");
-        barProgressDialog.setMessage("En cours ...");
+        barProgressDialog.setTitle("Getting the best route ...");
+        barProgressDialog.setMessage("Progressing ...");
         barProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(1);
