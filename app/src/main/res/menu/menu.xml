@@ -21,10 +21,10 @@
                 android:icon="@drawable/icon_navigation"
                 android:title="Navigation" />
 
-<!--            <item-->
-<!--                android:id="@+id/infos"-->
-<!--                android:icon="@drawable/icon_info"-->
-<!--                android:title="Infos utiles sur le tramway" />-->
+            <item
+                android:id="@+id/infos"
+                android:icon="@drawable/icon_info"
+                android:title="Infos utiles" />
 
             <item
                 android:id="@+id/adresse"
