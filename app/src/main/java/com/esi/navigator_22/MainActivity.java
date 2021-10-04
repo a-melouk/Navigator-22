@@ -330,13 +330,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         myMap.setMultiTouchControls(true);
 
-//        getRouteTramway();
-//        getRouteBus();
-//        getRouteCorrespondance();
-//        getStations();
-//        getMatrice();
-//        getBestRoute();
-
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
@@ -683,6 +676,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         adresse = preferences.getString("serveur", "");
         urlStations = adresse + "stations_sba";
+        Log.d("urlstations",urlStations);
         urlRouteTramway = adresse + "subway";
         urlRouteBus = adresse + "bus";
         urlCorrespondance = adresse + "correspondance";
@@ -694,6 +688,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         barProgressDialog.setProgress(0);
         barProgressDialog.setMax(1);
         barProgressDialog.setCancelable(true);
+        //        getRouteTramway();
+//        getRouteBus();
+//        getRouteCorrespondance();
+//        getStations();
+//        getMatrice();
+//        getBestRoute();
 
     }
 
