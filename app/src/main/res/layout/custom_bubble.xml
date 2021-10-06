@@ -1,35 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="60dp"
-    android:background="@drawable/info"
-    android:orientation="horizontal">
+    android:layout_height="45dp"
+    android:alpha="0.8"
+    android:background="@drawable/info_window"
+    android:orientation="horizontal"
+    tools:ignore="ContentDescription,HardcodedText">
 
     <TextView
         android:id="@+id/nomStation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxHeight="45dp"
-        android:layout_gravity="center"
-        android:layout_weight="1"
+        android:layout_centerHorizontal="true"
         android:gravity="center"
+        android:maxHeight="45dp"
         android:maxLines="3"
-        android:padding="3dp"
-        android:text="Station\naaaaa"
+        android:paddingStart="5dp"
+        android:paddingEnd="2dp"
+        android:text="Direction des services agricoles\n5.41 km\n65 minutes"
         android:textColor="#FFFFFF"
-        android:textSize="13dp" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/route"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:layout_below="@id/nomStation"-->
-<!--        android:padding="3dp"-->
-<!--        android:text="Details\nbbbbb\naaa"-->
-<!--        android:textAlignment="center"-->
-<!--        android:textColor="#FFFFFF"-->
-<!--        android:textSize="13dp" />-->
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
 
 </RelativeLayout>

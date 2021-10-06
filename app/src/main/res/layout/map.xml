@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription,HardcodedText">
+
+
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/horGuideline93"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/horGuideline8" />
+
+    <RelativeLayout
+        android:id="@+id/searchViewsParent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horGuideline10">
+
+        <RelativeLayout
+            android:id="@+id/searchViews"
+            android:layout_width="320dp"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/background_white_primary_15dp"
+            android:visibility="invisible">
+
+            <ImageButton
+                android:id="@+id/close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="3dp"
+                android:layout_marginEnd="10dp"
+                android:elevation="2dp"
+                android:src="@drawable/icon_close" />
+
+            <SearchView
+                android:id="@+id/stationSource"
+                android:layout_width="350dp"
+                android:layout_height="40dp"
+                android:layout_below="@id/close"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:queryHint="Source"
+                android:searchIcon="@drawable/pin_source"
+                android:visibility="visible"
+                app:theme="@style/SearchViewStyle" />
+
+            <SearchView
+                android:id="@+id/stationDestination"
+                android:layout_width="350dp"
+                android:layout_height="40dp"
+                android:layout_below="@id/stationSource"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:queryHint="Destination"
+                android:searchIcon="@drawable/pin_destination"
+                android:visibility="visible"
+                app:theme="@style/SearchViewStyle" />
+
+            <ImageView
+                android:id="@+id/mean_walk"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+
+                android:layout_marginBottom="10dp"
+                android:padding="4dp"
+                android:src="@drawable/mean_walk" />
+
+            <ImageView
+                android:id="@+id/mean_tramway"
+                android:layout_width="30dp"
+
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_walk"
+                android:padding="4dp"
+                android:src="@drawable/mean_tram" />
+
+            <ImageView
+                android:id="@+id/mean_bus"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_tramway"
+                android:padding="4dp"
+                android:src="@drawable/mean_bus" />
+
+            <ImageView
+                android:id="@+id/mean_car"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_bus"
+                android:padding="4dp"
+                android:src="@drawable/mean_car" />
+
+            <ImageView
+                android:id="@+id/the_best_time"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_below="@id/stationDestination"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_toEndOf="@id/mean_car"
+                android:padding="4dp"
+                android:src="@drawable/icon_time" />
+
+            <Button
+                android:id="@+id/start"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignTop="@+id/mean_car"
+                android:layout_alignBottom="@+id/mean_car"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="-4dp"
+                android:text="Start" />
+        </RelativeLayout>
+
+        <ListView
+            android:id="@+id/searchStationList"
+            android:layout_width="280dp"
+            android:layout_height="70dp"
+            android:layout_centerHorizontal="true" />
+
+        <ListView
+            android:id="@+id/source"
+            android:layout_width="350dp"
+            android:layout_height="93dp"
+            android:layout_below="@id/searchViews"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginRight="20dp" />
+
+        <ListView
+            android:id="@+id/destination"
+            android:layout_width="350dp"
+            android:layout_height="93dp"
+            android:layout_below="@id/searchViews"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginRight="20dp" />
+
+    </RelativeLayout>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="13dp"
+        android:contentDescription="@string/todo"
+        android:scaleType="center"
+        android:src="@drawable/icon_ok"
+        android:visibility="invisible"
+        app:fabCustomSize="40dp"
+        app:layout_constraintBottom_toBottomOf="@id/horGuideline45"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="32dp" />
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/lignes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitEnd"
+        android:src="@drawable/icon_plus"
+        app:fabCustomSize="40dp"
+        app:layout_constraintBottom_toBottomOf="@id/horGuideline87"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/verGuideline88"
+        app:maxImageSize="32dp" />
+
+    <RelativeLayout
+        android:id="@+id/menu_linear"
+        android:layout_width="90dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="3dp"
+        android:background="@drawable/background_white_primary_15dp"
+        android:orientation="horizontal"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/lignes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_goneMarginBottom="3dp">
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/tramway"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:contentDescription="tramway"
+            android:src="@drawable/icon_tramway"
+            android:visibility="invisible"
+            app:backgroundTint="@color/black"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="32dp"
+            app:tint="@color/tramway" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+
+            android:id="@+id/bus_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="bus_03"
+            android:src="@drawable/bus_03"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bus_11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bus_3"
+            android:contentDescription="bus_11"
+            android:src="@drawable/bus_11"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bus_16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bus_3"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="bus_16"
+            android:src="@drawable/bus_16"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bus_17"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bus_11"
+            android:layout_alignParentStart="true"
+            android:contentDescription="bus_17"
+            android:src="@drawable/bus_17"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bus_22"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bus_16"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="bus_22"
+            android:src="@drawable/bus_22"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bus_25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bus_17"
+            android:layout_alignParentStart="true"
+            android:contentDescription="bus_25"
+            android:src="@drawable/bus_25"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:elevation="2dp"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/bus_27"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bus_22"
+            android:layout_alignParentEnd="true"
+            android:contentDescription="bus_27"
+            android:elevation="2dp"
+            android:src="@drawable/bus_27"
+            android:visibility="invisible"
+            app:backgroundTint="@color/etu"
+            app:fabCustomSize="40dp"
+            app:maxImageSize="30dp"
+            app:tint="@color/white" />
+
+
+    </RelativeLayout>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        app:layout_constraintEnd_toStartOf="@id/verGuideline88"
+        app:layout_constraintStart_toEndOf="@id/verGuideline12">
+
+
+        <LinearLayout
+            android:id="@+id/bottom_sheet_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            app:behavior_hideable="false"
+            app:behavior_peekHeight="80dp"
+            app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+
+            >
+
+            <LinearLayout
+                android:id="@+id/bottom_sheet_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/background_primary"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="serif"
+                    android:gravity="center_horizontal"
+                    android:text="Travel details"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/bottom_sheet_arrow"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    app:srcCompat="@drawable/icon_more" />
+
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white">
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horGuideline933"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.58" />
+
+                <LinearLayout
+                    android:id="@+id/linear_durations"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="2dp"
+                    android:background="@drawable/background_white_primary_5dp"
+                    android:filterTouchesWhenObscured="false"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@id/horGuideline933">
+
+                    <TextView
+                        android:id="@+id/from_to"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="serif"
+                        android:gravity="center_horizontal"
+                        android:text="From ... To "
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+
+                    <LinearLayout
+                        android:id="@+id/linear_walk"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="2dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="serif"
+                            android:paddingStart="2dp"
+                            android:paddingEnd="2dp"
+                            android:text="Total walk duration"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/walk_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="serif"
+                            android:paddingStart="2dp"
+                            android:paddingEnd="2dp"
+                            android:text="66 minutes"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/black"
+                            android:textSize="15sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/linear_total"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="2dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="serif"
+                            android:paddingStart="2dp"
+                            android:paddingEnd="2dp"
+                            android:text="Total travel duration"
+                            android:textColor="@color/black"
+                            android:textSize="15sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/total_duration"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="serif"
+                            android:paddingStart="2dp"
+                            android:paddingEnd="2dp"
+                            android:text="Total duration"
+                            android:textAlignment="textEnd"
+                            android:textColor="@color/black"
+                            android:textSize="15sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/gradient"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/horGuideline93">
+
+        <ImageView
+            android:id="@+id/reset"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="6dp"
+            android:background="?attr/selectableItemBackground"
+            android:elevation="10dp"
+            android:src="@drawable/icon_reset" />
+
+        <ImageView
+            android:id="@+id/currentPosition"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@id/reset"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/icon_current" />
+
+        <ImageView
+            android:id="@+id/car"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="10dp"
+            android:elevation="5dp"
+            android:src="@drawable/icon_car" />
+
+        <ImageView
+            android:id="@+id/walk"
+            android:layout_width="40dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/car"
+            android:background="@drawable/gradient_bottom"
+            android:elevation="5dp"
+            android:src="@drawable/icon_walk" />
+
+
+    </RelativeLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.08" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline40"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.4" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline45"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.42" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.60" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline87"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.87" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline91"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.91" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horGuideline93"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.93" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verGuideline80"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.80" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verGuideline90"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.90" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verGuideline88"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.88" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/verGuideline12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.12" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

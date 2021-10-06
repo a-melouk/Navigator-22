@@ -4,23 +4,74 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    tools:ignore="ContentDescription,HardcodedText">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.AppTheme.AppBarOverlay">
-
+        android:background="@drawable/gradient">
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/Theme.AppTheme.PopupOverlay" />
+            app:titleTextColor="@color/white">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+
+                <SearchView
+                    android:id="@+id/stationNameText"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:queryHint="Search.."
+                    android:searchIcon="@drawable/icon_search"
+                    app:layout_constraintBottom_toTopOf="@id/horGuideline95"
+                    app:layout_constraintEnd_toEndOf="@id/verGuideline100"
+                    app:layout_constraintStart_toStartOf="@id/verGuideline0"
+                    app:layout_constraintTop_toTopOf="@id/horGuideline5"
+                    app:theme="@style/SearchViewStyle" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horGuideline5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.05" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/horGuideline95"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_percent="0.95" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/verGuideline0"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.0" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/verGuideline100"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="1" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+
+    <include layout="@layout/map" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

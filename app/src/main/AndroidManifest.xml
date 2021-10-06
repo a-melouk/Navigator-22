@@ -9,29 +9,27 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/app_icon"
+        android:icon="@mipmap/navigator_22"
         android:label="@string/app_name"
-        android:requestLegacyExternalStorage="true"
-        android:roundIcon="@mipmap/app_icon_round"
+        android:roundIcon="@mipmap/navigator_22"
         android:supportsRtl="true"
         android:theme="@style/Theme.Navigator22"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".AllNearSubwayStationsActivity"
-            android:theme="@style/Theme.AppTheme"></activity>
+            android:name=".InfoActivity"
+            android:exported="true" />
         <activity
-            android:name=".NthSubwayStationsActivity"
-            android:theme="@style/Theme.AppTheme"></activity>
+            android:name=".AllNearTramwayStationsActivity"
+            android:theme="@style/Theme.AppTheme" />
+        <activity
+            android:name=".NthTramwayStationsActivity"
+            android:theme="@style/Theme.AppTheme" />
         <activity
             android:name=".MainActivity"
-            android:theme="@style/Theme.AppTheme.NoActionBar">
+            android:theme="@style/Theme.AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -5,32 +5,10 @@
     android:id="@+id/nav_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
+    android:fitsSystemWindows="false"
     tools:context=".MainActivity"
     tools:openDrawer="start">
 
-    <!--    <include-->
-    <!--        android:id="@+id/app_bar_main"-->
-    <!--        layout="@layout/app_bar_main"-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="match_parent" />-->
-
-<!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:orientation="vertical">-->
-
-
-<!--        <androidx.appcompat.widget.Toolbar-->
-<!--            android:id="@+id/toolbar"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="?attr/actionBarSize"-->
-<!--            android:background="@color/tramway">-->
-
-<!--        </androidx.appcompat.widget.Toolbar>-->
-
-
-<!--    </LinearLayout>-->
 
     <include
         layout="@layout/app_bar_main"
@@ -41,8 +19,10 @@
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
+
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header"
+
         app:menu="@menu/menu" />
 </androidx.drawerlayout.widget.DrawerLayout>

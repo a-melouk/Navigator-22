@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="190dp"
-    android:background="@drawable/side_nav_bar"
+    android:layout_height="wrap_content"
+    android:background="@drawable/gradient"
     android:gravity="bottom"
     android:orientation="vertical"
+
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
 
     <ImageView
         android:id="@+id/person_navigating"
-        android:layout_width="180dp"
-        android:layout_height="90dp"
-        android:src="@drawable/navigator_22"/>
+        android:layout_margin="5dp"
+
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@drawable/icon_nav_header"/>
 
     <TextView
-        android:layout_width="180dp"
+        android:layout_width="wrap_content"
         android:layout_height="30dp"
         android:layout_marginBottom="10dp"
-        android:text="22-Navigator"
+        android:text="@string/app_name"
+        android:layout_marginStart="5dp"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="20dp"
+        android:textSize="20sp"
         android:textStyle="bold"
         android:id="@+id/appName"
         android:layout_below="@id/person_navigating"/>
