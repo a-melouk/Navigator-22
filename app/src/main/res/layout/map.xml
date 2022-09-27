@@ -12,6 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:visibility="visible"
+        tilesource="Mapnik"
         app:layout_constraintBottom_toTopOf="@+id/horGuideline93"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

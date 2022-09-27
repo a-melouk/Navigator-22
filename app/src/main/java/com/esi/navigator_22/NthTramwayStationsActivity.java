@@ -5,15 +5,10 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
@@ -66,11 +61,11 @@ public class NthTramwayStationsActivity extends AppCompatActivity {
             for (int i = 0; i < MainActivity.stationsTramway.size(); i++) {
                 StationDetails stationDetails = new StationDetails();
                 stationDetails.type = MainActivity.stationsTramway.get(i).type;
-                stationDetails.nomFr = MainActivity.stationsTramway.get(i).nomFr;
-                stationDetails.numero = MainActivity.stationsTramway.get(i).numero;
-                stationDetails.coordonnees = MainActivity.stationsTramway.get(i).coordonnees;
-                stationDetails.distanceTo = getDistanceOffline(stationDetails.coordonnees, currentLocation);
-                stationDetails.timeTo = getDistanceOffline(stationDetails.coordonnees, currentLocation) / 3.8;
+                stationDetails.name = MainActivity.stationsTramway.get(i).name;
+                stationDetails.line = MainActivity.stationsTramway.get(i).line;
+                stationDetails.coordinates = MainActivity.stationsTramway.get(i).coordinates;
+                stationDetails.distanceTo = getDistanceOffline(stationDetails.coordinates, currentLocation);
+                stationDetails.timeTo = getDistanceOffline(stationDetails.coordinates, currentLocation) / 3.8;
                 plusProchesOffline.add(stationDetails);
             }
             sort(plusProchesOffline, "distance");
@@ -79,8 +74,8 @@ public class NthTramwayStationsActivity extends AppCompatActivity {
 
                 StationDetails availableStation = new StationDetails();
                 availableStation.type = plusProchesOffline.get(i).type;
-                availableStation.nomFr = plusProchesOffline.get(i).nomFr;
-                getRouteOnlineOnFoot(plusProchesOffline.get(i).coordonnees);
+                availableStation.name = plusProchesOffline.get(i).name;
+                getRouteOnlineOnFoot(plusProchesOffline.get(i).coordinates);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
                 plusProchesOnline.add(availableStation);

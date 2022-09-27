@@ -4,21 +4,21 @@ import org.osmdroid.util.GeoPoint;
 
 public class RouteBus {
     GeoPoint coordinates;
-    String numLigne;
+    String line;
 
     public RouteBus() {
     }
 
-    public RouteBus(GeoPoint coordinates, String numLigne) {
+    public RouteBus(GeoPoint coordinates, String line) {
         this.coordinates = coordinates;
-        this.numLigne = numLigne;
+        this.line = line;
     }
 
     @Override
     public String toString() {
         return "RouteBus{" +
                 "coordinates=" + coordinates +
-                ", numLigne='" + numLigne + '\'' +
+                ", numLigne='" + line + '\'' +
                 '}';
     }
 }

@@ -11,7 +11,6 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
-import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.util.GeoPoint;
@@ -60,11 +59,11 @@ public class AllNearTramwayStationsActivity extends AppCompatActivity {
             for (int i = 0; i < MainActivity.stationsTramway.size(); i++) {
 
                 StationDetails availableStation = new StationDetails();
-                availableStation.nomFr = MainActivity.stationsTramway.get(i).nomFr;
-                availableStation.numero = MainActivity.stationsTramway.get(i).numero;
+                availableStation.name = MainActivity.stationsTramway.get(i).name;
+                availableStation.line = MainActivity.stationsTramway.get(i).line;
                 availableStation.type = MainActivity.stationsTramway.get(i).type;
-                availableStation.coordonnees = MainActivity.stationsTramway.get(i).coordonnees;
-                getRouteOnlineOnFoot(MainActivity.stationsTramway.get(i).coordonnees);
+                availableStation.coordinates = MainActivity.stationsTramway.get(i).coordinates;
+                getRouteOnlineOnFoot(MainActivity.stationsTramway.get(i).coordinates);
                 availableStation.distanceTo = distanceTo;
                 availableStation.timeTo = timeTo;
                 plusProchesOnline.add(availableStation);

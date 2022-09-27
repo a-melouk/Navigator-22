@@ -28,8 +28,8 @@ public class StationNameAdapter extends ArrayAdapter<Station> {
 
         TextView name = convertView.findViewById(R.id.stationName);
         TextView number = convertView.findViewById(R.id.stationNumber);
-        name.setText(station.nomFr);
-        if (station.type.equals("bus")) number.setText(removeFromStart(station.numero));
+        name.setText(station.name);
+        if (station.type.equals("bus")) number.setText(removeFromStart(station.line));
         else if (station.type.equals("tramway")) number.setText("Tramway");
         else number.setText(" ");
 

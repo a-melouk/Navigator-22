@@ -39,7 +39,7 @@ public class StationAdapter extends ArrayAdapter<StationDetails> {
 
         tramway.setImageResource(R.drawable.icon_tram);
 //        nomAr.setText(getItem(position).numero);
-        nomFr.setText(getItem(position).nomFr);
+        nomFr.setText(getItem(position).name);
         distance.setText(String.valueOf(getItem(position).distanceTo));
         time.setText(String.valueOf((int) getItem(position).timeTo));
 

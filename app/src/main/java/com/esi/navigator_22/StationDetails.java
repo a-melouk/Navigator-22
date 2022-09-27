@@ -27,8 +27,8 @@ public class StationDetails extends Station {
     public String toString() {
         return "StationDetails{" +
                 "type='" + type + '\'' +
-                ", nomFr='" + nomFr + '\'' +
-                ", numero=" + numero +
+                ", nomFr='" + name + '\'' +
+                ", numero=" + line +
                 ", distanceTo=" + distanceTo +
                 ", timeTo=" + timeTo +
                 '}';
